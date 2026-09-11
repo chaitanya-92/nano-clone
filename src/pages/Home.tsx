@@ -6,6 +6,7 @@ import { Marketplace } from "../components/sections/Marketplace";
 import { Pricing } from "../components/sections/Pricing";
 import { Proof } from "../components/sections/Proof";
 import { Workflow } from "../components/sections/Workflow";
+import { FeaturedTestimonial } from "@/components/sections/FeaturedTestimonial";
 
 export default function Home() {
   return (
@@ -13,6 +14,7 @@ export default function Home() {
       <Navbar />
       <main>
         <Hero />
+        <FeaturedTestimonial />
         <Marketplace />
         <Workflow />
         <Proof />
