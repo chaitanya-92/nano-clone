@@ -99,6 +99,69 @@ export const marketplaceSection = {
   imageAlt: "Naano creator marketplace",
 };
 
+export const proofSection = {
+  title: "Real teams. Measurable pipeline.",
+  description:
+    "See how B2B teams turn creator trust into attributable demand with Naano.",
+
+  video: {
+    eyebrow: "VIDEO TESTIMONIAL",
+    duration: "2:40",
+
+    quote:
+      "“Naano became one of our fastest acquisition channels. We know exactly what every creator brings.”",
+
+    person: {
+      name: "Vincent Josse",
+      role: "CEO & Founder, BlogSEO",
+      image: "/src/assets/testimonials/vincent-josse.png",
+    },
+  },
+
+  caseStudy: {
+    eyebrow: "CASE STUDY",
+    company: "BlogSEO",
+
+    title:
+      "How BlogSEO turned creator content into product signups",
+
+    description:
+      "BlogSEO briefed SEO & SaaS creators on LinkedIn and X, then traced every trial back to the post that drove it, all in Naano.",
+
+    metrics: [
+      {
+        value: "9",
+        label: "creators activated",
+      },
+      {
+        value: "2,940",
+        label: "qualified clicks",
+      },
+      {
+        value: "512",
+        label: "trials started",
+      },
+    ],
+
+    cta: "Read case study",
+
+    trustedEyebrow: "TRUSTED BY TEAMS AT",
+
+    trustedLogos: [
+      "lemlist",
+      "folk.",
+      "LEADbay",
+      "ringover",
+      "attio",
+      "La Growth Machine",
+      "gojiberry",
+      "ChatSEO",
+      "Abyssale",
+    ],
+
+    additionalCount: "+30",
+  },
+} as const;
 export const footerGroups = [
   {
     title: "Product",
@@ -275,6 +338,108 @@ export const results = [
     label: "Posts published",
   },
 ];
+
+export const creatorPosts = [
+  {
+    id: "thomas",
+
+    name: "Thomas Higadère",
+
+    role: "Creator · B2B & AI · 34K followers",
+
+    avatar: "thomas.png",
+
+    postImage: "post1.png",
+
+    text:
+      "How AI changed our prospecting workflow for wealth managers and private bankers.",
+
+    metrics: {
+      impressions: "42.8K",
+      clicks: "312",
+      leads: "18",
+    },
+
+    company: "lemlist",
+
+    companyLogo: "lemlist.png",
+  },
+
+  {
+    id: "robin",
+
+    name: "Robin Tempe",
+
+    role: "Creator · Sales & AI · 12K followers",
+
+    avatar: "robin.png",
+
+    postImage: "post2.png",
+
+    text:
+      "I run my entire prospecting workflow through an AI. Here is how.",
+
+    metrics: {
+      impressions: "9K",
+      clicks: "100",
+      leads: "50",
+    },
+
+    company: "LEADBay",
+
+    companyLogo: "leadbay.png",
+  },
+
+  {
+    id: "eric",
+
+    name: "Eric Djavid",
+
+    role: "Sales Leader · B2B · 40K followers",
+
+    avatar: "eric.png",
+
+    postImage: "post3.png",
+
+    text:
+      "Most sales teams spend 80% of their time on the wrong leads. Here is how I changed that.",
+
+    metrics: {
+      impressions: "20K",
+      clicks: "350",
+      leads: "80",
+    },
+
+    company: "LEADBay",
+
+    companyLogo: "leadbay.png",
+  },
+
+  {
+    id: "marina",
+
+    name: "Marina Panova",
+
+    role: "Content Creator · B2B · 34K followers",
+
+    avatar: "nada.png",
+
+    postImage: "post4.png",
+
+    text:
+      "How I build my 30-day LinkedIn content system, the exact playbook.",
+
+    metrics: {
+      impressions: "100K",
+      clicks: "1,600",
+      leads: "320",
+    },
+
+    company: "Abyssale",
+
+    companyLogo: "abyssale.png",
+  },
+] as const;
 
 export const pricingPlans = [
   {
