@@ -1,10 +1,12 @@
 import { motion } from "framer-motion";
 import { ArrowRight, BadgeCheck } from "lucide-react";
-import { LinkedinIcon } from "@/components/ui/linkedin-icon";
 
+import { LinkedinIcon } from "@/components/ui/linkedin-icon";
 import { Button } from "@/components/ui/button";
 import { navigationActions, siteConfig } from "@/data/data";
 import { useMouseParallax } from "@/hooks/useMouseParallax";
+
+import cloudBackground from "@/assets/images/cloud-background.png";
 
 import { TrustedLogos } from "./TrustedLogos";
 
@@ -28,95 +30,49 @@ export function Hero() {
         lg:py-32
       "
     >
-      {/* Background clouds */}
-
-      <motion.div
+      {/* Cloud background */}
+      <motion.img
+        src={cloudBackground}
+        alt=""
+        aria-hidden="true"
         className="
-          cloud-orb
-          cloud-orb-left
           pointer-events-none
+          absolute
+          -left-[5%]
+          -top-[5%]
+          z-0
+          h-[110%]
+          w-[110%]
+          max-w-none
+          object-cover
         "
         animate={{
-          x: x * 10,
-          y: y * 6,
+          x: x * 18,
+          y: y * 10,
         }}
         transition={{
           type: "spring",
           stiffness: 35,
-          damping: 20,
+          damping: 24,
           mass: 0.8,
         }}
       />
 
-      <motion.div
+      {/* Very subtle atmospheric overlay */}
+      <div
+        aria-hidden="true"
         className="
-          cloud-orb
-          cloud-orb-right
           pointer-events-none
-        "
-        animate={{
-          x: x * -14,
-          y: y * -8,
-        }}
-        transition={{
-          type: "spring",
-          stiffness: 30,
-          damping: 22,
-          mass: 0.9,
-        }}
-      />
-
-      {/* Extra subtle cloud layer */}
-
-      <motion.div
-        className="
           absolute
-          -left-20
-          top-1/3
-          h-72
-          w-72
-          rounded-full
-          bg-white/40
-          blur-3xl
-          pointer-events-none
+          inset-0
+          z-[1]
+          bg-white/[0.03]
         "
-        animate={{
-          x: x * 7,
-          y: y * 4,
-        }}
-        transition={{
-          type: "spring",
-          stiffness: 25,
-          damping: 20,
-        }}
       />
 
-      <motion.div
-        className="
-          absolute
-          -right-24
-          top-1/2
-          h-80
-          w-80
-          rounded-full
-          bg-white/35
-          blur-3xl
-          pointer-events-none
-        "
-        animate={{
-          x: x * -9,
-          y: y * -5,
-        }}
-        transition={{
-          type: "spring",
-          stiffness: 25,
-          damping: 20,
-        }}
-      />
-
+      {/* Hero content */}
       <div className="naano-shell relative z-10 text-center">
         {/* Eyebrow */}
-
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -143,14 +99,9 @@ export function Hero() {
             "
           >
             <span className="flex items-center gap-1.5">
-              <span className="text-black">
-                X
-              </span>
+              <span className="text-black">X</span>
 
-              <LinkedinIcon 
-                className="h-4 w-4"
-
-              />
+              <LinkedinIcon className="h-4 w-4" />
             </span>
 
             <span>
@@ -160,7 +111,6 @@ export function Hero() {
         </motion.div>
 
         {/* Hero content */}
-
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
@@ -209,7 +159,6 @@ export function Hero() {
         </motion.div>
 
         {/* CTA */}
-
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
@@ -230,9 +179,7 @@ export function Hero() {
         >
           <Button
             size="lg"
-            onClick={() =>
-              navigate("#launch-campaign")
-            }
+            onClick={() => navigate("#launch-campaign")}
             className="
               h-14
               rounded-2xl
@@ -248,16 +195,13 @@ export function Hero() {
             "
           >
             Launch a campaign
-
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
 
           <Button
             variant="ghost"
             size="lg"
-            onClick={() =>
-              navigate("#how-it-works")
-            }
+            onClick={() => navigate("#how-it-works")}
             className="
               h-14
               rounded-2xl
@@ -272,13 +216,11 @@ export function Hero() {
             "
           >
             See how Naano works
-
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </motion.div>
 
         {/* Trust statement */}
-
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -304,7 +246,6 @@ export function Hero() {
         </motion.div>
 
         {/* Moving logos */}
-
         <TrustedLogos />
       </div>
     </section>
