@@ -64,6 +64,25 @@ export const navigationActions = {
     closeLabel: "Close navigation menu",
   },
 };
+
+export const featuredTestimonial = {
+  company: {
+    name: "Zmirov Communication",
+    logo: "/src/assets/logos/zmirov-communication.png",
+  },
+  quote: {
+    before:
+      "We manage €10M+ of influence budget every year. For B2B, Naano simply makes our life",
+    highlight: "easier",
+    closingQuote: '"',
+  },
+  person: {
+    name: "David Zmirov",
+    role: "CEO, Zmirov Communication",
+    category: "Influence agency",
+    image: "/src/assets/testimonials/david-zmirov.png",
+  },
+};
 export const footerGroups = [
   {
     title: "Product",
