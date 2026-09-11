@@ -1,3 +1,4 @@
+
 import { Footer } from "../components/layout/Footer";
 import { Navbar } from "../components/layout/Navbar/Navbar";
 import { FaqCta } from "../components/sections/FaqCta";
@@ -7,6 +8,7 @@ import { Pricing } from "../components/sections/Pricing";
 import { Proof } from "../components/sections/Proof";
 import { Workflow } from "../components/sections/Workflow";
 import { FeaturedTestimonial } from "@/components/sections/FeaturedTestimonial";
+import { CreatorPosts } from "@/components/sections/CreatorPosts";
 
 export default function Home() {
   return (
@@ -18,6 +20,7 @@ export default function Home() {
         <Marketplace />
         <Workflow />
         <Proof />
+        <CreatorPosts />
         <Pricing />
         <FaqCta />
       </main>
