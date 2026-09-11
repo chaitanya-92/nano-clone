@@ -441,6 +441,23 @@ export const creatorPosts = [
   },
 ] as const;
 
+export const finalCta = {
+  eyebrow: "READY TO LAUNCH?",
+  title: ["Your next creator", "campaign starts here."],
+  description: "Get a clear creator strategy, campaign format and estimated budget for your next launch.",
+  card: {
+    eyebrow: "CAMPAIGN STRATEGY CALL",
+    title: "30-minute working session",
+    description: "Leave with a concrete plan for your next creator campaign.",
+    items: ["Creator strategy", "Campaign format", "Budget recommendation"],
+    primaryAction: "Book a campaign call",
+    helperText: "Pick a time on the next page.",
+    secondaryPrefix: "Prefer to start yourself?",
+    secondaryAction: "Start for free",
+  },
+  trustText: "Trusted by B2B teams building creator-led acquisition.",
+} as const;
+
 export const pricingPlans = [
   {
     eyebrow: "Self-serve",

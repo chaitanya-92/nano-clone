@@ -9,6 +9,7 @@ import { Proof } from "../components/sections/Proof";
 import { Workflow } from "../components/sections/Workflow";
 import { FeaturedTestimonial } from "@/components/sections/FeaturedTestimonial";
 import { CreatorPosts } from "@/components/sections/CreatorPosts";
+import { FinalCta } from "@/components/sections/FinalCta";
 
 export default function Home() {
   return (
@@ -23,6 +24,7 @@ export default function Home() {
         <CreatorPosts />
         <Pricing />
         <FaqCta />
+        <FinalCta />
       </main>
       <Footer />
     </div>
