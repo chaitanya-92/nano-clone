@@ -425,7 +425,32 @@ a {
       hsl(var(--naano-cloud-soft) / 0.7)
     );
 }
+.workflow-visual {
+  width: 100%;
+  max-width: 190px;
+}
 
+.workflow-mini-card {
+  width: 100%;
+  border: 1px solid rgba(219, 232, 239, 0.9);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.82);
+  padding: 1rem;
+  box-shadow:
+    0 8px 24px rgba(43, 88, 112, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+}
+
+.workflow-creators {
+  max-width: 190px;
+}
+
+@media (max-width: 1023px) {
+  .workflow-visual {
+    max-width: 220px;
+  }
+}
 /* =========================================================
    STEP NUMBER
    ========================================================= */

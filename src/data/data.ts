@@ -155,33 +155,104 @@ export const workflowSteps = [
   {
     number: "01",
     title: "Find creators your buyers trust",
-    icon: "users",
+    visual: {
+      type: "creators",
+      creators: [
+        {
+          name: "Eric",
+          fit: "92%",
+          image: "/src/assets/images/workflowimages/eric.png",
+        },
+        {
+          name: "Robin",
+          fit: "88%",
+          image: "/src/assets/images/workflowimages/robin.png",
+        },
+        {
+          name: "Aya",
+          fit: "84%",
+          image: "/src/assets/images/workflowimages/aya.png",
+        },
+      ],
+    },
   },
 
   {
     number: "02",
     title: "Build a campaign brief in minutes",
-    icon: "file",
+    visual: {
+      type: "brief",
+      badge: "AI",
+      items: [
+        "Objectives and key messages",
+        "Creator guidelines",
+        "Tracking links ready",
+      ],
+      progress: 72,
+    },
   },
 
   {
     number: "03",
     title: "Manage every collaboration",
-    icon: "clipboard",
+    visual: {
+      type: "collaboration",
+      creators: [
+        {
+          name: "Raphael",
+          status: "Draft ready",
+          image: "/src/assets/images/workflowimages/raphael.png",
+        },
+        {
+          name: "Thomas",
+          status: "Scheduled",
+          image: "/src/assets/images/workflowimages/thomas.png",
+        },
+        {
+          name: "Nada",
+          status: "Live",
+          image: "/src/assets/images/workflowimages/nada.png",
+        },
+      ],
+    },
   },
 
   {
     number: "04",
     title: "Track reach, clicks, and leads",
-    icon: "chart",
+    visual: {
+      type: "results",
+      label: "Attributed pipeline",
+      value: "€48.2K",
+      change: "+24%",
+      views: "124K views",
+      leads: "418 leads",
+      bars: [30, 42, 35, 55, 70, 88, 100],
+    },
   },
 
   {
     number: "05",
     title: "Pay creators without the admin",
-    icon: "wallet",
+    visual: {
+      type: "payment",
+      title: "Payment scheduled",
+      subtitle: "Handled by Naano",
+      payoutLabel: "Creator payout",
+      payout: "€1,240",
+      actions: ["Contract", "Invoice", "Payout"],
+    },
   },
-];
+] as const;
+
+export const workflowSection = {
+  eyebrow: "One platform, from brief to results",
+
+  title: "Run creator campaigns from one place.",
+
+  description:
+    "Find the right voices, launch faster, and connect every post to measurable business results.",
+};
 
 export const results = [
   {
