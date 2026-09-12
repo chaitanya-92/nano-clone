@@ -1,13 +1,21 @@
 import {
   createReadStream,
   existsSync,
-  mkdirSync,
 } from "node:fs";
+
 import { join, extname, normalize } from "node:path";
-import { createServer } from "node:http";
+
+import {
+  createServer,
+  type ServerResponse,
+} from "node:http";
+
 import { PORT, APP_ORIGIN } from "./config/env";
+
 import { initializeDatabaseConnection } from "./config/database";
+
 import { authRoutes } from "./routes/authRoutes";
+
 import { handleError } from "./middleware/errorMiddleware";
 
 const distDirectory = join(
@@ -29,10 +37,49 @@ const mimeTypes: Record<string, string> = {
   ".woff2": "font/woff2",
 };
 
+const allowedOrigins = [
+  "https://nano-clone.vercel.app",
+  "http://localhost:5173",
+];
+
 initializeDatabaseConnection();
 
+function setCorsHeaders(
+  response: ServerResponse,
+  origin: string | undefined,
+) {
+  if (!origin || !allowedOrigins.includes(origin)) {
+    return;
+  }
+
+  response.setHeader(
+    "Access-Control-Allow-Origin",
+    origin,
+  );
+
+  response.setHeader(
+    "Access-Control-Allow-Credentials",
+    "true",
+  );
+
+  response.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, OPTIONS",
+  );
+
+  response.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type",
+  );
+
+  response.setHeader(
+    "Vary",
+    "Origin",
+  );
+}
+
 function serveStatic(
-  response: any,
+  response: ServerResponse,
   url: URL,
 ) {
   const requestedPath =
@@ -85,6 +132,16 @@ function serveStatic(
 
 const server = createServer(
   async (request, response) => {
+    const origin = request.headers.origin;
+
+    setCorsHeaders(response, origin);
+
+    if (request.method === "OPTIONS") {
+      response.writeHead(204);
+      response.end();
+      return;
+    }
+
     try {
       const url = new URL(
         request.url ?? "/",
