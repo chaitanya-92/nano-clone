@@ -683,3 +683,12 @@ button {
     @apply font-sans;
   }
 }
+
+@layer components {
+  .auth-input { height: 54px; width: 100%; border-radius: 12px; border: 1px solid #d5d9df; padding: 0 1rem; font-size: 16px; color: #202124; outline: none; transition: border-color 160ms ease, box-shadow 160ms ease; }
+  .auth-input::placeholder { color: #a5adbc; }
+  .auth-input:focus { border-color: #2864f0; box-shadow: 0 0 0 2px rgb(40 100 240 / 10%); }
+  .auth-submit { margin-top: 0.25rem; height: 50px; width: 100%; border-radius: 12px; background: #2864f0; color: white; font-size: 16px; font-weight: 600; box-shadow: 0 6px 14px rgb(40 100 240 / 22%); transition: background-color 160ms ease, opacity 160ms ease; }
+  .auth-submit:hover { background: #2059dd; }
+  .auth-submit:disabled { cursor: wait; opacity: 0.65; }
+}

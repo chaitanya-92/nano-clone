@@ -1,4 +1,5 @@
 import { ChevronDown, Globe2 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import {
   NavigationMenu,
@@ -29,31 +30,30 @@ export function DesktopNav() {
 
   return (
     <div className="hidden items-center lg:flex">
-      {/* Main navigation */}
       <NavigationMenu>
         <NavigationMenuList className="gap-7">
           {navItems.map((item) => (
             <NavigationMenuItem key={item.label}>
-              <NavigationMenuLink
+                <NavigationMenuLink
                 render={<a href={item.href} />}
                 className="
-                  inline-flex
-                  items-center
-                  text-[15px]
-                  font-medium
-                  text-[hsl(var(--naano-ink))]
-                  no-underline
-                  outline-none
-                  transition-none
-                  hover:text-[hsl(var(--naano-ink))]
+                    inline-flex
+                    items-center
+                    text-[15px]
+                    font-medium
+                    text-[hsl(var(--naano-ink))]
+                    no-underline
+                    outline-none
+                    transition-none
+                    hover:text-[hsl(var(--naano-ink))]
+                    hover:bg-transparent
                 "
-              >
+                >
                 {item.label}
-              </NavigationMenuLink>
+                </NavigationMenuLink>
             </NavigationMenuItem>
           ))}
 
-          {/* Resources */}
           <NavigationMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger
@@ -62,6 +62,7 @@ export function DesktopNav() {
                     variant="ghost"
                     className="
                       h-auto
+                      cursor-pointer
                       gap-1
                       rounded-none
                       bg-transparent
@@ -78,9 +79,7 @@ export function DesktopNav() {
                   />
                 }
               >
-                <span>
-                  {navigationActions.resources.label}
-                </span>
+                <span>{navigationActions.resources.label}</span>
 
                 <ChevronDown
                   className="h-3 w-3"
@@ -123,14 +122,10 @@ export function DesktopNav() {
         </NavigationMenuList>
       </NavigationMenu>
 
-      {/* Right side actions */}
       <div className="ml-9 flex items-center gap-2.5">
-        {/* Language */}
         <Button
           variant="ghost"
-          onClick={() =>
-            navigate(navigationActions.language.href)
-          }
+          onClick={() => navigate(navigationActions.language.href)}
           aria-label={navigationActions.language.ariaLabel}
           className="
             h-10
@@ -152,17 +147,12 @@ export function DesktopNav() {
             strokeWidth={1.8}
           />
 
-          <span>
-            {navigationActions.language.label}
-          </span>
+          <span>{navigationActions.language.label}</span>
         </Button>
 
-        {/* Sign in */}
         <Button
           variant="outline"
-          onClick={() =>
-            navigate(navigationActions.signIn.href)
-          }
+          render={<Link to="/login" />}
           className="
             h-10
             rounded-full
@@ -182,11 +172,8 @@ export function DesktopNav() {
           {navigationActions.signIn.label}
         </Button>
 
-        {/* Sign up */}
         <Button
-          onClick={() =>
-            navigate(navigationActions.signUp.href)
-          }
+          render={<Link to="/register" />}
           className="
             h-10
             rounded-full
@@ -194,7 +181,7 @@ export function DesktopNav() {
             px-5
             text-[14px]
             font-medium
-            text-white
+            !text-white
             shadow-none
             transition-none
             hover:bg-black
