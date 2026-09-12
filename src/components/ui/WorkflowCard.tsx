@@ -11,6 +11,29 @@ type CollaborationVisualData = Extract<WorkflowVisual, { type: "collaboration" }
 type ResultsVisualData = Extract<WorkflowVisual, { type: "results" }>;
 type PaymentVisualData = Extract<WorkflowVisual, { type: "payment" }>;
 
+const workflowImageModules = import.meta.glob(
+  "../../assets/images/workflowimages/*",
+  {
+    eager: true,
+    import: "default",
+    query: "?url",
+  },
+) as Record<string, string>;
+
+function resolveWorkflowImage(imagePath: string) {
+  const fileName = imagePath.split("/").pop();
+
+  if (!fileName) {
+    return imagePath;
+  }
+
+  const assetPath = Object.keys(workflowImageModules).find((path) =>
+    path.endsWith(`/${fileName}`),
+  );
+
+  return assetPath ? workflowImageModules[assetPath] : imagePath;
+}
+
 const revealTransition = {
   duration: 0.45,
   ease: [0.22, 1, 0.36, 1] as const,
@@ -31,16 +54,30 @@ function CreatorVisual({ visual }: { visual: CreatorVisualData }) {
           >
             <motion.div
               animate={{ y: [0, -1.5, 0] }}
-              transition={{ duration: 5, delay: index * 0.35, repeat: Infinity, ease: "easeInOut" }}
+              transition={{
+                duration: 5,
+                delay: index * 0.35,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
               className="mx-auto h-10 w-10 overflow-hidden rounded-[9px] border border-white bg-white shadow-[0_4px_12px_rgba(30,80,110,0.10)]"
             >
-              <img src={creator.image} alt={creator.name} className="h-full w-full object-cover" />
+              <img
+                src={resolveWorkflowImage(creator.image)}
+                alt={creator.name}
+                className="h-full w-full object-cover"
+              />
             </motion.div>
 
-            <p className="mt-1.5 text-[8px] font-semibold leading-none text-[#25292d]">{creator.name}</p>
+            <p className="mt-1.5 text-[8px] font-semibold leading-none text-[#25292d]">
+              {creator.name}
+            </p>
 
             <p className="mt-1 text-[7px] leading-none text-[#9199a1]">
-              Fit <span className="font-semibold text-[#5b7d99]">{creator.fit}</span>
+              Fit{" "}
+              <span className="font-semibold text-[#5b7d99]">
+                {creator.fit}
+              </span>
             </p>
           </motion.div>
         ))}
@@ -59,8 +96,13 @@ function BriefVisual({ visual }: { visual: BriefVisualData }) {
       className="w-[166px] rounded-[16px] border border-[#e3edf3] bg-white px-4 py-4 shadow-[0_10px_30px_rgba(40,90,120,0.07)]"
     >
       <div className="flex items-center justify-between">
-        <span className="text-[10px] font-semibold text-[#252a2f]">Campaign brief</span>
-        <span className="rounded-full bg-[#e5f3fb] px-2 py-1 text-[7px] font-bold leading-none text-[#4c7897]">{visual.badge}</span>
+        <span className="text-[10px] font-semibold text-[#252a2f]">
+          Campaign brief
+        </span>
+
+        <span className="rounded-full bg-[#e5f3fb] px-2 py-1 text-[7px] font-bold leading-none text-[#4c7897]">
+          {visual.badge}
+        </span>
       </div>
 
       <div className="mt-4 space-y-2.5">
@@ -70,13 +112,23 @@ function BriefVisual({ visual }: { visual: BriefVisualData }) {
             initial={{ opacity: 0, x: -5 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.32, delay: 0.25 + index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+            transition={{
+              duration: 0.32,
+              delay: 0.25 + index * 0.1,
+              ease: [0.22, 1, 0.36, 1],
+            }}
             className="flex items-start gap-2"
           >
             <span className="mt-[1px] grid h-3.5 w-3.5 shrink-0 place-items-center rounded-full bg-[#e0f1fa]">
-              <Check className="h-2.5 w-2.5 text-[#5b8bae]" strokeWidth={2.6} />
+              <Check
+                className="h-2.5 w-2.5 text-[#5b8bae]"
+                strokeWidth={2.6}
+              />
             </span>
-            <span className="text-[8.5px] leading-[1.25] text-[#69727a]">{item}</span>
+
+            <span className="text-[8.5px] leading-[1.25] text-[#69727a]">
+              {item}
+            </span>
           </motion.div>
         ))}
       </div>
@@ -86,7 +138,11 @@ function BriefVisual({ visual }: { visual: BriefVisualData }) {
           initial={{ width: 0 }}
           whileInView={{ width: `${visual.progress}%` }}
           viewport={{ once: true }}
-          transition={{ delay: 0.45, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          transition={{
+            delay: 0.45,
+            duration: 0.8,
+            ease: [0.22, 1, 0.36, 1],
+          }}
           className="h-full rounded-full bg-[#356482]"
         />
       </div>
@@ -94,7 +150,11 @@ function BriefVisual({ visual }: { visual: BriefVisualData }) {
   );
 }
 
-function CollaborationVisual({ visual }: { visual: CollaborationVisualData }) {
+function CollaborationVisual({
+  visual,
+}: {
+  visual: CollaborationVisualData;
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10, scale: 0.97 }}
@@ -110,12 +170,22 @@ function CollaborationVisual({ visual }: { visual: CollaborationVisualData }) {
             initial={{ opacity: 0, x: -6 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.35, delay: 0.18 + index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+            transition={{
+              duration: 0.35,
+              delay: 0.18 + index * 0.1,
+              ease: [0.22, 1, 0.36, 1],
+            }}
             className="flex items-center gap-2"
           >
-            <img src={creator.image} alt={creator.name} className="h-7 w-7 shrink-0 rounded-full border border-white object-cover shadow-[0_2px_8px_rgba(0,0,0,0.08)]" />
+            <img
+              src={resolveWorkflowImage(creator.image)}
+              alt={creator.name}
+              className="h-7 w-7 shrink-0 rounded-full border border-white object-cover shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
+            />
 
-            <span className="flex-1 text-[9px] font-semibold text-[#2d3237]">{creator.name}</span>
+            <span className="flex-1 text-[9px] font-semibold text-[#2d3237]">
+              {creator.name}
+            </span>
 
             <motion.span
               initial={{ opacity: 0, scale: 0.92 }}
@@ -145,8 +215,13 @@ function ResultsVisual({ visual }: { visual: ResultsVisualData }) {
       <p className="text-[7px] leading-none text-[#9ba2aa]">{visual.label}</p>
 
       <div className="mt-1 flex items-center gap-1.5">
-        <span className="text-[23px] font-bold leading-none tracking-[-0.055em] text-[#252a2f]">{visual.value}</span>
-        <span className="rounded-md bg-[#e1f1fb] px-1.5 py-1 text-[6px] font-bold leading-none text-[#4c7897]">{visual.change}</span>
+        <span className="text-[23px] font-bold leading-none tracking-[-0.055em] text-[#252a2f]">
+          {visual.value}
+        </span>
+
+        <span className="rounded-md bg-[#e1f1fb] px-1.5 py-1 text-[6px] font-bold leading-none text-[#4c7897]">
+          {visual.change}
+        </span>
       </div>
 
       <div className="mt-5 flex h-[58px] items-end gap-[5px]">
@@ -156,8 +231,16 @@ function ResultsVisual({ visual }: { visual: ResultsVisualData }) {
             initial={{ height: 0 }}
             whileInView={{ height: `${height}%` }}
             viewport={{ once: true }}
-            transition={{ delay: 0.15 + index * 0.07, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-            className={`flex-1 rounded-t-[3px] ${index >= visual.bars.length - 2 ? "bg-[#315f7e]" : "bg-[#cfeaf8]"}`}
+            transition={{
+              delay: 0.15 + index * 0.07,
+              duration: 0.55,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            className={`flex-1 rounded-t-[3px] ${
+              index >= visual.bars.length - 2
+                ? "bg-[#315f7e]"
+                : "bg-[#cfeaf8]"
+            }`}
           />
         ))}
       </div>
@@ -187,12 +270,20 @@ function PaymentVisual({ visual }: { visual: PaymentVisualData }) {
           transition={{ duration: 0.35 }}
           className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#e2f2fb]"
         >
-          <CircleCheck className="h-4 w-4 text-[#4d7895]" strokeWidth={1.8} />
+          <CircleCheck
+            className="h-4 w-4 text-[#4d7895]"
+            strokeWidth={1.8}
+          />
         </motion.span>
 
         <div>
-          <p className="text-[9px] font-semibold leading-[1.05] text-[#292e33]">{visual.title}</p>
-          <p className="mt-0.5 text-[6.5px] leading-none text-[#9ba2aa]">{visual.subtitle}</p>
+          <p className="text-[9px] font-semibold leading-[1.05] text-[#292e33]">
+            {visual.title}
+          </p>
+
+          <p className="mt-0.5 text-[6.5px] leading-none text-[#9ba2aa]">
+            {visual.subtitle}
+          </p>
         </div>
       </div>
 
@@ -200,12 +291,21 @@ function PaymentVisual({ visual }: { visual: PaymentVisualData }) {
         initial={{ opacity: 0, y: 5 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ delay: 0.2, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        transition={{
+          delay: 0.2,
+          duration: 0.4,
+          ease: [0.22, 1, 0.36, 1],
+        }}
         className="mt-4 rounded-[11px] border border-[#edf0f2] bg-[#fcfdfe] px-3 py-3"
       >
         <div className="flex items-center justify-between">
-          <span className="max-w-[55px] text-[6.5px] leading-[1.2] text-[#9ba2aa]">{visual.payoutLabel}</span>
-          <span className="text-[12px] font-bold leading-none text-[#292e33]">{visual.payout}</span>
+          <span className="max-w-[55px] text-[6.5px] leading-[1.2] text-[#9ba2aa]">
+            {visual.payoutLabel}
+          </span>
+
+          <span className="text-[12px] font-bold leading-none text-[#292e33]">
+            {visual.payout}
+          </span>
         </div>
       </motion.div>
 
@@ -216,7 +316,10 @@ function PaymentVisual({ visual }: { visual: PaymentVisualData }) {
             initial={{ opacity: 0, y: 3 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.35 + index * 0.07, duration: 0.25 }}
+            transition={{
+              delay: 0.35 + index * 0.07,
+              duration: 0.25,
+            }}
             className="rounded-md bg-[#f1f3f4] px-1.5 py-1 text-[5.5px] font-medium leading-none text-[#9299a0]"
           >
             {action}
@@ -255,7 +358,11 @@ export function WorkflowCard({ step, index = 0 }: WorkflowCardProps) {
       initial={{ opacity: 0, y: 18 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.55, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
+      transition={{
+        duration: 0.55,
+        delay: index * 0.08,
+        ease: [0.22, 1, 0.36, 1],
+      }}
       whileHover={{ y: -3 }}
       className="group relative flex min-h-[300px] flex-1 flex-col overflow-visible rounded-[1.35rem] border border-[#e7eef2] bg-white/[0.78] px-5 pb-5 pt-7 shadow-[0_15px_45px_rgba(45,90,115,0.045)] backdrop-blur-[2px] transition-shadow duration-500 hover:shadow-[0_20px_50px_rgba(45,90,115,0.075)] sm:px-5"
     >
