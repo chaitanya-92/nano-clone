@@ -579,4 +579,128 @@ export const authPages = {
     sideTitle: "One platform. Two sides.",
     sideDescription: "Creators get paid to post. B2B brands get real pipeline. Pick where you fit and we'll set the rest up in a couple of minutes.",
   },
+} as const; 
+
+export const authContent = {
+  login: {
+    logoLabel: "Naano",
+    language: "EN",
+    title: "Welcome back",
+    subtitle: "Sign in to your account",
+    social: {
+      linkedin: "Continue with LinkedIn",
+      google: "Continue with Google",
+    },
+    divider: "OR CONTINUE WITH EMAIL",
+    emailLabel: "EMAIL",
+    emailPlaceholder: "john@company.com",
+    passwordLabel: "PASSWORD",
+    passwordPlaceholder: "••••••••",
+    forgotPassword: "Forgot password?",
+    submit: "Sign in",
+    footerPrefix: "Don't have an account?",
+    footerAction: "Sign up",
+    footerHref: "/register",
+    panelTitle: "Welcome back.",
+    panelDescription: "Sign in to manage your campaigns, creators and payouts, all in one place.",
+  },
+  register: {
+    logoLabel: "Naano",
+    language: "EN",
+    title: "Create your account",
+    subtitle: "First, who are you here as?",
+    roles: [
+      {
+        id: "creator",
+        title: "I'm a creator",
+        description: "Create content and collaborate with B2B brands.",
+      },
+      {
+        id: "brand",
+        title: "I'm a brand",
+        description: "Find creators and launch your next campaign.",
+      },
+    ],
+    footerPrefix: "Already have an account?",
+    footerAction: "Sign in",
+    footerHref: "/login",
+    panelTitle: "One platform. Two sides.",
+    panelDescription: "Connect B2B brands and creators in one place to build campaigns that drive real results.",
+  },
+  chat: {
+    prompt: "What would you like to see?",
+  },
+} as const;
+
+export const messagesPageData = {
+  title: "Messages",
+  searchPlaceholder: "Search conversations",
+  conversations: [
+    {
+      id: "naano-bot",
+      name: "NaanoBot",
+      description: "A question or need help? Start here.",
+      status: "Now",
+    },
+  ],
+  emptyState: "No conversations yet - the thread opens with your first Booking.",
+  assistant: {
+    name: "Naano help center",
+    status: "Instant assistant · team when needed",
+    eyebrow: "YOUR NAANO SPACE",
+    title: "How can we help?",
+    description:
+      "Product question, bug or performance concern: everything stays here and the team steps in when needed.",
+    availability: "Available now",
+    options: [
+      {
+        id: "performance",
+        title: "Understand my performance",
+        description: "Review your analytics",
+      },
+      {
+        id: "product-help",
+        title: "Get product help",
+        description: "Get an instant answer",
+      },
+      {
+        id: "bug",
+        title: "Report a bug",
+        description: "Escalated when needed",
+      },
+      {
+        id: "idea",
+        title: "Suggest an idea",
+        description: "Share product feedback",
+      },
+    ],
+    welcomeMessage:
+      "Hi, I’m the Naano assistant. Ask me a question or choose an option above — the team can step in if needed.",
+  },
+  performance: {
+    eyebrow: "PERFORMANCE SNAPSHOT",
+    label: "Estimate",
+    title: "Your profile is ready; views are still missing",
+    description:
+      "Naano can already help with your profile, but needs more post analytics for performance comparisons.",
+    metric: "Median · 0",
+  },
+  requestStatus: {
+    title: "Request status",
+    status: "Assistant available",
+    description: "A human takes over for sensitive requests.",
+    sections: [
+      {
+        title: "Shared context",
+        description:
+          "Naano uses the active page and your account data — campaigns, bookings and analytics — without accessing other accounts.",
+      },
+      {
+        title: "Important limitation",
+        description:
+          "A drop in views can have many causes. Recommendations are hypotheses to test, never a certain diagnosis.",
+      },
+    ],
+  },
+  inputPlaceholder: "Ask Naano a question...",
 } as const;
