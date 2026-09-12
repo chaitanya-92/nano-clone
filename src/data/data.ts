@@ -579,4 +579,55 @@ export const authPages = {
     sideTitle: "One platform. Two sides.",
     sideDescription: "Creators get paid to post. B2B brands get real pipeline. Pick where you fit and we'll set the rest up in a couple of minutes.",
   },
+} as const; 
+
+export const authContent = {
+  login: {
+    logoLabel: "Naano",
+    language: "EN",
+    title: "Welcome back",
+    subtitle: "Sign in to your account",
+    social: {
+      linkedin: "Continue with LinkedIn",
+      google: "Continue with Google",
+    },
+    divider: "OR CONTINUE WITH EMAIL",
+    emailLabel: "EMAIL",
+    emailPlaceholder: "john@company.com",
+    passwordLabel: "PASSWORD",
+    passwordPlaceholder: "••••••••",
+    forgotPassword: "Forgot password?",
+    submit: "Sign in",
+    footerPrefix: "Don't have an account?",
+    footerAction: "Sign up",
+    footerHref: "/register",
+    panelTitle: "Welcome back.",
+    panelDescription: "Sign in to manage your campaigns, creators and payouts, all in one place.",
+  },
+  register: {
+    logoLabel: "Naano",
+    language: "EN",
+    title: "Create your account",
+    subtitle: "First, who are you here as?",
+    roles: [
+      {
+        id: "creator",
+        title: "I'm a creator",
+        description: "Create content and collaborate with B2B brands.",
+      },
+      {
+        id: "brand",
+        title: "I'm a brand",
+        description: "Find creators and launch your next campaign.",
+      },
+    ],
+    footerPrefix: "Already have an account?",
+    footerAction: "Sign in",
+    footerHref: "/login",
+    panelTitle: "One platform. Two sides.",
+    panelDescription: "Connect B2B brands and creators in one place to build campaigns that drive real results.",
+  },
+  chat: {
+    prompt: "What would you like to see?",
+  },
 } as const;
