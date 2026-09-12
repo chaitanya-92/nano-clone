@@ -543,3 +543,40 @@ export const faqs = [
   ],
 ] as const;
 
+export const authPages = {
+  login: {
+    title: "Welcome back",
+    subtitle: "Sign in to your account",
+    linkedin: "Continue with LinkedIn",
+    google: "Continue with Google",
+    divider: "OR CONTINUE WITH EMAIL",
+    emailLabel: "EMAIL",
+    emailPlaceholder: "john@company.com",
+    passwordLabel: "PASSWORD",
+    passwordPlaceholder: "••••••••",
+    forgotPassword: "Forgot password?",
+    submit: "Sign in",
+    footerPrefix: "Don't have an account?",
+    footerAction: "Sign up",
+    footerHref: "/register",
+    sideTitle: "Welcome back.",
+    sideDescription: "Sign in to manage your campaigns, creators and payouts, all in one place.",
+  },
+  register: {
+    title: "Create your account",
+    subtitle: "First, who are you here as?",
+    creator: {
+      title: "I'm a creator",
+      description: "Get paid to create LinkedIn content for B2B brands you actually use.",
+    },
+    brand: {
+      title: "I'm a brand",
+      description: "Find creators, launch campaigns, and trace real pipeline back to each post.",
+    },
+    footerPrefix: "Already have an account?",
+    footerAction: "Sign in",
+    footerHref: "/login",
+    sideTitle: "One platform. Two sides.",
+    sideDescription: "Creators get paid to post. B2B brands get real pipeline. Pick where you fit and we'll set the rest up in a couple of minutes.",
+  },
+} as const;
