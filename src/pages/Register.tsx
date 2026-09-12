@@ -1,46 +1,17 @@
-import { useState } from "react";
-import { Check } from "lucide-react";
+import { useState, type FormEvent } from "react";
+import { Check, Eye, EyeOff } from "lucide-react";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { authContent } from "@/data/data";
+import { signIn, type UserRole } from "@/features/authSlice";
+import { register } from "@/lib/auth";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
 export default function Register() {
   const content = authContent.register;
-  const [selectedRole, setSelectedRole] = useState<string | null>(null);
-
-  return (
-    <AuthShell panelTitle={content.panelTitle} panelDescription={content.panelDescription}>
-      <div>
-        <h1 className="text-[30px] font-semibold tracking-[-0.035em] text-[#171d2b]">{content.title}</h1>
-        <p className="mt-1 text-[16px] text-[#747c8d]">{content.subtitle}</p>
-
-        <div className="mt-8 space-y-3">
-          {content.roles.map((role) => {
-            const selected = selectedRole === role.id;
-
-            return (
-              <button key={role.id} type="button" onClick={() => setSelectedRole(role.id)} className={`relative w-full rounded-[14px] border p-5 text-left transition ${selected ? "border-[#2864f0] bg-[#f4f8ff] shadow-[0_4px_14px_rgba(40,100,240,0.08)]" : "border-[#dfe2e8] bg-white hover:border-[#cbd0d8] hover:bg-[#fafbfc]"}`}>
-                <div className="pr-8">
-                  <h2 className="text-[16px] font-semibold text-[#202124]">{role.title}</h2>
-                  <p className="mt-1 text-[14px] leading-5 text-[#747c8d]">{role.description}</p>
-                </div>
-
-                <span className={`absolute right-5 top-5 flex h-5 w-5 items-center justify-center rounded-full border ${selected ? "border-[#2864f0] bg-[#2864f0] text-white" : "border-[#cdd1d8]"}`}>
-                  {selected && <Check className="h-3 w-3" strokeWidth={3} />}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        <button type="button" disabled={!selectedRole} className="mt-5 h-[50px] w-full rounded-[12px] bg-[#2864f0] text-[16px] font-semibold text-white shadow-[0_6px_14px_rgba(40,100,240,0.22)] transition hover:bg-[#2059dd] disabled:cursor-not-allowed disabled:opacity-45">
-          Continue
-        </button>
-
-        <p className="mt-7 text-center text-[14px] text-[#747c8d]">
-          {content.footerPrefix}{" "}
-          <a href={content.footerHref} className="font-medium text-[#2864f0] hover:underline">{content.footerAction}</a>
-        </p>
-      </div>
-    </AuthShell>
-  );
+  const dispatch = useAppDispatch(); const navigate = useNavigate(); const { isAuthenticated, isLoading } = useAppSelector((state) => state.auth);
+  const [selectedRole, setSelectedRole] = useState<UserRole | null>(null); const [name, setName] = useState(""); const [email, setEmail] = useState(""); const [password, setPassword] = useState(""); const [showPassword, setShowPassword] = useState(false); const [error, setError] = useState(""); const [submitting, setSubmitting] = useState(false);
+  if (!isLoading && isAuthenticated) return <Navigate to="/dashboard" replace />;
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) { event.preventDefault(); if (!selectedRole) return setError("Choose a role to continue."); setError(""); setSubmitting(true); try { const { user } = await register(name, email, password, selectedRole); dispatch(signIn(user)); navigate("/dashboard", { replace: true }); } catch (reason) { setError(reason instanceof Error ? reason.message : "Unable to create your account."); } finally { setSubmitting(false); } }
+  return <AuthShell panelTitle={content.panelTitle} panelDescription={content.panelDescription}><div><h1 className="text-[30px] font-semibold tracking-[-0.035em] text-[#171d2b]">{content.title}</h1><p className="mt-1 text-[16px] text-[#747c8d]">{content.subtitle}</p><form className="mt-8 space-y-4" onSubmit={handleSubmit} noValidate><div className="space-y-3">{content.roles.map((role) => { const selected = selectedRole === role.id; return <button key={role.id} type="button" onClick={() => setSelectedRole(role.id as UserRole)} className={`relative w-full rounded-[14px] border p-5 text-left transition ${selected ? "border-[#2864f0] bg-[#f4f8ff] shadow-[0_4px_14px_rgba(40,100,240,0.08)]" : "border-[#dfe2e8] bg-white hover:border-[#cbd0d8] hover:bg-[#fafbfc]"}`}><div className="pr-8"><h2 className="text-[16px] font-semibold text-[#202124]">{role.title}</h2><p className="mt-1 text-[14px] leading-5 text-[#747c8d]">{role.description}</p></div><span className={`absolute right-5 top-5 flex h-5 w-5 items-center justify-center rounded-full border ${selected ? "border-[#2864f0] bg-[#2864f0] text-white" : "border-[#cdd1d8]"}`}>{selected && <Check className="h-3 w-3" strokeWidth={3} />}</span></button>; })}</div><label className="block"><span className="mb-2 block text-[12px] font-semibold tracking-wide text-[#62666d]">Name</span><input required value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" className="auth-input" placeholder="Your name" /></label><label className="block"><span className="mb-2 block text-[12px] font-semibold tracking-wide text-[#62666d]">Email</span><input required value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" type="email" className="auth-input" placeholder="you@company.com" /></label><label className="block"><span className="mb-2 block text-[12px] font-semibold tracking-wide text-[#62666d]">Password</span><div className="relative"><input required minLength={8} value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="new-password" type={showPassword ? "text" : "password"} className="auth-input pr-12" placeholder="At least 8 characters" /><button type="button" onClick={() => setShowPassword((value) => !value)} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#9ba0a8]" aria-label={showPassword ? "Hide password" : "Show password"}>{showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}</button></div></label>{error && <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}<button disabled={submitting} type="submit" className="auth-submit">{submitting ? "Creating account…" : "Create account"}</button></form><p className="mt-7 text-center text-[14px] text-[#747c8d]">{content.footerPrefix}{" "}<Link to={content.footerHref} className="font-medium text-[#2864f0] hover:underline">{content.footerAction}</Link></p></div></AuthShell>;
 }

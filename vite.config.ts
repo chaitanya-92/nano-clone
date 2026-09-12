@@ -11,4 +11,5 @@ export default defineConfig({
       "@": path.resolve(process.cwd(), "src"),
     },
   },
+  server: { proxy: { "/api": "http://127.0.0.1:8787" } },
 });

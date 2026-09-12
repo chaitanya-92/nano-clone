@@ -7,7 +7,7 @@ import {
     Sparkles,
     WalletCards,
   } from "lucide-react";
-  import { Link } from "react-router-dom";
+  import { useNavigate } from "react-router-dom";
   import { Avatar, AvatarFallback } from "@/components/ui/avatar";
   import { Button } from "@/components/ui/button";
   import {
@@ -18,8 +18,20 @@ import {
     DropdownMenuTrigger,
   } from "@/components/ui/dropdown-menu";
   import { SidebarTrigger } from "@/components/ui/sidebar";
+  import { logout } from "@/lib/auth";
+  import { signOut } from "@/features/authSlice";
+  import { useAppDispatch, useAppSelector } from "@/store/hooks";
   
   export function DashboardNavbar() {
+    const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+    const user = useAppSelector((state) => state.auth.user);
+    const initials = user?.name.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase() ?? "N";
+    const handleLogout = async () => {
+      await logout().catch(() => undefined);
+      dispatch(signOut());
+      navigate("/login", { replace: true });
+    };
     return (
       <header className="sticky top-0 z-30 h-[72px] border-b border-[#e8ebf0] bg-white">
         <div className="flex h-full items-center justify-between px-6">
@@ -51,7 +63,7 @@ import {
               <DropdownMenuTrigger render={<Button variant="ghost" className="h-10 rounded-full p-0 hover:bg-transparent" />}>
                 <Avatar className="h-10 w-10">
                   <AvatarFallback className="bg-[#5966c9] text-[15px] font-semibold text-white">
-                    C
+                    {initials}
                   </AvatarFallback>
                 </Avatar>
                 <ChevronDown className="ml-1 h-4 w-4 text-[#68748a]" strokeWidth={1.8} />
@@ -61,16 +73,16 @@ import {
                 <div className="flex items-center gap-3 px-3 py-3">
                   <Avatar className="h-10 w-10">
                     <AvatarFallback className="bg-[#5966c9] text-[15px] font-semibold text-white">
-                      C
+                      {initials}
                     </AvatarFallback>
                   </Avatar>
   
                   <div className="min-w-0">
                     <p className="truncate text-[14px] font-semibold text-[#202124]">
-                      Chaitanya
+                      {user?.name ?? "Naano member"}
                     </p>
                     <p className="truncate text-[12px] text-[#8792a6]">
-                      Creator
+                      {user?.role === "brand" ? "Brand" : "Creator"}
                     </p>
                   </div>
                 </div>
@@ -87,16 +99,16 @@ import {
                   Settings
                 </DropdownMenuItem>
   
-                <DropdownMenuItem className="h-10 cursor-pointer rounded-lg px-3 text-[13px] text-[#526078] focus:bg-[#f5f7fa] focus:text-[#202124]">
-                  <Link to="/dashboard/integrations" className="flex w-full items-center">
+                <DropdownMenuItem render={<a href="mailto:hello@naano.co" />} className="h-10 cursor-pointer rounded-lg px-3 text-[13px] text-[#526078] focus:bg-[#f5f7fa] focus:text-[#202124]">
+                  <span className="flex w-full items-center">
                     <Globe2 className="mr-2 h-4 w-4" strokeWidth={1.8} />
-                    Integrations
-                  </Link>
+                    Contact support
+                  </span>
                 </DropdownMenuItem>
   
                 <DropdownMenuSeparator />
   
-                <DropdownMenuItem className="h-10 cursor-pointer rounded-lg px-3 text-[13px] text-[#d34a4a] focus:bg-[#fff3f3] focus:text-[#d34a4a]">
+                <DropdownMenuItem onClick={() => void handleLogout()} className="h-10 cursor-pointer rounded-lg px-3 text-[13px] text-[#d34a4a] focus:bg-[#fff3f3] focus:text-[#d34a4a]">
                   <LogOut className="mr-2 h-4 w-4" strokeWidth={1.8} />
                   Log out
                 </DropdownMenuItem>
