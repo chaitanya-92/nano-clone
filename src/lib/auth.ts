@@ -1,0 +1,19 @@
+import type { User, UserRole } from "@/features/authSlice";
+
+type AuthResponse = { user: User };
+
+async function request<T>(path: string, options: RequestInit = {}) {
+  const response = await fetch(path, {
+    ...options,
+    credentials: "include",
+    headers: { "Content-Type": "application/json", ...options.headers },
+  });
+  const body = (await response.json().catch(() => ({}))) as T & { error?: string };
+  if (!response.ok) throw new Error(body.error ?? "Something went wrong. Please try again.");
+  return body;
+}
+
+export function getCurrentUser() { return request<{ user: User | null }>("/api/auth/me"); }
+export function login(email: string, password: string) { return request<AuthResponse>("/api/auth/login", { method: "POST", body: JSON.stringify({ email, password }) }); }
+export function register(name: string, email: string, password: string, role: UserRole) { return request<AuthResponse>("/api/auth/register", { method: "POST", body: JSON.stringify({ name, email, password, role }) }); }
+export function logout() { return request<{ ok: true }>("/api/auth/logout", { method: "POST" }); }

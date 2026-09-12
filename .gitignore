@@ -9,6 +9,8 @@ build/
 .env
 .env.local
 .env.*.local
+data/*.sqlite
+data/*.sqlite-*
 
 # Vite
 .vite/
@@ -37,3 +39,4 @@ coverage/
 
 # Local tooling caches
 .cache/
+backend/.env
