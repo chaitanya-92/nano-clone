@@ -1,7 +1,7 @@
 import { useState, type ChangeEvent } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import { ArrowRight, Building2, CheckCircle2, Eye, EyeOff, Globe2, UserRound } from "lucide-react";
+import { ArrowRight, Building2, CheckCircle2, Eye, EyeOff, Globe2, Plus, UserRound } from "lucide-react";
 import {
   Link,
   Navigate,
@@ -9,6 +9,9 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import { OnboardingShell } from "@/auth/components/OnboardingShell";
+import { TermsReaderDialog } from "@/auth/components/TermsReaderDialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { countries, getIndustrySuggestions, industries } from "@/data/creatorOptions";
 import { FieldError } from "@/auth/components/FieldError";
 import { accountSchema, creatorDetailsSchema, creatorPositioningSchema, creatorPricingSchema, creatorSocialSchema, professionalSchema, brandCompanySchema } from "@/auth/schemas";
 import { analyzeCompanyWebsite, connectSocial, saveBrandOnboarding, saveCreatorCard, saveCreatorDetails, saveCreatorProfessional, saveCreatorProfile, saveCreatorSocial } from "@/lib/onboarding";
@@ -19,11 +22,10 @@ import { signIn } from "@/features/authSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { toast } from "@/components/ui/toast";
 
-const industries=["AI","SaaS","Software","Developer Tools","Fintech","Cybersecurity","Marketing","Sales","Productivity","Data / Analytics","E-commerce","EdTech"];
-const countries=["India","United States","United Kingdom","Germany","France","Canada","Australia","Singapore","Other"];
+
 const creatorSteps=["Account","Social profiles","Creator card","Professional"];
 const brandSteps=["Account","Company","Value prop & ICP","Review"];
-const initialValues={name:"",email:"",password:"",confirmPassword:"",role:"" as "creator"|"brand"|"",linkedinUrl:"",xProfileUrl:"",country:"",industries:[] as string[],headline:"",bio:"",priceCents:24000,registrationCountry:"",registeredBusiness:false,legalStatus:"individual",legalName:"",tradeName:"",panGstin:"",legalAddress:"",taxResponsibilityConfirmed:false,selfBillingMandateAccepted:false,certificationAccepted:false,website:"",companyName:"",description:"",valueProposition:"",icps:[{title:"",description:""},{title:"",description:""},{title:"",description:""}],brief:""};
+const initialValues={name:"",email:"",password:"",confirmPassword:"",role:"" as "creator"|"brand"|"",linkedinUrl:"",xProfileUrl:"",country:"",industries:[] as string[],headline:"",bio:"",priceCents:undefined as number|undefined,registrationCountry:"",registeredBusiness:false,legalStatus:"individual",legalName:"",tradeName:"",panGstin:"",legalAddress:"",taxResponsibilityConfirmed:false,selfBillingMandateAccepted:false,certificationAccepted:false,website:"",companyName:"",description:"",valueProposition:"",icps:[{title:"",description:""},{title:"",description:""},{title:"",description:""}],brief:""};
 
 function Input({name,label,placeholder,type="text",formik,disabled=false}:{name:string;label:string;placeholder?:string;type?:string;formik:any;disabled?:boolean}){return <label className="block"><span className="mb-2 block text-xs font-semibold tracking-wide text-[#626a78]">{label}</span><input name={name} type={type} value={formik.values[name]} onChange={(event)=>{formik.handleChange(event);formik.setFieldTouched(name,true,false)}} onBlur={formik.handleBlur} placeholder={placeholder} disabled={disabled} className={disabled?"auth-input cursor-not-allowed bg-[#f5f6f8] text-[#8b93a2]":"auth-input"}/><FieldError error={formik.errors[name]} touched={formik.touched[name]}/></label>}
 
@@ -403,9 +405,597 @@ export default function Register() {
           }} statusLabel={role==="creator"?"Registering as Creator":"Registering as Company"} title={title} description={description} steps={steps} current={step} canBack={step>0} canNext={!saving} nextLabel={step===steps.length-1?"Finish setup":"Continue"} onBack={()=>{setError("");setStep(value=>Math.max(0,value-1))}} onNext={next} saving={saving}>
  {step===0&&<div className="space-y-5"><div className="rounded-2xl border border-[#e4e7ec] bg-[#fafbfc] p-4"><p className="text-sm font-semibold text-[#252a34]">{role==="creator"?"Creator workspace":"Brand workspace"}</p><p className="mt-1 text-xs leading-5 text-[#747c8d]">You can refine these details later from your workspace.</p></div><div className="grid gap-3 sm:grid-cols-2"><a href={`${import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8787"}/api/auth/google?role=${role}&flow=signup`} className="flex h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border border-[#dfe3e8] bg-white text-sm font-semibold text-[#252a34] transition hover:bg-[#f7f8fa]"><GoogleIcon className="h-5 w-5"/>Continue with Google</a><a href={`${import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8787"}/api/auth/linkedin?role=${role}`} className="flex h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border border-[#dfe3e8] bg-white text-sm font-semibold text-[#252a34] transition hover:bg-[#f7f8fa]"><LinkedinIcon className="h-5 w-5" variant="brand"/>Continue with LinkedIn</a></div><div className="flex items-center gap-3"><div className="h-px flex-1 bg-[#e7e9ed]"/><span className="text-[11px] font-semibold uppercase tracking-[.14em] text-[#a0a6b0]">or continue with email</span><div className="h-px flex-1 bg-[#e7e9ed]"/></div><Input name="name" label="Full name" placeholder="Your full name" formik={formik}/><EmailField formik={formik} status={emailStatus} onStatus={setEmailStatus} verified={emailVerified} onVerified={setEmailVerified} onExistingEmail={handleExistingEmail}/><label className="block"><span className="mb-2 block text-xs font-semibold tracking-wide text-[#626a78]">Password</span><div className="relative"><input name="password" value={formik.values.password} onChange={(event)=>{formik.handleChange(event);formik.setFieldTouched("password",true,false);const value=event.target.value;if(value.length<8)formik.setFieldError("password","Use at least 8 characters.");else if(!/[A-Z]/.test(value))formik.setFieldError("password","Add an uppercase letter.");else if(!/[0-9]/.test(value))formik.setFieldError("password","Add a number.");else formik.setFieldError("password",undefined)}} onBlur={formik.handleBlur} type={showPassword?"text":"password"} placeholder="Use 8+ characters, a number and an uppercase letter" autoComplete="new-password" className="auth-input pr-12"/><button type="button" onClick={()=>setShowPassword(v=>!v)} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#9ba0a8]">{showPassword?<EyeOff className="h-5 w-5"/>:<Eye className="h-5 w-5" />}</button></div><FieldError error={formik.errors.password} touched={formik.touched.password}/><div className="mt-2 grid grid-cols-2 gap-2 text-[11px] text-[#747c8d]"><span className={formik.values.password.length>=8?"text-[#374151]":"text-[#9aa1ad]"}>• 8+ characters</span><span className={/[A-Z]/.test(formik.values.password)?"text-[#374151]":"text-[#9aa1ad]"}>• Uppercase letter</span><span className={/[0-9]/.test(formik.values.password)?"text-[#374151]":"text-[#9aa1ad]"}>• Number</span><span className={formik.values.confirmPassword&&formik.values.password===formik.values.confirmPassword?"text-[#374151]":"text-[#9aa1ad]"}>• Passwords match</span></div></label><label className="block"><span className="mb-2 block text-xs font-semibold tracking-wide text-[#626a78]">Confirm password</span><input name="confirmPassword" type="password" value={formik.values.confirmPassword} onChange={(event)=>{formik.handleChange(event);formik.setFieldTouched("confirmPassword",true,false);formik.setFieldError("confirmPassword",event.target.value!==formik.values.password?"Passwords do not match.":undefined)}} placeholder="Re-enter your password" autoComplete="new-password" className="auth-input"/><FieldError error={formik.errors.confirmPassword} touched={formik.touched.confirmPassword}/></label></div>}
  {role==="creator"&&step===1&&<div className="space-y-5"><div className="rounded-2xl border border-[#dbe7ff] bg-[#f5f8ff] p-5"><p className="font-semibold">Connect your professional presence</p><p className="mt-2 text-sm leading-6 text-[#687387]">We’ll verify the profile link before connecting it to your account.</p></div><div className="grid gap-4 md:grid-cols-2"><div><Input name="linkedinUrl" label="LinkedIn profile" placeholder="https://linkedin.com/in/your-profile" formik={formik} disabled={socialStatus.linkedin==="Connected"}/><button type="button" onClick={async()=>{setSocialErrors(v=>({...v,linkedin:""}));try{await connectSocial("linkedin",formik.values.linkedinUrl);setSocialStatus(v=>({...v,linkedin:"Connected"}))}catch(e){setSocialErrors(v=>({...v,linkedin:e instanceof Error?e.message:"Unable to verify LinkedIn profile."}))}}} disabled={!formik.values.linkedinUrl||saving||socialStatus.linkedin==="Connected"} className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-xl border border-[#0a66c2]/20 bg-[#f2f8fc] px-4 py-2.5 text-sm font-semibold text-[#0a66c2] disabled:cursor-not-allowed disabled:opacity-50"><Linkedin className="h-4 w-4"/>{socialStatus.linkedin==="Connected"?"Connected":"Connect LinkedIn"}</button>{socialErrors.linkedin&&<p className="mt-2 text-xs font-medium text-red-600">{socialErrors.linkedin}</p>}</div><div><Input name="xProfileUrl" label="X profile" placeholder="https://x.com/your-handle" formik={formik} disabled={socialStatus.x==="Connected"}/><button type="button" onClick={async()=>{setSocialErrors(v=>({...v,x:""}));try{await connectSocial("x",formik.values.xProfileUrl);setSocialStatus(v=>({...v,x:"Connected"}))}catch(e){setSocialErrors(v=>({...v,x:e instanceof Error?e.message:"Unable to verify X profile."}))}}} disabled={!formik.values.xProfileUrl||saving||socialStatus.x==="Connected"} className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-xl border border-[#e4e8ee] bg-white px-4 py-2.5 text-sm font-semibold text-[#202124] disabled:cursor-not-allowed disabled:opacity-50"><Globe2 className="h-4 w-4"/>{socialStatus.x==="Connected"?"Connected":"Connect X"}</button>{socialErrors.x&&<p className="mt-2 text-xs font-medium text-red-600">{socialErrors.x}</p>}</div></div><div className="flex items-start gap-3 rounded-xl border border-[#e4e8ee] p-4 text-xs leading-5 text-[#737c8d]"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#2864f0]"/>Only information you submit or authorize is connected to your account.</div></div>}
- {role==="creator"&&step===2&&<div className="grid gap-5 md:grid-cols-2"><Input name="headline" label="Professional headline" placeholder="e.g. Developer, designer or industry creator" formik={formik}/><label className="block"><span className="mb-2 block text-xs font-semibold text-[#626a78]">Country</span><select name="country" value={formik.values.country} onChange={formik.handleChange} className="auth-input"><option value="">Select your country</option>{countries.map(item=><option key={item}>{item}</option>)}</select><FieldError error={formik.errors.country} touched={formik.touched.country}/></label><label className="block md:col-span-2"><span className="mb-2 block text-xs font-semibold text-[#626a78]">About you</span><textarea name="bio" value={formik.values.bio} onChange={formik.handleChange} onBlur={formik.handleBlur} rows={4} placeholder="Tell brands what you build, who you help and what you can credibly talk about." className="w-full resize-none rounded-xl border border-[#d5d9df] p-4 text-[15px] outline-none focus:border-[#2864f0] focus:ring-2 focus:ring-[#2864f0]/10"/><FieldError error={formik.errors.bio} touched={formik.touched.bio}/></label><div className="md:col-span-2"><p className="mb-2 text-xs font-semibold text-[#626a78]">Industries <span className="font-normal text-[#9aa1af]">(up to 3)</span></p><div className="flex flex-wrap gap-2">{industries.map(item=>{const selected=formik.values.industries.includes(item);return <button key={item} type="button" onClick={()=>formik.setFieldValue("industries",selected?formik.values.industries.filter(x=>x!==item):formik.values.industries.length<3?[...formik.values.industries,item]:formik.values.industries)} className={`rounded-full border px-3 py-2 text-xs font-medium ${selected?"border-[#2864f0] bg-[#eef4ff] text-[#245bdc]":"border-[#dfe3e9] text-[#737c8d]"}`}>{item}</button>})}</div><FieldError error={formik.errors.industries} touched={formik.touched.industries}/></div><div className="md:col-span-2 rounded-2xl border border-[#e2e7ef] bg-[#fafbfe] p-5"><p className="text-xs font-bold uppercase tracking-[.14em] text-[#2864f0]">Price per post</p><div className="mt-2 flex items-center gap-2"><span className="text-lg text-[#7d8491]">€</span><input name="priceCents" type="number" min="0" value={formik.values.priceCents/100} onChange={e=>formik.setFieldValue("priceCents",Math.round(Number(e.target.value)*100))} className="w-32 bg-transparent text-3xl font-semibold tracking-[-.04em] outline-none"/></div></div></div>}
- {role==="creator"&&step===3&&<div className="space-y-4"><Input name="registrationCountry" label="Registration country" placeholder="e.g. Your country" formik={formik}/><Input name="legalName" label="Legal name" placeholder="Your legal name" formik={formik}/><Input name="legalAddress" label="Legal address" placeholder="Your billing address" formik={formik}/><label className="block"><span className="mb-2 block text-xs font-semibold text-[#626a78]">Legal status</span><select name="legalStatus" value={formik.values.legalStatus} onChange={formik.handleChange} className="auth-input"><option value="individual">Individual</option><option value="company">Company</option><option value="sole_proprietorship">Sole proprietorship</option></select></label>{[["taxResponsibilityConfirmed","I confirm I am responsible for applicable taxes."],["selfBillingMandateAccepted","I accept the self-billing mandate."],["certificationAccepted","I certify this information is accurate."]].map(([name,text])=><label key={name} className="flex gap-3 rounded-xl border border-[#e4e8ee] p-4 text-sm text-[#555e6e]"><input type="checkbox" name={name} checked={Boolean(formik.values[name])} onChange={formik.handleChange} className="mt-1 h-4 w-4"/><span>{text}<FieldError error={formik.errors[name]} touched={formik.touched[name]}/></span></label>)}</div>}
- {role==="brand"&&step===1&&<div className="space-y-5"><Input name="website" label="Company website" placeholder="https://yourcompany.com" formik={formik}/><button type="button" onClick={async()=>{setError("");try{const result=await analyzeCompanyWebsite(formik.values.website);setAnalysis(result.data);if(result.data?.company_name)formik.setFieldValue("companyName",result.data.company_name);if(result.data?.description)formik.setFieldValue("description",result.data.description)}catch(e){setError(e instanceof Error?e.message:"Unable to analyze the website.")}}} disabled={!formik.values.website||saving} className="rounded-xl bg-[#2864f0] px-5 py-3 text-sm font-semibold text-white">Analyze company website</button>{analysis&&<div className="rounded-2xl border border-[#dbe7ff] bg-[#f5f8ff] p-5"><p className="text-xs font-bold uppercase tracking-[.14em] text-[#2864f0]">Website analysis complete</p><p className="mt-2 font-semibold">{analysis.company_name||"Company detected"}</p><p className="mt-1 text-sm leading-6 text-[#687386]">{analysis.description||"Review the extracted company information in the next step."}</p></div>}</div>}
+ {role==="creator"&&step===2&&(
+  <div className="space-y-6">
+    <div className="grid gap-5 md:grid-cols-2">
+      <Input
+        name="headline"
+        label="Professional headline"
+        placeholder="e.g. AI Engineer, Product Designer or Fintech Creator"
+        formik={formik}
+      />
+
+      <label className="block">
+        <span className="mb-2 block text-xs font-semibold text-[#626a78]">
+          Country
+        </span>
+
+        <select
+          name="country"
+          value={formik.values.country}
+          onChange={formik.handleChange}
+          className="auth-input cursor-pointer"
+        >
+          <option value="">Select your country</option>
+          {countries.map((country) => (
+            <option key={country.code} value={country.name}>
+              {country.name}
+            </option>
+          ))}
+        </select>
+
+        <FieldError
+          error={formik.errors.country}
+          touched={formik.touched.country}
+        />
+      </label>
+
+      <label className="block md:col-span-2">
+        <span className="mb-2 block text-xs font-semibold text-[#626a78]">
+          About you
+        </span>
+
+        <textarea
+          name="bio"
+          value={formik.values.bio}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          rows={4}
+          placeholder="Tell brands what you build, who you help and what you can credibly talk about."
+          className="w-full resize-none rounded-xl border border-[#d5d9df] p-4 text-[15px] outline-none focus:border-[#2864f0] focus:ring-2 focus:ring-[#2864f0]/10"
+        />
+
+        <FieldError
+          error={formik.errors.bio}
+          touched={formik.touched.bio}
+        />
+      </label>
+    </div>
+
+    <div>
+      <div className="flex items-end justify-between gap-3">
+        <div>
+          <p className="text-xs font-semibold text-[#626a78]">
+            Industries
+            <span className="ml-1 font-normal text-[#9aa1af]">
+              (up to 3)
+            </span>
+          </p>
+
+          <p className="mt-1 text-xs text-[#8a92a0]">
+            Recommendations update from your professional headline.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setShowIndustryInput((value) => !value)}
+          className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-semibold text-[#4d5665] transition hover:bg-[#f4f5f7] hover:text-[#171d2b]"
+        >
+          <Plus className="h-3.5 w-3.5" />
+          Add industry
+        </button>
+      </div>
+
+      {showIndustryInput && (
+        <div className="mt-3 flex gap-2">
+          <input
+            value={customIndustry}
+            onChange={(event) =>
+              setCustomIndustry(event.target.value)
+            }
+            onKeyDown={(event) => {
+              if (event.key !== "Enter") {
+                return;
+              }
+
+              event.preventDefault();
+
+              const value = customIndustry.trim();
+              const allIndustries = [
+                ...industries,
+                ...customIndustries,
+              ];
+
+              if (
+                !value ||
+                allIndustries.some(
+                  (item) =>
+                    item.toLowerCase() ===
+                    value.toLowerCase(),
+                )
+              ) {
+                return;
+              }
+
+              setCustomIndustries((items) => [
+                ...items,
+                value,
+              ]);
+              setCustomIndustry("");
+              setShowIndustryInput(false);
+
+              if (formik.values.industries.length < 3) {
+                formik.setFieldValue(
+                  "industries",
+                  [
+                    ...formik.values.industries,
+                    value,
+                  ],
+                );
+              }
+            }}
+            placeholder="Add a custom industry"
+            className="auth-input flex-1"
+          />
+
+          <button
+            type="button"
+            onClick={() => {
+              const value = customIndustry.trim();
+              const allIndustries = [
+                ...industries,
+                ...customIndustries,
+              ];
+
+              if (
+                !value ||
+                allIndustries.some(
+                  (item) =>
+                    item.toLowerCase() ===
+                    value.toLowerCase(),
+                )
+              ) {
+                return;
+              }
+
+              setCustomIndustries((items) => [
+                ...items,
+                value,
+              ]);
+              setCustomIndustry("");
+              setShowIndustryInput(false);
+
+              if (formik.values.industries.length < 3) {
+                formik.setFieldValue(
+                  "industries",
+                  [
+                    ...formik.values.industries,
+                    value,
+                  ],
+                );
+              }
+            }}
+            className="cursor-pointer rounded-xl bg-[#171d2b] px-4 text-xs font-semibold text-white transition hover:bg-[#111827]"
+          >
+            Add
+          </button>
+        </div>
+      )}
+
+      <div className="mt-4">
+        <p className="mb-2 text-[11px] font-bold uppercase tracking-[.14em] text-[#2864f0]">
+          Suggested for your headline
+        </p>
+
+        <div className="flex flex-wrap gap-2">
+          {getIndustrySuggestions(formik.values.headline)
+            .slice(0, 8)
+            .map((industry) => {
+              const selected =
+                formik.values.industries.includes(
+                  industry,
+                );
+
+              return (
+                <button
+                  key={industry}
+                  type="button"
+                  onClick={() =>
+                    formik.setFieldValue(
+                      "industries",
+                      selected
+                        ? formik.values.industries.filter(
+                            (item) =>
+                              item !== industry,
+                          )
+                        : formik.values.industries.length <
+                            3
+                          ? [
+                              ...formik.values.industries,
+                              industry,
+                            ]
+                          : formik.values.industries,
+                    )
+                  }
+                  className={
+                    selected
+                      ? "cursor-pointer rounded-full border border-[#2864f0] bg-[#eef4ff] px-3 py-2 text-xs font-medium text-[#245bdc]"
+                      : "cursor-pointer rounded-full border border-[#dfe3e9] px-3 py-2 text-xs font-medium text-[#737c8d] transition hover:border-[#cbd1da] hover:text-[#374151]"
+                  }
+                >
+                  {industry}
+                </button>
+              );
+            })}
+        </div>
+      </div>
+
+      <div className="mt-5">
+        <p className="mb-2 text-[11px] font-bold uppercase tracking-[.14em] text-[#8a92a0]">
+          All industries
+        </p>
+
+        <div className="flex max-h-48 flex-wrap gap-2 overflow-y-auto pr-1">
+          {[...industries, ...customIndustries].map(
+            (industry) => {
+              const selected =
+                formik.values.industries.includes(
+                  industry,
+                );
+
+              return (
+                <button
+                  key={industry}
+                  type="button"
+                  onClick={() =>
+                    formik.setFieldValue(
+                      "industries",
+                      selected
+                        ? formik.values.industries.filter(
+                            (item) =>
+                              item !== industry,
+                          )
+                        : formik.values.industries.length <
+                            3
+                          ? [
+                              ...formik.values.industries,
+                              industry,
+                            ]
+                          : formik.values.industries,
+                    )
+                  }
+                  className={
+                    selected
+                      ? "cursor-pointer rounded-full border border-[#2864f0] bg-[#eef4ff] px-3 py-2 text-xs font-medium text-[#245bdc]"
+                      : "cursor-pointer rounded-full border border-[#dfe3e9] px-3 py-2 text-xs font-medium text-[#737c8d] transition hover:border-[#cbd1da] hover:text-[#374151]"
+                  }
+                >
+                  {industry}
+                </button>
+              );
+            },
+          )}
+        </div>
+
+        <FieldError
+          error={formik.errors.industries}
+          touched={formik.touched.industries}
+        />
+      </div>
+    </div>
+
+    <div className="rounded-2xl border border-[#e2e7ef] bg-[#fafbfe] p-5">
+      {(() => {
+        const selectedCountry = countries.find(
+          (country) =>
+            country.name === formik.values.country,
+        );
+        const currencySymbol =
+          selectedCountry?.symbol ?? "¤";
+
+        return (
+          <>
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-xs font-bold uppercase tracking-[.14em] text-[#2864f0]">
+                Price per post
+              </p>
+
+              {selectedCountry && (
+                <span className="text-xs font-medium text-[#8a92a0]">
+                  {selectedCountry.currency}
+                </span>
+              )}
+            </div>
+
+            <div className="mt-3 flex items-center gap-3">
+              <span className="text-2xl font-medium text-[#7d8491]">
+                {currencySymbol}
+              </span>
+
+              <input
+                name="priceCents"
+                type="number"
+                min="0"
+                step="1"
+                value={
+                  formik.values.priceCents === undefined
+                    ? ""
+                    : formik.values.priceCents / 100
+                }
+                onChange={(event) => {
+                  const value =
+                    event.target.value;
+
+                  formik.setFieldValue(
+                    "priceCents",
+                    value === ""
+                      ? undefined
+                      : Math.round(
+                          Number(value) * 100,
+                        ),
+                  );
+                }}
+                onBlur={() =>
+                  formik.setFieldTouched(
+                    "priceCents",
+                    true,
+                  )
+                }
+                placeholder="0"
+                className="w-40 bg-transparent text-3xl font-semibold tracking-[-.04em] outline-none placeholder:text-[#c4c9d1]"
+              />
+            </div>
+
+            <FieldError
+              error={formik.errors.priceCents}
+              touched={formik.touched.priceCents}
+            />
+          </>
+        );
+      })()}
+    </div>
+  </div>
+)} {role==="creator"&&step===3&&(
+  <div className="space-y-4">
+    <label className="block">
+      <span className="mb-2 block text-xs font-semibold text-[#626a78]">
+        Registration country
+      </span>
+
+      <select
+        name="registrationCountry"
+        value={formik.values.registrationCountry}
+        onChange={formik.handleChange}
+        className="auth-input cursor-pointer"
+      >
+        <option value="">
+          Select your country
+        </option>
+
+        {countries.map((country) => (
+          <option
+            key={country.code}
+            value={country.name}
+          >
+            {country.name}
+          </option>
+        ))}
+      </select>
+
+      <FieldError
+        error={formik.errors.registrationCountry}
+        touched={formik.touched.registrationCountry}
+      />
+    </label>
+
+    <Input
+      name="legalName"
+      label="Legal name"
+      placeholder="Your legal name"
+      formik={formik}
+    />
+
+    <Input
+      name="legalAddress"
+      label="Legal address"
+      placeholder="Your billing address"
+      formik={formik}
+    />
+
+    <label className="block">
+      <span className="mb-2 block text-xs font-semibold text-[#626a78]">
+        Legal status
+      </span>
+
+      <select
+        name="legalStatus"
+        value={formik.values.legalStatus}
+        onChange={formik.handleChange}
+        className="auth-input cursor-pointer"
+      >
+        <option value="individual">
+          Individual
+        </option>
+        <option value="company">
+          Company
+        </option>
+        <option value="sole_proprietorship">
+          Sole proprietorship
+        </option>
+      </select>
+    </label>
+
+    {[
+      {
+        key: "taxResponsibilityConfirmed",
+        label:
+          "I confirm I am responsible for applicable taxes.",
+        title: "Tax responsibilities",
+        description:
+          "Review the tax responsibility acknowledgement before accepting it.",
+        sections: [
+          {
+            heading: "What you are confirming",
+            body:
+              "You confirm that you are responsible for determining the taxes that apply to your creator earnings and for meeting the filing or payment obligations that apply to you in your country or jurisdiction.",
+          },
+          {
+            heading: "Your information",
+            body:
+              "You are responsible for providing accurate registration, identity and payment information. Update your information when it changes so your account records remain current.",
+          },
+          {
+            heading: "Taxes and deductions",
+            body:
+              "Depending on your location and transaction, taxes or deductions may apply to amounts shown in your workspace. Review those amounts with an appropriate tax professional when necessary.",
+          },
+          {
+            heading: "Before accepting",
+            body:
+              "Make sure you understand the obligations that apply to you. This acknowledgement does not replace professional tax advice or the rules that apply in your jurisdiction.",
+          },
+        ],
+      },
+      {
+        key: "selfBillingMandateAccepted",
+        label:
+          "I accept the self-billing mandate.",
+        title: "Self-billing mandate",
+        description:
+          "Review the self-billing acknowledgement before accepting it.",
+        sections: [
+          {
+            heading: "What self-billing means",
+            body:
+              "Self-billing is an invoicing arrangement where the customer or platform prepares an invoice or related transaction record on the supplier's behalf under agreed terms.",
+          },
+          {
+            heading: "Your responsibilities",
+            body:
+              "You confirm that the information you provide for invoicing and payments is accurate and that you will review transaction records promptly.",
+          },
+          {
+            heading: "Keeping records accurate",
+            body:
+              "Update your legal name, business details, registration information or tax details when they change so future transaction records can use current information.",
+          },
+          {
+            heading: "Before accepting",
+            body:
+              "Review the transaction and invoicing details available to you and make sure the self-billing arrangement is appropriate for your business or individual status.",
+          },
+        ],
+      },
+      {
+        key: "certificationAccepted",
+        label:
+          "I certify this information is accurate.",
+        title: "Information certification",
+        description:
+          "Review the information certification acknowledgement before accepting it.",
+        sections: [
+          {
+            heading: "What you are confirming",
+            body:
+              "You confirm that the information submitted during onboarding is complete and accurate to the best of your knowledge.",
+          },
+          {
+            heading: "Updates",
+            body:
+              "Update information when material details change, including legal, payment or registration information used by your workspace.",
+          },
+          {
+            heading: "Account records",
+            body:
+              "Accurate information helps keep your creator profile, transaction records and payment-related workflows consistent.",
+          },
+          {
+            heading: "Before accepting",
+            body:
+              "Review the details you entered above and correct anything that is incomplete or inaccurate before completing onboarding.",
+          },
+        ],
+      },
+    ].map((term) => (
+      <div
+        key={term.key}
+        className="rounded-xl border border-[#e4e8ee] p-4"
+      >
+        <div className="flex items-start gap-3">
+          <Checkbox
+            checked={Boolean(
+              formik.values[term.key],
+            )}
+            onCheckedChange={(checked) =>
+              formik.setFieldValue(
+                term.key,
+                Boolean(checked),
+              )
+            }
+            disabled={!readTerms[term.key]}
+            aria-label={term.label}
+            className="mt-0.5"
+          />
+
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium text-[#555e6e]">
+              {term.label}
+            </p>
+
+            <div className="mt-2 flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() =>
+                  setActiveTerm({
+                    title: term.title,
+                    description: term.description,
+                    sections: term.sections,
+                    key: term.key,
+                  })
+                }
+                className="cursor-pointer text-xs font-semibold text-[#3f4857] underline underline-offset-2 transition hover:text-[#171d2b]"
+              >
+                Read more
+              </button>
+
+              {!readTerms[term.key] && (
+                <span className="text-[11px] text-[#9aa1ad]">
+                  Read to the end to unlock
+                </span>
+              )}
+            </div>
+
+            <FieldError
+              error={formik.errors[term.key]}
+              touched={formik.touched[term.key]}
+            />
+          </div>
+        </div>
+      </div>
+    ))}
+
+    <TermsReaderDialog
+      open={Boolean(activeTerm)}
+      title={activeTerm?.title ?? ""}
+      description={activeTerm?.description ?? ""}
+      sections={activeTerm?.sections ?? []}
+      onOpenChange={(open) => {
+        if (!open) {
+          setActiveTerm(null);
+        }
+      }}
+      onReadComplete={() => {
+        if (activeTerm) {
+          setReadTerms((terms) => ({
+            ...terms,
+            [activeTerm.key]: true,
+          }));
+        }
+      }}
+    />
+  </div>
+)} {role==="brand"&&step===1&&<div className="space-y-5"><Input name="website" label="Company website" placeholder="https://yourcompany.com" formik={formik}/><button type="button" onClick={async()=>{setError("");try{const result=await analyzeCompanyWebsite(formik.values.website);setAnalysis(result.data);if(result.data?.company_name)formik.setFieldValue("companyName",result.data.company_name);if(result.data?.description)formik.setFieldValue("description",result.data.description)}catch(e){setError(e instanceof Error?e.message:"Unable to analyze the website.")}}} disabled={!formik.values.website||saving} className="rounded-xl bg-[#2864f0] px-5 py-3 text-sm font-semibold text-white">Analyze company website</button>{analysis&&<div className="rounded-2xl border border-[#dbe7ff] bg-[#f5f8ff] p-5"><p className="text-xs font-bold uppercase tracking-[.14em] text-[#2864f0]">Website analysis complete</p><p className="mt-2 font-semibold">{analysis.company_name||"Company detected"}</p><p className="mt-1 text-sm leading-6 text-[#687386]">{analysis.description||"Review the extracted company information in the next step."}</p></div>}</div>}
  {role==="brand"&&step===2&&<div className="space-y-5"><div><label className="mb-2 block text-xs font-semibold text-[#626a78]">Company name</label><input name="companyName" value={formik.values.companyName} onChange={formik.handleChange} className="auth-input"/></div><div><label className="mb-2 block text-xs font-semibold text-[#626a78]">Description</label><textarea name="description" value={formik.values.description} onChange={formik.handleChange} rows={3} className="w-full rounded-xl border border-[#d5d9df] p-4 outline-none focus:border-[#2864f0]"/></div><div><label className="mb-2 block text-xs font-semibold text-[#626a78]">Value proposition</label><textarea name="valueProposition" value={formik.values.valueProposition} onChange={formik.handleChange} rows={4} className="w-full rounded-xl border border-[#d5d9df] p-4 outline-none focus:border-[#2864f0]"/></div><Input name="country" label="Country" placeholder="India" formik={formik}/><div><p className="mb-2 text-xs font-semibold text-[#626a78]">Industries</p><div className="flex flex-wrap gap-2">{industries.map(item=>{const selected=formik.values.industries.includes(item);return <button key={item} type="button" onClick={()=>formik.setFieldValue("industries",selected?formik.values.industries.filter(x=>x!==item):formik.values.industries.length<3?[...formik.values.industries,item]:formik.values.industries)} className={`rounded-full border px-3 py-2 text-xs font-medium ${selected?"border-[#2864f0] bg-[#eef4ff] text-[#245bdc]":"border-[#dfe3e9] text-[#737c8d]"}`}>{item}</button>})}</div><FieldError error={formik.errors.industries} touched={formik.touched.industries}/></div><div className="grid gap-4 md:grid-cols-3">{formik.values.icps.map((item,index)=><div key={index} className="rounded-2xl border border-[#e3e7ed] p-4"><input value={item.title} onChange={e=>{const next=[...formik.values.icps];next[index]={...next[index],title:e.target.value};formik.setFieldValue("icps",next)}} placeholder={`ICP ${index+1}`} className="w-full border-0 p-1 font-semibold outline-none"/><textarea value={item.description} onChange={e=>{const next=[...formik.values.icps];next[index]={...next[index],description:e.target.value};formik.setFieldValue("icps",next)}} placeholder="Who are they?" rows={3} className="mt-2 w-full resize-none border-0 p-1 text-sm outline-none"/></div>)}</div></div>}
  {role==="brand"&&step===3&&<div className="space-y-5"><div className="rounded-2xl bg-[#f5f8ff] p-6"><p className="text-xs font-bold uppercase tracking-[.15em] text-[#2864f0]">Ready to launch</p><p className="mt-3 text-2xl font-semibold tracking-[-.03em]">{formik.values.companyName||"Your company"}</p><p className="mt-2 text-sm leading-6 text-[#687386]">{formik.values.valueProposition||"Your value proposition will appear here."}</p></div><div className="grid gap-3 md:grid-cols-3">{formik.values.icps.filter(item=>item.title).map(item=><div key={item.title} className="rounded-xl border border-[#e4e8ee] p-4"><p className="text-sm font-semibold">{item.title}</p><p className="mt-1 text-xs leading-5 text-[#737c8d]">{item.description}</p></div>)}</div><p className="text-sm text-[#737c8d]">Your profile will be saved to your workspace and can be refined later.</p></div>}
  {error&&<p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{error}</p>}
