@@ -3,7 +3,6 @@ import {
   Check,
   Copy,
   ExternalLink,
-  Loader2,
   Share2,
 } from "lucide-react";
 import { motion } from "framer-motion";
