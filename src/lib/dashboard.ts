@@ -87,6 +87,7 @@ export interface Collaboration {
   impressions: number;
   engagements: number;
   net_amount_cents: number;
+  currency: string;
 }
 
 export interface AnalyticsResponse {

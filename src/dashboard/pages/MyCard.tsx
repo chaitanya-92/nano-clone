@@ -1,7 +1,53 @@
-import { Copy, ExternalLink, Pencil, Save, Share2 } from "lucide-react";
+function fileToDataUrl(
+  file: File,
+): Promise<string> {
+  return new Promise(
+    (resolve, reject) => {
+      const reader =
+        new FileReader();
+
+      reader.onload = () => {
+        if (
+          typeof reader.result !==
+          "string"
+        ) {
+          reject(
+            new Error(
+              "Unable to read image.",
+            ),
+          );
+          return;
+        }
+
+        resolve(reader.result);
+      };
+
+      reader.onerror = () =>
+        reject(
+          new Error(
+            "Unable to read image.",
+          ),
+        );
+
+      reader.readAsDataURL(file);
+    },
+  );
+}
+
+import {
+  Check,
+  Copy,
+  ExternalLink,
+  ImagePlus,
+  Pencil,
+  Save,
+  Share2,
+  Upload,
+} from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,6 +71,10 @@ export default function MyCard() {
     bio: "",
   });
   const [copied, setCopied] = useState(false);
+  const [photoOpen, setPhotoOpen] = useState(false);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState("");
+  const [photoSaving, setPhotoSaving] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -51,6 +101,96 @@ export default function MyCard() {
     [profile?.slug],
   );
 
+  const savePhoto = async () => {
+    if (!photoFile) {
+      return;
+    }
+
+    if (
+      !photoFile.type.startsWith("image/")
+    ) {
+      toast.add({
+        title: "Invalid image",
+        description:
+          "Choose a PNG, JPEG or WebP image.",
+        type: "error",
+        timeout: 2500,
+      });
+      return;
+    }
+
+    if (photoFile.size > 3 * 1024 * 1024) {
+      toast.add({
+        title: "Image is too large",
+        description:
+          "Choose an image smaller than 3 MB.",
+        type: "error",
+        timeout: 2500,
+      });
+      return;
+    }
+
+    setPhotoSaving(true);
+    setError("");
+
+    try {
+      const photoData =
+        await fileToDataUrl(photoFile);
+
+      const { data } =
+        await updateCreatorProfile({
+          profilePhotoUrl: photoData,
+        });
+
+      setProfile(data);
+      setPhotoFile(null);
+      setPhotoPreview("");
+      setPhotoOpen(false);
+
+      toast.add({
+        title: "Profile photo updated",
+        description:
+          "Your creator card now uses the new photo.",
+        type: "success",
+        timeout: 2200,
+      });
+    } catch (value) {
+      setError(
+        value instanceof Error
+          ? value.message
+          : "Unable to update your profile photo.",
+      );
+    } finally {
+      setPhotoSaving(false);
+    }
+  };
+
+  const handlePhotoChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file =
+      event.target.files?.[0] ??
+      null;
+
+    if (!file) {
+      return;
+    }
+
+    setPhotoFile(file);
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      setPhotoPreview(
+        typeof reader.result === "string"
+          ? reader.result
+          : "",
+      );
+    };
+
+    reader.readAsDataURL(file);
+  };
+
   const save = async () => {
     try {
       const { data } = await updateCreatorProfile(draft);
@@ -69,11 +209,34 @@ export default function MyCard() {
       return;
     }
 
-    await navigator.clipboard.writeText(publicUrl);
+    try {
+      await navigator.clipboard.writeText(
+        publicUrl,
+      );
 
-    setCopied(true);
+      setCopied(true);
 
-    window.setTimeout(() => setCopied(false), 1600);
+      toast.add({
+        title: "Card link copied",
+        description:
+          "Your public creator card link is ready to share.",
+        type: "success",
+        timeout: 2200,
+      });
+
+      window.setTimeout(
+        () => setCopied(false),
+        1600,
+      );
+    } catch {
+      toast.add({
+        title: "Copy failed",
+        description:
+          "Your browser did not allow clipboard access.",
+        type: "error",
+        timeout: 2600,
+      });
+    }
   };
 
   const share = async () => {
@@ -198,7 +361,11 @@ export default function MyCard() {
               {profile.country || "Global"}
             </div>
 
-            <motion.div
+            <motion.button
+              type="button"
+              onClick={() =>
+                setPhotoOpen(true)
+              }
               initial={{
                 scale: 0.72,
                 opacity: 0,
@@ -213,17 +380,38 @@ export default function MyCard() {
                 damping: 18,
                 delay: 0.12,
               }}
-              className="absolute -bottom-14 left-1/2 flex h-28 w-28 -translate-x-1/2 items-center justify-center rounded-full border-4 border-[#316df0] bg-[#6572cc] text-4xl text-white"
+              whileHover={{
+                scale: 1.03,
+              }}
+              className="group absolute -bottom-14 left-1/2 flex h-28 w-28 -translate-x-1/2 cursor-pointer items-center justify-center overflow-hidden rounded-full border-4 border-[#316df0] bg-[#6572cc] text-4xl text-white"
+              aria-label="Change profile photo"
             >
-              {profile.name
-                ?.trim()
-                .split(/\s+/)
-                .filter(Boolean)
-                .map((value) => value[0])
-                .slice(0, 2)
-                .join("")
-                .toUpperCase() || "N"}
-            </motion.div>
+              {profile.profile_photo_url ? (
+                <img
+                  src={profile.profile_photo_url}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                profile.name
+                  ?.trim()
+                  .split(/\s+/)
+                  .filter(Boolean)
+                  .map(
+                    (value) => value[0],
+                  )
+                  .slice(0, 2)
+                  .join("")
+                  .toUpperCase() ||
+                "N"
+              )}
+
+              <span className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition group-hover:bg-black/35 group-hover:opacity-100">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#28344b] shadow-lg">
+                  <Pencil className="h-4 w-4" />
+                </span>
+              </span>
+            </motion.button>
           </div>
 
           <div className="px-8 pb-9 pt-20 text-center">
@@ -317,6 +505,105 @@ export default function MyCard() {
           </div>
         </aside>
       </section>
+
+      <Dialog
+        open={photoOpen}
+        onOpenChange={(value) => {
+          setPhotoOpen(value);
+
+          if (!value) {
+            setPhotoFile(null);
+            setPhotoPreview("");
+          }
+        }}
+      >
+        <DialogContent className="max-w-[520px]">
+          <DialogHeader>
+            <DialogTitle>
+              Update profile photo
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-5">
+            <div className="flex items-center justify-center">
+              <div className="flex h-36 w-36 items-center justify-center overflow-hidden rounded-full border-4 border-[#dfe6f0] bg-[#6572cc] text-4xl text-white">
+                {photoPreview ? (
+                  <img
+                    src={photoPreview}
+                    alt="Preview"
+                    className="h-full w-full object-cover"
+                  />
+                ) : profile.profile_photo_url ? (
+                  <img
+                    src={
+                      profile.profile_photo_url
+                    }
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  profile.name
+                    ?.trim()
+                    .split(/\s+/)
+                    .filter(Boolean)
+                    .map(
+                      (value) =>
+                        value[0],
+                    )
+                    .slice(0, 2)
+                    .join("")
+                    .toUpperCase() ||
+                  "N"
+                )}
+              </div>
+            </div>
+
+            <label
+              htmlFor="profile-photo-upload"
+              className="flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-[#d8e0eb] bg-[#fafbfd] px-6 py-8 text-center transition hover:bg-[#f7f9fc]"
+            >
+              <ImagePlus className="h-7 w-7 text-[#66758d]" />
+              <span className="mt-3 text-sm font-semibold text-[#344059]">
+                Choose a new photo
+              </span>
+              <span className="mt-1 text-xs text-[#8995aa]">
+                PNG, JPEG or WebP · Max 3 MB
+              </span>
+
+              <input
+                id="profile-photo-upload"
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                onChange={handlePhotoChange}
+                className="sr-only"
+              />
+            </label>
+
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                onClick={() =>
+                  void savePhoto()
+                }
+                disabled={
+                  photoSaving ||
+                  !photoFile
+                }
+                className="cursor-pointer bg-[#171d2b] hover:bg-[#111827]"
+              >
+                {photoSaving ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Upload className="mr-2 h-4 w-4" />
+                )}
+                {photoSaving
+                  ? "Uploading…"
+                  : "Save photo"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-[620px]">
