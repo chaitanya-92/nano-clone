@@ -11,14 +11,8 @@ import {
   now,
 } from "../utils/api";
 
-export function earnings(
-  request: IncomingMessage,
-  response: ServerResponse,
-) {
-  const user = requireAuth(
-    request,
-    response,
-  );
+export function earnings(request: IncomingMessage, response: ServerResponse) {
+  const user = requireAuth(request, response);
 
   if (!user) {
     return;
@@ -78,52 +72,38 @@ export function earnings(
     )
     .all(user.id);
 
-  return json(
-    response,
-    200,
-    {
-      data: {
-        summary,
-        activity,
-      },
+  return json(response, 200, {
+    data: {
+      summary,
+      activity,
     },
-  );
+  });
 }
 
 export function payoutMethods(
   request: IncomingMessage,
   response: ServerResponse,
 ) {
-  const user = requireAuth(
-    request,
-    response,
-  );
+  const user = requireAuth(request, response);
 
   if (!user) {
     return;
   }
 
-  return json(
-    response,
-    200,
-    {
-      data: db
-        .prepare(
-          "SELECT id, type, label, status, created_at FROM payout_methods WHERE user_id = ? ORDER BY created_at DESC",
-        )
-        .all(user.id),
-    },
-  );
+  return json(response, 200, {
+    data: db
+      .prepare(
+        "SELECT id, type, label, status, created_at FROM payout_methods WHERE user_id = ? ORDER BY created_at DESC",
+      )
+      .all(user.id),
+  });
 }
 
 export async function addPayoutMethod(
   request: IncomingMessage,
   response: ServerResponse,
 ) {
-  const user = requireAuth(
-    request,
-    response,
-  );
+  const user = requireAuth(request, response);
 
   if (!user) {
     return;
@@ -131,23 +111,13 @@ export async function addPayoutMethod(
 
   const body = await readJson(request);
   const label = stringValue(body.label);
-  const type = stringValue(
-    body.type,
-    "stripe",
-  );
+  const type = stringValue(body.type, "stripe");
 
   if (!label) {
-    return error(
-      response,
-      422,
-      "INVALID_PAYOUT_METHOD",
-      "Label is required.",
-    );
+    return error(response, 422, "INVALID_PAYOUT_METHOD", "Label is required.");
   }
 
-  const id = randomBytes(16).toString(
-    "base64url",
-  );
+  const id = randomBytes(16).toString("base64url");
   const timestamp = now();
 
   db.prepare(
@@ -168,53 +138,36 @@ export async function addPayoutMethod(
     user.id,
     type,
     label,
-    stringValue(
-      body.providerReference,
-    ) || null,
+    stringValue(body.providerReference) || null,
     "pending",
     timestamp,
     timestamp,
   );
 
-  return json(
-    response,
-    201,
-    {
-      data: db
-        .prepare(
-          "SELECT id, type, label, status, created_at FROM payout_methods WHERE id = ?",
-        )
-        .get(id),
-    },
-  );
+  return json(response, 201, {
+    data: db
+      .prepare(
+        "SELECT id, type, label, status, created_at FROM payout_methods WHERE id = ?",
+      )
+      .get(id),
+  });
 }
 
 export async function withdraw(
   request: IncomingMessage,
   response: ServerResponse,
 ) {
-  const user = requireAuth(
-    request,
-    response,
-  );
+  const user = requireAuth(request, response);
 
   if (!user) {
     return;
   }
 
   const body = await readJson(request);
-  const amount = integerValue(
-    body.amountCents,
-    -1,
-  );
-  const methodId = stringValue(
-    body.payoutMethodId,
-  );
+  const amount = integerValue(body.amountCents, -1);
+  const methodId = stringValue(body.payoutMethodId);
 
-  if (
-    amount <= 0 ||
-    !methodId
-  ) {
+  if (amount <= 0 || !methodId) {
     return error(
       response,
       422,
@@ -224,13 +177,8 @@ export async function withdraw(
   }
 
   const method = db
-    .prepare(
-      "SELECT id FROM payout_methods WHERE id = ? AND user_id = ?",
-    )
-    .get(
-      methodId,
-      user.id,
-    );
+    .prepare("SELECT id FROM payout_methods WHERE id = ? AND user_id = ?")
+    .get(methodId, user.id);
 
   if (!method) {
     return error(
@@ -249,10 +197,7 @@ export async function withdraw(
     amount: number;
   };
 
-  if (
-    amount >
-    available.amount
-  ) {
+  if (amount > available.amount) {
     return error(
       response,
       409,
@@ -262,19 +207,12 @@ export async function withdraw(
   }
 
   const timestamp = now();
-  const withdrawalId =
-    randomBytes(16).toString(
-      "base64url",
-    );
-  const earningId =
-    randomBytes(16).toString(
-      "base64url",
-    );
+  const withdrawalId = randomBytes(16).toString("base64url");
+  const earningId = randomBytes(16).toString("base64url");
 
-  const transaction =
-    db.transaction(() => {
-      db.prepare(
-        `INSERT INTO withdrawals
+  const transaction = db.transaction(() => {
+    db.prepare(
+      `INSERT INTO withdrawals
           (
             id,
             user_id,
@@ -286,19 +224,19 @@ export async function withdraw(
             updated_at
           )
           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      ).run(
-        withdrawalId,
-        user.id,
-        methodId,
-        amount,
-        "EUR",
-        "pending",
-        timestamp,
-        timestamp,
-      );
+    ).run(
+      withdrawalId,
+      user.id,
+      methodId,
+      amount,
+      "EUR",
+      "pending",
+      timestamp,
+      timestamp,
+    );
 
-      db.prepare(
-        `INSERT INTO earnings
+    db.prepare(
+      `INSERT INTO earnings
           (
             id,
             user_id,
@@ -311,30 +249,24 @@ export async function withdraw(
             updated_at
           )
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      ).run(
-        earningId,
-        user.id,
-        "withdrawal",
-        "available",
-        -amount,
-        "EUR",
-        "Withdrawal requested",
-        timestamp,
-        timestamp,
-      );
-    });
+    ).run(
+      earningId,
+      user.id,
+      "withdrawal",
+      "available",
+      -amount,
+      "EUR",
+      "Withdrawal requested",
+      timestamp,
+      timestamp,
+    );
+  });
 
   transaction();
 
-  return json(
-    response,
-    201,
-    {
-      data: db
-        .prepare(
-          "SELECT * FROM withdrawals WHERE id = ?",
-        )
-        .get(withdrawalId),
-    },
-  );
+  return json(response, 201, {
+    data: db
+      .prepare("SELECT * FROM withdrawals WHERE id = ?")
+      .get(withdrawalId),
+  });
 }

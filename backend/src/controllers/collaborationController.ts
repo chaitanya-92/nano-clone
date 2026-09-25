@@ -2,13 +2,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { randomBytes } from "node:crypto";
 import { db } from "../db/client";
 import { requireAuth } from "../middleware/authMiddleware";
-import {
-  error,
-  json,
-  readJson,
-  stringValue,
-  now,
-} from "../utils/api";
+import { error, json, readJson, stringValue, now } from "../utils/api";
 
 const allowedStatuses = new Set([
   "application_accepted",
@@ -27,20 +21,14 @@ function isParticipant(
     brand_id: string;
   },
 ) {
-  return (
-    userId === row.creator_id ||
-    userId === row.brand_id
-  );
+  return userId === row.creator_id || userId === row.brand_id;
 }
 
 export function listCollaborations(
   request: IncomingMessage,
   response: ServerResponse,
 ) {
-  const user = requireAuth(
-    request,
-    response,
-  );
+  const user = requireAuth(request, response);
 
   if (!user) {
     return;
@@ -87,18 +75,11 @@ export function listCollaborations(
          OR c.brand_id = ?
       ORDER BY c.created_at DESC`,
     )
-    .all(
-      user.id,
-      user.id,
-    );
+    .all(user.id, user.id);
 
-  return json(
-    response,
-    200,
-    {
-      data: rows,
-    },
-  );
+  return json(response, 200, {
+    data: rows,
+  });
 }
 
 export function getCollaboration(
@@ -106,10 +87,7 @@ export function getCollaboration(
   response: ServerResponse,
   id: string,
 ) {
-  const user = requireAuth(
-    request,
-    response,
-  );
+  const user = requireAuth(request, response);
 
   if (!user) {
     return;
@@ -153,13 +131,9 @@ export function getCollaboration(
     );
   }
 
-  return json(
-    response,
-    200,
-    {
-      data: row,
-    },
-  );
+  return json(response, 200, {
+    data: row,
+  });
 }
 
 export async function updateCollaboration(
@@ -167,19 +141,14 @@ export async function updateCollaboration(
   response: ServerResponse,
   id: string,
 ) {
-  const user = requireAuth(
-    request,
-    response,
-  );
+  const user = requireAuth(request, response);
 
   if (!user) {
     return;
   }
 
   const row = db
-    .prepare(
-      "SELECT * FROM collaborations WHERE id = ?",
-    )
+    .prepare("SELECT * FROM collaborations WHERE id = ?")
     .get(id) as any;
 
   if (!row) {
@@ -202,10 +171,7 @@ export async function updateCollaboration(
 
   const body = await readJson(request);
 
-  const status = stringValue(
-    body.status,
-    row.status,
-  );
+  const status = stringValue(body.status, row.status);
 
   if (!allowedStatuses.has(status)) {
     return error(
@@ -216,22 +182,13 @@ export async function updateCollaboration(
     );
   }
 
-  const brief = stringValue(
-    body.brief,
-    row.brief,
-  );
+  const brief = stringValue(body.brief, row.brief);
 
   const contentUrl =
-    stringValue(
-      body.contentUrl,
-      row.content_url ?? "",
-    ) || null;
+    stringValue(body.contentUrl, row.content_url ?? "") || null;
 
   const publishedUrl =
-    stringValue(
-      body.publishedUrl,
-      row.published_url ?? "",
-    ) || null;
+    stringValue(body.publishedUrl, row.published_url ?? "") || null;
 
   const timestamp = now();
 
@@ -267,10 +224,7 @@ export async function updateCollaboration(
     id,
   );
 
-  if (
-    status === "payment_released" &&
-    user.role === "brand"
-  ) {
+  if (status === "payment_released" && user.role === "brand") {
     const exists = db
       .prepare(
         "SELECT id FROM earnings WHERE collaboration_id = ? AND type = 'collaboration'",
@@ -278,17 +232,14 @@ export async function updateCollaboration(
       .get(id);
 
     if (!exists) {
-      const campaign =
-        db
-          .prepare(
-            "SELECT budget_cents, currency FROM campaigns WHERE id = ?",
-          )
-          .get(row.campaign_id) as
-          | {
-              budget_cents: number;
-              currency: string;
-            }
-          | undefined;
+      const campaign = db
+        .prepare("SELECT budget_cents, currency FROM campaigns WHERE id = ?")
+        .get(row.campaign_id) as
+        | {
+            budget_cents: number;
+            currency: string;
+          }
+        | undefined;
 
       db.prepare(
         `INSERT INTO earnings
@@ -307,9 +258,7 @@ export async function updateCollaboration(
           )
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       ).run(
-        randomBytes(16).toString(
-          "base64url",
-        ),
+        randomBytes(16).toString("base64url"),
         row.creator_id,
         id,
         "collaboration",
@@ -324,15 +273,7 @@ export async function updateCollaboration(
     }
   }
 
-  return json(
-    response,
-    200,
-    {
-      data: db
-        .prepare(
-          "SELECT * FROM collaborations WHERE id = ?",
-        )
-        .get(id),
-    },
-  );
+  return json(response, 200, {
+    data: db.prepare("SELECT * FROM collaborations WHERE id = ?").get(id),
+  });
 }

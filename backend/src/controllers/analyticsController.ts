@@ -8,39 +8,24 @@ export function analytics(
   response: ServerResponse,
   url: URL,
 ) {
-  const user = requireAuth(
-    request,
-    response,
-  );
+  const user = requireAuth(request, response);
 
   if (!user) {
     return;
   }
 
-  const range =
-    url.searchParams.get("range") ??
-    "all";
+  const range = url.searchParams.get("range") ?? "all";
 
   const since =
     range === "30d"
-      ? new Date(
-          Date.now() -
-            30 * 86400000,
-        ).toISOString()
+      ? new Date(Date.now() - 30 * 86400000).toISOString()
       : range === "90d"
-        ? new Date(
-            Date.now() -
-              90 * 86400000,
-          ).toISOString()
+        ? new Date(Date.now() - 90 * 86400000).toISOString()
         : null;
 
-  const where = since
-    ? "AND published_at >= ?"
-    : "";
+  const where = since ? "AND published_at >= ?" : "";
 
-  const args = since
-    ? [user.id, since]
-    : [user.id];
+  const args = since ? [user.id, since] : [user.id];
 
   const summary = db
     .prepare(
@@ -68,35 +53,30 @@ export function analytics(
     )
     .all(...args);
 
-  const profile =
-    (db
-      .prepare(
-        "SELECT followers, impressions, engagement_count, post_count FROM creator_profiles WHERE user_id = ?",
-      )
-      .get(user.id) as
-      | {
-          followers: number;
-          impressions: number;
-          engagement_count: number;
-          post_count: number;
-        }
-      | undefined) ?? {
-      followers: 0,
-      impressions: 0,
-      engagement_count: 0,
-      post_count: 0,
-    };
+  const profile = (db
+    .prepare(
+      "SELECT followers, impressions, engagement_count, post_count FROM creator_profiles WHERE user_id = ?",
+    )
+    .get(user.id) as
+    | {
+        followers: number;
+        impressions: number;
+        engagement_count: number;
+        post_count: number;
+      }
+    | undefined) ?? {
+    followers: 0,
+    impressions: 0,
+    engagement_count: 0,
+    post_count: 0,
+  };
 
-  return json(
-    response,
-    200,
-    {
-      data: {
-        range,
-        profile,
-        summary,
-        posts,
-      },
+  return json(response, 200, {
+    data: {
+      range,
+      profile,
+      summary,
+      posts,
     },
-  );
+  });
 }
