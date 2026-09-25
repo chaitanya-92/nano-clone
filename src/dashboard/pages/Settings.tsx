@@ -241,13 +241,6 @@ export default function Settings() {
             : "Unable to load payout methods.";
 
         setError(message);
-
-        toast.add({
-          title: "Unable to load payments",
-          description: message,
-          type: "error",
-          timeout: 4000,
-        });
       })
       .finally(() => {
         setLoadingPayments(false);
@@ -336,13 +329,6 @@ export default function Settings() {
     const xValue = xProfileUrl.trim();
 
     if (!displayName) {
-      toast.add({
-        title: "Name is required",
-        description:
-          "Enter a display name before saving.",
-        type: "error",
-        timeout: 3500,
-      });
       return;
     }
 
@@ -381,15 +367,6 @@ export default function Settings() {
           x: "invalid",
         }));
       }
-
-      toast.add({
-        title: "Check your social links",
-        description:
-          linkedinValidation ||
-          xValidation,
-        type: "error",
-        timeout: 3500,
-      });
       return;
     }
 
@@ -412,20 +389,6 @@ export default function Settings() {
       setXProfileUrl(
         data.x_profile_url ?? "",
       );
-      setInitialLinkedin(
-        data.linkedin_url ?? "",
-      );
-      setInitialX(
-        data.x_profile_url ?? "",
-      );
-
-      toast.add({
-        title: "Changes saved",
-        description:
-          "Your profile changes were saved successfully.",
-        type: "success",
-        timeout: 2500,
-      });
     } catch (value) {
       const message =
         value instanceof Error
@@ -433,13 +396,6 @@ export default function Settings() {
           : "Unable to save your profile.";
 
       setError(message);
-
-      toast.add({
-        title: "Save failed",
-        description: message,
-        type: "error",
-        timeout: 4000,
-      });
     } finally {
       setBusy(false);
     }
@@ -449,13 +405,6 @@ export default function Settings() {
     const value = methodLabel.trim();
 
     if (!value) {
-      toast.add({
-        title: "Payout method required",
-        description:
-          "Enter a name for the payout method.",
-        type: "error",
-        timeout: 3500,
-      });
       return;
     }
 
@@ -475,14 +424,6 @@ export default function Settings() {
       ]);
       setMethodLabel("");
       setShowMethod(false);
-
-      toast.add({
-        title: "Payout method added",
-        description:
-          "Your payout method was saved successfully.",
-        type: "success",
-        timeout: 2500,
-      });
     } catch (value) {
       const message =
         value instanceof Error
@@ -490,13 +431,6 @@ export default function Settings() {
           : "Unable to save payout method.";
 
       setError(message);
-
-      toast.add({
-        title: "Payout method failed",
-        description: message,
-        type: "error",
-        timeout: 4000,
-      });
     } finally {
       setBusy(false);
     }
