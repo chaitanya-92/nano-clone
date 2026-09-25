@@ -121,21 +121,36 @@ export async function handleGoogleCallback(code: string, role: "creator" | "bran
   const email = String(profile.email).toLowerCase();
 
   let user: any = findUserByEmail(email);
+  let isNewUser = false;
 
   if (!user) {
     user = createOAuthUser({
       email,
-      name: String(profile.name || email.split("@")[0]),
+      name: String(
+        profile.name ||
+          email.split("@")[0],
+      ),
       role,
       provider: "google",
     });
+
+    isNewUser = true;
   }
 
-  return user;
+  return {
+    user,
+    isNewUser,
+  };
 }
 
 export function getFrontendDashboardUrl() {
   return `${FRONTEND_ORIGIN}/dashboard`;
+}
+
+export function getFrontendOnboardingUrl(
+  role: "creator" | "brand",
+) {
+  return `${FRONTEND_ORIGIN}/register?oauth=google&role=${role}`;
 }
 
 export function getFrontendLoginErrorUrl(error: string) {

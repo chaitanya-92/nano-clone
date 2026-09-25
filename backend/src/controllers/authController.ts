@@ -19,6 +19,7 @@ import { createHash } from "node:crypto";
 import {
   getFrontendDashboardUrl,
   getFrontendLoginErrorUrl,
+  getFrontendOnboardingUrl,
   handleGoogleCallback,
   startGoogleOAuth,
 } from "../services/googleOAuthService";
@@ -306,14 +307,24 @@ export async function googleCallback(
   }
 
   try {
-    const role = cookies.naano_oauth_role === "brand" ? "brand" : "creator";
-    const user = await handleGoogleCallback(params.code, role);
+    const role =
+      cookies.naano_oauth_role === "brand"
+        ? "brand"
+        : "creator";
+
+    const { user, isNewUser } =
+      await handleGoogleCallback(
+        params.code,
+        role,
+      );
 
     createSession(response, user.id);
 
     return redirect(
       response,
-      getFrontendDashboardUrl(),
+      isNewUser
+        ? getFrontendOnboardingUrl(role)
+        : getFrontendDashboardUrl(),
     );
   } catch {
     return redirect(
