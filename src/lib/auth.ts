@@ -2,7 +2,7 @@ import type { User, UserRole } from "@/features/authSlice";
 
 type AuthResponse = { user: User };
 
-const API_URL = import.meta.env.VITE_API_URL ?? "";
+const API_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8787";
 
 async function request<T>(
   path: string,
