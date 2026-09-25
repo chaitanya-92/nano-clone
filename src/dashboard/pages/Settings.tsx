@@ -34,6 +34,7 @@ import {
 } from "@/lib/dashboard";
 import { getCurrentUser, logout } from "@/lib/auth";
 import { signOut } from "@/features/authSlice";
+import { toast } from "@/components/ui/toast";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
 type Tab = "profile" | "payments" | "account";
