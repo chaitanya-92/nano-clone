@@ -166,8 +166,10 @@ export function logout(
 export function google(
   _request: IncomingMessage,
   response: ServerResponse,
+  url: URL,
 ) {
-  const started = startGoogleOAuth(response);
+  const role = url.searchParams.get("role") === "brand" ? "brand" : "creator";
+  const started = startGoogleOAuth(response, role);
 
   if (!started) {
     return redirect(
@@ -219,9 +221,8 @@ export async function googleCallback(
   }
 
   try {
-    const user = await handleGoogleCallback(
-      params.code,
-    );
+    const role = cookies.naano_oauth_role === "brand" ? "brand" : "creator";
+    const user = await handleGoogleCallback(params.code, role);
 
     createSession(response, user.id);
 
