@@ -200,6 +200,32 @@ export default function MyCard() {
         1600,
       );
     } catch {
+      const textarea =
+        document.createElement(
+          "textarea",
+        );
+
+      textarea.value = publicUrl;
+      textarea.style.position =
+        "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(
+        textarea,
+      );
+      textarea.select();
+      document.execCommand("copy");
+      textarea.remove();
+
+      toast.add({
+        title: "Card link copied",
+        description:
+          "The public creator card link is ready to share.",
+        type: "success",
+        timeout: 2200,
+      });
+
+      return;
+    } catch {
       toast.add({
         title: "Copy failed",
         description:

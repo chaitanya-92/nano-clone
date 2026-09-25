@@ -250,6 +250,33 @@ export default function Overview() {
         1800,
       );
     } catch {
+      const textarea =
+        document.createElement(
+          "textarea",
+        );
+
+      textarea.value = cardUrl;
+      textarea.style.position =
+        "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(
+        textarea,
+      );
+      textarea.select();
+      document.execCommand("copy");
+      textarea.remove();
+      setCopied(true);
+
+      toast.add({
+        title: "Card link copied",
+        description:
+          "The public creator card link is ready to share.",
+        type: "success",
+        timeout: 2200,
+      });
+
+      return;
+    } catch {
       toast.add({
         title: "Copy failed",
         description:
