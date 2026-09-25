@@ -216,16 +216,19 @@ export default function MyCard() {
               className="absolute -bottom-14 left-1/2 flex h-28 w-28 -translate-x-1/2 items-center justify-center rounded-full border-4 border-[#316df0] bg-[#6572cc] text-4xl text-white"
             >
               {profile.name
-                .split(" ")
+                ?.trim()
+                .split(/\s+/)
+                .filter(Boolean)
                 .map((value) => value[0])
                 .slice(0, 2)
-                .join("")}
+                .join("")
+                .toUpperCase() || "N"}
             </motion.div>
           </div>
 
           <div className="px-8 pb-9 pt-20 text-center">
             <h2 className="text-[32px] font-semibold tracking-[-1.2px] text-[#141a29]">
-              {profile.name}
+              {profile.name || "Creator"}
             </h2>
 
             <p className="mt-2 text-[16px] text-[#7b879d]">
@@ -252,21 +255,27 @@ export default function MyCard() {
             <div className="mt-8 grid grid-cols-3 border-y border-[#e8ecf2] py-6">
               <div>
                 <p className="text-2xl font-semibold text-[#182239]">
-                  {profile.followers.toLocaleString()}
+                  {Number(
+                    profile.followers ?? 0,
+                  ).toLocaleString()}
                 </p>
                 <p className="mt-1 text-xs text-[#8794aa]">Followers</p>
               </div>
 
               <div className="border-x border-[#e8ecf2]">
                 <p className="text-2xl font-semibold text-[#182239]">
-                  {profile.impressions.toLocaleString()}
+                  {Number(
+                    profile.impressions ?? 0,
+                  ).toLocaleString()}
                 </p>
                 <p className="mt-1 text-xs text-[#8794aa]">Impressions</p>
               </div>
 
               <div>
                 <p className="text-2xl font-semibold text-[#182239]">
-                  {profile.post_count.toLocaleString()}
+                  {Number(
+                    profile.post_count ?? 0,
+                  ).toLocaleString()}
                 </p>
                 <p className="mt-1 text-xs text-[#8794aa]">Posts</p>
               </div>
