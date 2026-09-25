@@ -1,4 +1,5 @@
 import { Copy, ExternalLink, Pencil, Save, Share2 } from "lucide-react";
+import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -170,7 +171,24 @@ export default function MyCard() {
       )}
 
       <section className="mt-8 grid gap-6 lg:grid-cols-[1fr_360px]">
-        <div className="overflow-hidden rounded-[28px] border border-[#dce4ef] bg-white shadow-[0_20px_60px_rgba(34,60,100,0.08)]">
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 18,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            duration: 0.5,
+            ease: "easeOut",
+          }}
+          whileHover={{
+            y: -4,
+          }}
+          className="overflow-hidden rounded-[28px] border border-[#dce4ef] bg-white shadow-[0_20px_60px_rgba(34,60,100,0.08)]"
+        >
           <div className="relative h-[170px] bg-gradient-to-br from-[#2159df] via-[#316df0] to-[#6f91f3]">
             <div className="absolute left-7 top-6 text-2xl font-bold text-white">
               naano
@@ -180,13 +198,29 @@ export default function MyCard() {
               {profile.country || "Global"}
             </div>
 
-            <div className="absolute -bottom-14 left-1/2 flex h-28 w-28 -translate-x-1/2 items-center justify-center rounded-full border-4 border-[#316df0] bg-[#6572cc] text-4xl text-white">
+            <motion.div
+              initial={{
+                scale: 0.72,
+                opacity: 0,
+              }}
+              animate={{
+                scale: 1,
+                opacity: 1,
+              }}
+              transition={{
+                type: "spring",
+                stiffness: 250,
+                damping: 18,
+                delay: 0.12,
+              }}
+              className="absolute -bottom-14 left-1/2 flex h-28 w-28 -translate-x-1/2 items-center justify-center rounded-full border-4 border-[#316df0] bg-[#6572cc] text-4xl text-white"
+            >
               {profile.name
                 .split(" ")
                 .map((value) => value[0])
                 .slice(0, 2)
                 .join("")}
-            </div>
+            </motion.div>
           </div>
 
           <div className="px-8 pb-9 pt-20 text-center">
@@ -238,7 +272,7 @@ export default function MyCard() {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         <aside className="rounded-[24px] border border-[#dfe5ed] bg-white p-6 shadow-[0_4px_16px_rgba(32,52,82,0.035)]">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#8a96aa]">
