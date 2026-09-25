@@ -10,10 +10,7 @@ import {
   Trash2,
   UserRound,
 } from "lucide-react";
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,10 +34,7 @@ import {
 import { connectSocial } from "@/lib/onboarding";
 import { logout } from "@/lib/auth";
 import { signOut } from "@/features/authSlice";
-import {
-  useAppDispatch,
-  useAppSelector,
-} from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
 const tabs = [
   {
@@ -60,9 +54,7 @@ const tabs = [
   },
 ] as const;
 
-type SocialProvider =
-  | "linkedin"
-  | "x";
+type SocialProvider = "linkedin" | "x";
 
 type SocialState = {
   url: string;
@@ -70,10 +62,7 @@ type SocialState = {
   message: string;
 };
 
-function isValidSocialUrl(
-  provider: SocialProvider,
-  value: string,
-) {
+function isValidSocialUrl(provider: SocialProvider, value: string) {
   try {
     const url = new URL(value.trim());
 
@@ -81,25 +70,18 @@ function isValidSocialUrl(
       return false;
     }
 
-    const hostname = url.hostname
-      .toLowerCase()
-      .replace(/^www\./, "");
+    const hostname = url.hostname.toLowerCase().replace(/^www\./, "");
 
     if (provider === "linkedin") {
       return (
         hostname === "linkedin.com" &&
-        /^\/in\/[A-Za-z0-9][A-Za-z0-9._-]*\/?$/.test(
-          url.pathname,
-        )
+        /^\/in\/[A-Za-z0-9][A-Za-z0-9._-]*\/?$/.test(url.pathname)
       );
     }
 
     return (
-      (hostname === "x.com" ||
-        hostname === "twitter.com") &&
-      /^\/[A-Za-z0-9_]{1,15}\/?$/.test(
-        url.pathname,
-      )
+      (hostname === "x.com" || hostname === "twitter.com") &&
+      /^\/[A-Za-z0-9_]{1,15}\/?$/.test(url.pathname)
     );
   } catch {
     return false;
@@ -109,392 +91,267 @@ function isValidSocialUrl(
 export default function Settings() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const user = useAppSelector(
-    (state) => state.auth.user,
-  );
-  const [tab, setTab] =
-    useState<(typeof tabs)[number]["id"]>(
-      "profile",
-    );
-  const [profile, setProfile] =
-    useState<CreatorProfile | null>(
-      null,
-    );
-  const [methods, setMethods] =
-    useState<PayoutMethod[]>([]);
+  const user = useAppSelector((state) => state.auth.user);
+  const [tab, setTab] = useState<(typeof tabs)[number]["id"]>("profile");
+  const [profile, setProfile] = useState<CreatorProfile | null>(null);
+  const [methods, setMethods] = useState<PayoutMethod[]>([]);
   const [name, setName] = useState("");
-  const [linkedin, setLinkedin] =
-    useState<SocialState>({
-      url: "",
-      status: "idle",
-      message: "",
-    });
-  const [xProfile, setXProfile] =
-    useState<SocialState>({
-      url: "",
-      status: "idle",
-      message: "",
-    });
-  const [methodLabel, setMethodLabel] =
-    useState("");
-  const [showMethod, setShowMethod] =
-    useState(false);
-  const [showDelete, setShowDelete] =
-    useState(false);
-  const [deleteConfirmation, setDeleteConfirmation] =
-    useState("");
-  const [busy, setBusy] =
-    useState(false);
-  const [error, setError] =
-    useState("");
-  const [saved, setSaved] =
-    useState(false);
+  const [linkedin, setLinkedin] = useState<SocialState>({
+    url: "",
+    status: "idle",
+    message: "",
+  });
+  const [xProfile, setXProfile] = useState<SocialState>({
+    url: "",
+    status: "idle",
+    message: "",
+  });
+  const [methodLabel, setMethodLabel] = useState("");
+  const [showMethod, setShowMethod] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [saved, setSaved] = useState(false);
 
-  const loadSettings =
-    async () => {
-      setError("");
+  const loadSettings = async () => {
+    setError("");
 
-      if (user?.role !== "creator") {
-        setError(
-          "Creator account required.",
-        );
-        return;
-      }
+    if (user?.role !== "creator") {
+      setError("Creator account required.");
+      return;
+    }
 
-      try {
-        const [
-          profileResult,
-          payoutResult,
-          socialResult,
-        ] = await Promise.all([
-          getCreatorProfile(),
-          getPayoutMethods(),
-          getSocialAccounts(),
-        ]);
+    try {
+      const [profileResult, payoutResult, socialResult] = await Promise.all([
+        getCreatorProfile(),
+        getPayoutMethods(),
+        getSocialAccounts(),
+      ]);
 
-        const creator =
-          profileResult.data;
+      const creator = profileResult.data;
 
-        setProfile(creator);
-        setName(
-          creator.name ?? "",
-        );
-        setMethods(
-          payoutResult.data,
-        );
+      setProfile(creator);
+      setName(creator.name ?? "");
+      setMethods(payoutResult.data);
 
-        const linkedInAccount =
-          socialResult.data.find(
-            (item) =>
-              item.provider ===
-              "linkedin",
-          );
+      const linkedInAccount = socialResult.data.find(
+        (item) => item.provider === "linkedin",
+      );
 
-        const xAccount =
-          socialResult.data.find(
-            (item) =>
-              item.provider === "x",
-          );
+      const xAccount = socialResult.data.find((item) => item.provider === "x");
 
-        setLinkedin({
-          url:
-            linkedInAccount?.profile_url ??
-            creator.linkedin_url ??
-            "",
-          status:
-            linkedInAccount?.status ===
-            "connected"
-              ? "valid"
-              : "idle",
-          message:
-            linkedInAccount?.status ===
-            "connected"
-              ? "Profile connected."
-              : "",
-        });
+      setLinkedin({
+        url: linkedInAccount?.profile_url ?? creator.linkedin_url ?? "",
+        status: linkedInAccount?.status === "connected" ? "valid" : "idle",
+        message:
+          linkedInAccount?.status === "connected" ? "Profile connected." : "",
+      });
 
-        setXProfile({
-          url:
-            xAccount?.profile_url ??
-            creator.x_profile_url ??
-            "",
-          status:
-            xAccount?.status ===
-            "connected"
-              ? "valid"
-              : "idle",
-          message:
-            xAccount?.status ===
-            "connected"
-              ? "Profile connected."
-              : "",
-        });
-      } catch (value) {
-        setError(
-          value instanceof Error
-            ? value.message
-            : "Unable to load settings.",
-        );
-      }
-    };
+      setXProfile({
+        url: xAccount?.profile_url ?? creator.x_profile_url ?? "",
+        status: xAccount?.status === "connected" ? "valid" : "idle",
+        message: xAccount?.status === "connected" ? "Profile connected." : "",
+      });
+    } catch (value) {
+      setError(
+        value instanceof Error ? value.message : "Unable to load settings.",
+      );
+    }
+  };
 
   useEffect(() => {
     void loadSettings();
   }, [user?.id, user?.role]);
 
-  const saveName =
-    async () => {
-      const value = name.trim();
+  const saveName = async () => {
+    const value = name.trim();
 
-      if (!value) {
-        setError(
-          "Display name is required.",
-        );
-        return;
-      }
+    if (!value) {
+      setError("Display name is required.");
+      return;
+    }
 
-      setBusy(true);
-      setError("");
-      setSaved(false);
+    setBusy(true);
+    setError("");
+    setSaved(false);
 
-      try {
-        const { data } =
-          await updateCreatorProfile({
-            name: value,
-          });
+    try {
+      const { data } = await updateCreatorProfile({
+        name: value,
+      });
 
-        setProfile(data);
-        setName(
-          data.name ?? value,
-        );
-        setSaved(true);
+      setProfile(data);
+      setName(data.name ?? value);
+      setSaved(true);
 
-        window.setTimeout(
-          () => setSaved(false),
-          1800,
-        );
-      } catch (value) {
-        setError(
-          value instanceof Error
-            ? value.message
-            : "Unable to save the display name.",
-        );
-      } finally {
-        setBusy(false);
-      }
-    };
+      window.setTimeout(() => setSaved(false), 1800);
+    } catch (value) {
+      setError(
+        value instanceof Error
+          ? value.message
+          : "Unable to save the display name.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
 
-  const validateSocial =
-    async (
-      provider: SocialProvider,
-    ) => {
-      const state =
+  const validateSocial = async (provider: SocialProvider) => {
+    const state = provider === "linkedin" ? linkedin : xProfile;
+
+    const value = state.url.trim();
+
+    if (!isValidSocialUrl(provider, value)) {
+      const message =
         provider === "linkedin"
-          ? linkedin
-          : xProfile;
-
-      const value = state.url.trim();
-
-      if (
-        !isValidSocialUrl(
-          provider,
-          value,
-        )
-      ) {
-        const message =
-          provider === "linkedin"
-            ? "Enter a valid HTTPS LinkedIn profile URL."
-            : "Enter a valid HTTPS X profile URL.";
-
-        if (provider === "linkedin") {
-          setLinkedin({
-            ...state,
-            status: "invalid",
-            message,
-          });
-        } else {
-          setXProfile({
-            ...state,
-            status: "invalid",
-            message,
-          });
-        }
-
-        return;
-      }
+          ? "Enter a valid HTTPS LinkedIn profile URL."
+          : "Enter a valid HTTPS X profile URL.";
 
       if (provider === "linkedin") {
         setLinkedin({
           ...state,
-          status: "checking",
-          message:
-            "Checking public profile…",
+          status: "invalid",
+          message,
         });
       } else {
         setXProfile({
           ...state,
-          status: "checking",
-          message:
-            "Checking public profile…",
+          status: "invalid",
+          message,
         });
       }
 
-      try {
-        const response =
-          await connectSocial(
-            provider,
-            value,
-          );
+      return;
+    }
 
-        const message =
-          "Profile verified and saved.";
+    if (provider === "linkedin") {
+      setLinkedin({
+        ...state,
+        status: "checking",
+        message: "Checking public profile…",
+      });
+    } else {
+      setXProfile({
+        ...state,
+        status: "checking",
+        message: "Checking public profile…",
+      });
+    }
 
-        if (provider === "linkedin") {
-          setLinkedin({
-            url:
-              response?.data
-                ?.profileUrl ?? value,
-            status: "valid",
-            message,
-          });
-        } else {
-          setXProfile({
-            url:
-              response?.data
-                ?.profileUrl ?? value,
-            status: "valid",
-            message,
-          });
-        }
+    try {
+      const response = await connectSocial(provider, value);
 
-        const { data } =
-          await getCreatorProfile();
+      const message = "Profile verified and saved.";
 
-        setProfile(data);
-
-        if (
-          provider === "linkedin"
-        ) {
-          setName(
-            data.name ?? "",
-          );
-        }
-      } catch (value) {
-        const message =
-          value instanceof Error
-            ? value.message
-            : "The profile could not be verified.";
-
-        if (provider === "linkedin") {
-          setLinkedin({
-            ...state,
-            status: "invalid",
-            message,
-          });
-        } else {
-          setXProfile({
-            ...state,
-            status: "invalid",
-            message,
-          });
-        }
-      }
-    };
-
-  const saveSocialLinks =
-    async () => {
-      if (
-        linkedin.url &&
-        linkedin.status !==
-          "valid"
-      ) {
-        await validateSocial(
-          "linkedin",
-        );
-      }
-
-      if (
-        xProfile.url &&
-        xProfile.status !==
-          "valid"
-      ) {
-        await validateSocial(
-          "x",
-        );
-      }
-    };
-
-  const saveMethod =
-    async () => {
-      const value =
-        methodLabel.trim();
-
-      if (!value) {
-        setError(
-          "Enter a name for the payout method.",
-        );
-        return;
-      }
-
-      setBusy(true);
-      setError("");
-
-      try {
-        const { data } =
-          await addPayoutMethod({
-            type: "stripe",
-            label: value,
-          });
-
-        setMethods(
-          (current) => [
-            data,
-            ...current,
-          ],
-        );
-        setMethodLabel("");
-        setShowMethod(false);
-      } catch (value) {
-        setError(
-          value instanceof Error
-            ? value.message
-            : "Unable to save payout method.",
-        );
-      } finally {
-        setBusy(false);
-      }
-    };
-
-  const handleDelete =
-    async () => {
-      if (
-        deleteConfirmation !==
-        "DELETE"
-      ) {
-        return;
-      }
-
-      setBusy(true);
-      setError("");
-
-      try {
-        await deleteAccount();
-        dispatch(signOut());
-        await logout().catch(
-          () => undefined,
-        );
-        navigate("/login", {
-          replace: true,
+      if (provider === "linkedin") {
+        setLinkedin({
+          url: response?.data?.profileUrl ?? value,
+          status: "valid",
+          message,
         });
-      } catch (value) {
-        setError(
-          value instanceof Error
-            ? value.message
-            : "Unable to delete your account.",
-        );
-        setBusy(false);
+      } else {
+        setXProfile({
+          url: response?.data?.profileUrl ?? value,
+          status: "valid",
+          message,
+        });
       }
-    };
+
+      const { data } = await getCreatorProfile();
+
+      setProfile(data);
+
+      if (provider === "linkedin") {
+        setName(data.name ?? "");
+      }
+    } catch (value) {
+      const message =
+        value instanceof Error
+          ? value.message
+          : "The profile could not be verified.";
+
+      if (provider === "linkedin") {
+        setLinkedin({
+          ...state,
+          status: "invalid",
+          message,
+        });
+      } else {
+        setXProfile({
+          ...state,
+          status: "invalid",
+          message,
+        });
+      }
+    }
+  };
+
+  const saveSocialLinks = async () => {
+    if (linkedin.url && linkedin.status !== "valid") {
+      await validateSocial("linkedin");
+    }
+
+    if (xProfile.url && xProfile.status !== "valid") {
+      await validateSocial("x");
+    }
+  };
+
+  const saveMethod = async () => {
+    const value = methodLabel.trim();
+
+    if (!value) {
+      setError("Enter a name for the payout method.");
+      return;
+    }
+
+    setBusy(true);
+    setError("");
+
+    try {
+      const { data } = await addPayoutMethod({
+        type: "stripe",
+        label: value,
+      });
+
+      setMethods((current) => [data, ...current]);
+      setMethodLabel("");
+      setShowMethod(false);
+    } catch (value) {
+      setError(
+        value instanceof Error
+          ? value.message
+          : "Unable to save payout method.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (deleteConfirmation !== "DELETE") {
+      return;
+    }
+
+    setBusy(true);
+    setError("");
+
+    try {
+      await deleteAccount();
+      dispatch(signOut());
+      await logout().catch(() => undefined);
+      navigate("/login", {
+        replace: true,
+      });
+    } catch (value) {
+      setError(
+        value instanceof Error
+          ? value.message
+          : "Unable to delete your account.",
+      );
+      setBusy(false);
+    }
+  };
 
   if (!profile) {
     return (
@@ -509,8 +366,7 @@ export default function Settings() {
         </section>
 
         <div className="mt-6 rounded-xl border border-[#f1c7c7] bg-[#fff7f7] px-4 py-3 text-sm text-[#9b3e3e]">
-          {error ||
-            "Unable to load settings."}
+          {error || "Unable to load settings."}
         </div>
       </div>
     );
@@ -564,9 +420,7 @@ export default function Settings() {
               <button
                 key={item.id}
                 type="button"
-                onClick={() =>
-                  setTab(item.id)
-                }
+                onClick={() => setTab(item.id)}
                 className={
                   tab === item.id
                     ? "flex w-full cursor-pointer items-center gap-3 rounded-xl bg-[#eef4ff] px-4 py-3 text-left text-sm font-semibold text-[#2864f0]"
@@ -588,7 +442,8 @@ export default function Settings() {
                   Personal profile
                 </h2>
                 <p className="mt-1 text-sm text-[#7d899f]">
-                  Manage the public profile information connected to your creator card.
+                  Manage the public profile information connected to your
+                  creator card.
                 </p>
               </div>
 
@@ -606,9 +461,7 @@ export default function Settings() {
                       id="display-name"
                       value={name}
                       onChange={(event) => {
-                        setName(
-                          event.target.value,
-                        );
+                        setName(event.target.value);
                         setSaved(false);
                       }}
                       className="auth-input flex-1"
@@ -616,13 +469,8 @@ export default function Settings() {
 
                     <Button
                       type="button"
-                      onClick={() =>
-                        void saveName()
-                      }
-                      disabled={
-                        busy ||
-                        !name.trim()
-                      }
+                      onClick={() => void saveName()}
+                      disabled={busy || !name.trim()}
                       className="cursor-pointer bg-[#171d2b] hover:bg-[#111827]"
                     >
                       {busy ? (
@@ -630,9 +478,7 @@ export default function Settings() {
                       ) : (
                         <Save className="mr-2 h-4 w-4" />
                       )}
-                      {saved
-                        ? "Saved"
-                        : "Save name"}
+                      {saved ? "Saved" : "Save name"}
                     </Button>
                   </div>
                 </div>
@@ -646,27 +492,16 @@ export default function Settings() {
                   </div>
 
                   <p className="mt-1 text-sm text-[#7d899f]">
-                    Validate each public profile before saving it to your workspace.
+                    Validate each public profile before saving it to your
+                    workspace.
                   </p>
 
                   <div className="mt-5 space-y-5">
                     {socialRows.map(
-                      ({
-                        provider,
-                        label,
-                        icon: Icon,
-                        state,
-                        setState,
-                      }) => (
-                        <div
-                          key={provider}
-                          className="space-y-2"
-                        >
+                      ({ provider, label, icon: Icon, state, setState }) => (
+                        <div key={provider} className="space-y-2">
                           <label
-                            htmlFor={
-                              provider +
-                              "-url"
-                            }
+                            htmlFor={provider + "-url"}
                             className="text-xs font-semibold text-[#626a78]"
                           >
                             {label}
@@ -674,31 +509,18 @@ export default function Settings() {
 
                           <div className="flex flex-col gap-2 sm:flex-row">
                             <input
-                              id={
-                                provider +
-                                "-url"
-                              }
-                              value={
-                                state.url
-                              }
-                              onChange={(
-                                event,
-                              ) =>
+                              id={provider + "-url"}
+                              value={state.url}
+                              onChange={(event) =>
                                 setState({
-                                  url:
-                                    event
-                                      .target
-                                      .value,
-                                  status:
-                                    "idle",
-                                  message:
-                                    "",
+                                  url: event.target.value,
+                                  status: "idle",
+                                  message: "",
                                 })
                               }
                               className="auth-input flex-1"
                               placeholder={
-                                provider ===
-                                "linkedin"
+                                provider === "linkedin"
                                   ? "https://linkedin.com/in/your-profile"
                                   : "https://x.com/your-handle"
                               }
@@ -707,37 +529,24 @@ export default function Settings() {
                             <Button
                               type="button"
                               variant={
-                                state.status ===
-                                "valid"
-                                  ? "outline"
-                                  : "default"
+                                state.status === "valid" ? "outline" : "default"
                               }
-                              onClick={() =>
-                                void validateSocial(
-                                  provider,
-                                )
-                              }
+                              onClick={() => void validateSocial(provider)}
                               disabled={
-                                state.status ===
-                                "checking" ||
-                                !state.url.trim()
+                                state.status === "checking" || !state.url.trim()
                               }
                               className="cursor-pointer sm:min-w-[150px]"
                             >
-                              {state.status ===
-                              "checking" ? (
+                              {state.status === "checking" ? (
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              ) : state.status ===
-                                "valid" ? (
+                              ) : state.status === "valid" ? (
                                 <Check className="mr-2 h-4 w-4" />
                               ) : (
                                 <RefreshCw className="mr-2 h-4 w-4" />
                               )}
-                              {state.status ===
-                              "checking"
+                              {state.status === "checking"
                                 ? "Checking..."
-                                : state.status ===
-                                  "valid"
+                                : state.status === "valid"
                                   ? "Verified"
                                   : "Validate profile"}
                             </Button>
@@ -746,11 +555,9 @@ export default function Settings() {
                           {state.message && (
                             <p
                               className={
-                                state.status ===
-                                "valid"
+                                state.status === "valid"
                                   ? "text-xs text-[#188b56]"
-                                  : state.status ===
-                                    "invalid"
+                                  : state.status === "invalid"
                                     ? "text-xs text-[#bd4b4b]"
                                     : "text-xs text-[#7b879a]"
                               }
@@ -765,21 +572,11 @@ export default function Settings() {
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() =>
-                        void saveSocialLinks()
-                      }
+                      onClick={() => void saveSocialLinks()}
                       disabled={
                         busy ||
-                        Boolean(
-                          linkedin.url &&
-                            linkedin.status !==
-                              "valid",
-                        ) ||
-                        Boolean(
-                          xProfile.url &&
-                            xProfile.status !==
-                              "valid",
-                        )
+                        Boolean(linkedin.url && linkedin.status !== "valid") ||
+                        Boolean(xProfile.url && xProfile.status !== "valid")
                       }
                       className="cursor-pointer"
                     >
@@ -818,16 +615,10 @@ export default function Settings() {
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() =>
-                        setShowMethod(
-                          (value) => !value,
-                        )
-                      }
+                      onClick={() => setShowMethod((value) => !value)}
                       className="cursor-pointer"
                     >
-                      {showMethod
-                        ? "Cancel"
-                        : "Add method"}
+                      {showMethod ? "Cancel" : "Add method"}
                     </Button>
                   </div>
 
@@ -835,24 +626,15 @@ export default function Settings() {
                     <div className="mt-4 flex flex-col gap-2 sm:flex-row">
                       <input
                         value={methodLabel}
-                        onChange={(event) =>
-                          setMethodLabel(
-                            event.target.value,
-                          )
-                        }
+                        onChange={(event) => setMethodLabel(event.target.value)}
                         className="auth-input flex-1"
                         placeholder="Primary payout account"
                       />
 
                       <Button
                         type="button"
-                        onClick={() =>
-                          void saveMethod()
-                        }
-                        disabled={
-                          busy ||
-                          !methodLabel.trim()
-                        }
+                        onClick={() => void saveMethod()}
+                        disabled={busy || !methodLabel.trim()}
                         className="cursor-pointer bg-[#171d2b] hover:bg-[#111827]"
                       >
                         <Save className="mr-2 h-4 w-4" />
@@ -863,26 +645,23 @@ export default function Settings() {
 
                   <div className="mt-4 space-y-2">
                     {methods.length ? (
-                      methods.map(
-                        (method) => (
-                          <div
-                            key={method.id}
-                            className="flex items-center justify-between rounded-xl border border-[#e2e8f0] bg-white px-4 py-3"
-                          >
-                            <div>
-                              <p className="text-sm font-semibold text-[#344059]">
-                                {method.label}
-                              </p>
-                              <p className="mt-1 text-xs text-[#8b97aa]">
-                                {method.type} ·{" "}
-                                {method.status}
-                              </p>
-                            </div>
-
-                            <Check className="h-4 w-4 text-[#18945a]" />
+                      methods.map((method) => (
+                        <div
+                          key={method.id}
+                          className="flex items-center justify-between rounded-xl border border-[#e2e8f0] bg-white px-4 py-3"
+                        >
+                          <div>
+                            <p className="text-sm font-semibold text-[#344059]">
+                              {method.label}
+                            </p>
+                            <p className="mt-1 text-xs text-[#8b97aa]">
+                              {method.type} · {method.status}
+                            </p>
                           </div>
-                        ),
-                      )
+
+                          <Check className="h-4 w-4 text-[#18945a]" />
+                        </div>
+                      ))
                     ) : (
                       <div className="rounded-xl border border-[#e2e8f0] bg-white px-4 py-5 text-sm text-[#8b97aa]">
                         No payout method saved.
@@ -908,8 +687,8 @@ export default function Settings() {
                     </h2>
 
                     <p className="mt-2 max-w-[680px] text-sm leading-6 text-[#8d6262]">
-                      Permanently delete your account and associated workspace data.
-                      This action cannot be undone.
+                      Permanently delete your account and associated workspace
+                      data. This action cannot be undone.
                     </p>
                   </div>
                 </div>
@@ -917,9 +696,7 @@ export default function Settings() {
                 <Button
                   type="button"
                   variant="destructive"
-                  onClick={() =>
-                    setShowDelete(true)
-                  }
+                  onClick={() => setShowDelete(true)}
                   className="mt-5 cursor-pointer"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
@@ -975,11 +752,7 @@ export default function Settings() {
             <input
               id="delete-confirmation"
               value={deleteConfirmation}
-              onChange={(event) =>
-                setDeleteConfirmation(
-                  event.target.value,
-                )
-              }
+              onChange={(event) => setDeleteConfirmation(event.target.value)}
               autoComplete="off"
               className="auth-input"
               placeholder="DELETE"
@@ -990,9 +763,7 @@ export default function Settings() {
             <Button
               type="button"
               variant="outline"
-              onClick={() =>
-                setShowDelete(false)
-              }
+              onClick={() => setShowDelete(false)}
               disabled={busy}
               className="cursor-pointer"
             >
@@ -1002,22 +773,12 @@ export default function Settings() {
             <Button
               type="button"
               variant="destructive"
-              onClick={() =>
-                void handleDelete()
-              }
-              disabled={
-                busy ||
-                deleteConfirmation !==
-                  "DELETE"
-              }
+              onClick={() => void handleDelete()}
+              disabled={busy || deleteConfirmation !== "DELETE"}
               className="cursor-pointer"
             >
-              {busy && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              {busy
-                ? "Deleting..."
-                : "Delete account permanently"}
+              {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {busy ? "Deleting..." : "Delete account permanently"}
             </Button>
           </DialogFooter>
         </DialogContent>
