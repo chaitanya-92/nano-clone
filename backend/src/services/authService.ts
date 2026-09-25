@@ -38,15 +38,16 @@ export async function registerUser({
     name: name.trim(),
     role,
     provider: "password",
+    emailVerified: 1,
     passwordHash: await hashPassword(password),
     createdAt: new Date().toISOString(),
   };
 
   db.prepare(`
     INSERT INTO users
-    (id, email, password_hash, name, role, provider, created_at)
+    (id, email, password_hash, name, role, provider, email_verified, created_at)
     VALUES
-    (@id, @email, @passwordHash, @name, @role, @provider, @createdAt)
+    (@id, @email, @passwordHash, @name, @role, @provider, @emailVerified, @createdAt)
   `).run(user);
 
   if (role === "creator") {
@@ -102,6 +103,7 @@ export function createOAuthUser({
     name: name.slice(0, 80),
     role,
     provider,
+    emailVerified: 1,
     createdAt: new Date().toISOString(),
   };
   db.prepare(`INSERT INTO users (id, email, name, role, provider, created_at) VALUES (@id, @email, @name, @role, @provider, @createdAt)`).run(user);
