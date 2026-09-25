@@ -698,14 +698,14 @@ export default function Register() {
                   </div>
                   <div className="grid gap-3 sm:grid-cols-2">
                     <a
-                      href={`${import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8787"}/api/auth/google?role=${role}&flow=signup`}
+                      href={`${import.meta.env.VITE_API_URL ?? "http://localhost:8787"}/api/auth/google?role=${role}&flow=signup`}
                       className="flex h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border border-[#dfe3e8] bg-white text-sm font-semibold text-[#252a34] transition hover:bg-[#f7f8fa]"
                     >
                       <GoogleIcon className="h-5 w-5" />
                       Continue with Google
                     </a>
                     <a
-                      href={`${import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8787"}/api/auth/linkedin?role=${role}`}
+                      href={`${import.meta.env.VITE_API_URL ?? "http://localhost:8787"}/api/auth/linkedin?role=${role}`}
                       className="flex h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border border-[#dfe3e8] bg-white text-sm font-semibold text-[#252a34] transition hover:bg-[#f7f8fa]"
                     >
                       <LinkedinIcon className="h-5 w-5" variant="brand" />
