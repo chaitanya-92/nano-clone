@@ -1,10 +1,4 @@
-import {
-  ArrowUpRight,
-  Check,
-  Copy,
-  ExternalLink,
-  Share2,
-} from "lucide-react";
+import { ArrowUpRight, Check, Copy, ExternalLink, Share2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -40,13 +34,10 @@ const stats = [
 
 export default function Overview() {
   const navigate = useNavigate();
-  const user = useAppSelector(
-    (state) => state.auth.user,
+  const user = useAppSelector((state) => state.auth.user);
+  const [dashboard, setDashboard] = useState<DashboardResponse["data"] | null>(
+    null,
   );
-  const [dashboard, setDashboard] =
-    useState<DashboardResponse["data"] | null>(
-      null,
-    );
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -65,10 +56,7 @@ export default function Overview() {
   const profile = dashboard?.profile;
 
   const cardUrl = useMemo(
-    () =>
-      profile?.slug
-        ? getPublicCardUrl(profile.slug)
-        : "",
+    () => (profile?.slug ? getPublicCardUrl(profile.slug) : ""),
     [profile?.slug],
   );
 
@@ -77,15 +65,10 @@ export default function Overview() {
       return;
     }
 
-    await navigator.clipboard.writeText(
-      cardUrl,
-    );
+    await navigator.clipboard.writeText(cardUrl);
     setCopied(true);
 
-    window.setTimeout(
-      () => setCopied(false),
-      1800,
-    );
+    window.setTimeout(() => setCopied(false), 1800);
   };
 
   const shareCard = async () => {
@@ -96,9 +79,7 @@ export default function Overview() {
     if (navigator.share) {
       await navigator
         .share({
-          title:
-            (profile?.name ?? "Creator") +
-            " on Naano",
+          title: (profile?.name ?? "Creator") + " on Naano",
           url: cardUrl,
         })
         .catch(() => undefined);
@@ -117,8 +98,7 @@ export default function Overview() {
         </p>
 
         <h1 className="mt-2 text-[34px] font-semibold tracking-[-1.7px] text-[#111827]">
-          Good to see you,{" "}
-          {profile?.name ?? user?.name ?? "there"}
+          Good to see you, {profile?.name ?? user?.name ?? "there"}
         </h1>
 
         <p className="mt-1 text-[18px] text-[#7d899f]">
@@ -134,18 +114,14 @@ export default function Overview() {
 
       <section className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {stats.map((stat) => {
-          const value =
-            dashboard?.metrics?.[stat.key] ?? 0;
+          const value = dashboard?.metrics?.[stat.key] ?? 0;
 
           return (
             <button
               key={stat.key}
               type="button"
               onClick={() =>
-                navigate(
-                  "/dashboard/analytics?metric=" +
-                    stat.key,
-                )
+                navigate("/dashboard/analytics?metric=" + stat.key)
               }
               className="cursor-pointer rounded-[18px] border border-[#e1e6ee] bg-white px-5 py-5 text-left shadow-[0_3px_12px_rgba(20,35,60,0.025)] transition hover:-translate-y-0.5 hover:border-[#cfd7e3]"
             >
@@ -154,8 +130,7 @@ export default function Overview() {
               </p>
 
               <p className="mt-5 text-[29px] font-semibold tracking-[-1px] text-[#172033]">
-                {stat.key === "impressions" &&
-                value === 0
+                {stat.key === "impressions" && value === 0
                   ? "—"
                   : value.toLocaleString()}
               </p>
@@ -177,8 +152,7 @@ export default function Overview() {
               </h2>
 
               <p className="mt-1 max-w-[190px] text-[13px] leading-5 text-[#8490a5]">
-                This is how brands discover
-                your positioning.
+                This is how brands discover your positioning.
               </p>
             </div>
 
@@ -199,9 +173,7 @@ export default function Overview() {
                 className="h-9 cursor-pointer rounded-lg border-[#dce3ec] px-3 text-[12px] text-[#60708a]"
               >
                 <Copy className="h-3.5 w-3.5" />
-                {copied
-                  ? "Copied"
-                  : "Copy card link"}
+                {copied ? "Copied" : "Copy card link"}
               </Button>
 
               <Button
@@ -227,9 +199,7 @@ export default function Overview() {
               </span>
 
               <span className="absolute right-5 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white text-[18px]">
-                {profile?.country === "India"
-                  ? "🇮🇳"
-                  : "🌐"}
+                {profile?.country === "India" ? "🇮🇳" : "🌐"}
               </span>
 
               <span className="absolute -bottom-10 left-1/2 flex h-20 w-20 -translate-x-1/2 items-center justify-center overflow-hidden rounded-full border-4 border-[#2864f0] bg-[#6572cc] text-[34px] text-white">
@@ -240,14 +210,11 @@ export default function Overview() {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  profile?.name
+                  (profile?.name
                     ?.split(" ")
-                    .map(
-                      (value) =>
-                        value[0],
-                    )
+                    .map((value) => value[0])
                     .slice(0, 1)
-                    .join("") ?? "N"
+                    .join("") ?? "N")
                 )}
               </span>
             </div>
@@ -258,9 +225,7 @@ export default function Overview() {
               </h3>
 
               <p className="mt-1 text-[15px] text-[#8792a6]">
-                {profile?.category ||
-                  profile?.headline ||
-                  "Creator"}
+                {profile?.category || profile?.headline || "Creator"}
               </p>
 
               <p className="mt-6 text-[13px] leading-5 text-[#7f8a9d]">
@@ -279,8 +244,7 @@ export default function Overview() {
               </h2>
 
               <p className="mt-1 text-[13px] text-[#8995aa]">
-                {profile?.card_status ===
-                "published"
+                {profile?.card_status === "published"
                   ? "1 of 1 steps complete"
                   : "Complete your creator card to launch"}
               </p>
@@ -298,8 +262,7 @@ export default function Overview() {
             <div className="flex items-center gap-5">
               <div
                 className={
-                  profile?.card_status ===
-                  "published"
+                  profile?.card_status === "published"
                     ? "flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#16a765] text-white"
                     : "flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#eef4ff] text-[#2864f0]"
                 }
@@ -313,18 +276,14 @@ export default function Overview() {
                 </h3>
 
                 <p className="mt-1 text-[12px] text-[#94a0b3]">
-                  {profile?.card_status ===
-                  "published"
+                  {profile?.card_status === "published"
                     ? "Your positioning and offer are ready."
                     : "Finish your card before sharing it."}
                 </p>
               </div>
 
               <span className="rounded-full bg-[#e8f8ef] px-4 py-1.5 text-[11px] font-semibold text-[#15945a]">
-                {profile?.card_status ===
-                "published"
-                  ? "Complete"
-                  : "Pending"}
+                {profile?.card_status === "published" ? "Complete" : "Pending"}
               </span>
 
               <Link
