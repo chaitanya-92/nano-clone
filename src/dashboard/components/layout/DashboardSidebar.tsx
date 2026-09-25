@@ -112,6 +112,19 @@ export function DashboardSidebar() {
                 setHovered(null)
               }
             >
+              {hovered === item.href &&
+                !active && (
+                  <motion.div
+                    layoutId="dashboard-hover-nav"
+                    transition={{
+                      type: "spring",
+                      stiffness: 520,
+                      damping: 38,
+                    }}
+                    className="absolute inset-0 rounded-xl bg-[#f6f8fb]"
+                  />
+                )}
+
               {active && (
                 <motion.div
                   layoutId="dashboard-active-nav"
