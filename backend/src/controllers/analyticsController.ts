@@ -54,9 +54,7 @@ export function analytics(
     .all(...args);
 
   const profile = (db
-    .prepare(
-      "SELECT followers FROM creator_profiles WHERE user_id = ?",
-    )
+    .prepare("SELECT followers FROM creator_profiles WHERE user_id = ?")
     .get(user.id) as
     | {
         followers: number;
@@ -76,25 +74,19 @@ export function analytics(
        ${where}`,
     )
     .get(...args) as {
-      impressions: number;
-      engagement_count: number;
-      post_count: number;
-    };
+    impressions: number;
+    engagement_count: number;
+    post_count: number;
+  };
 
   return json(response, 200, {
     data: {
       range,
       profile: {
         followers: Number(profile.followers ?? 0),
-        impressions: Number(
-          profileTotals.impressions ?? 0,
-        ),
-        engagement_count: Number(
-          profileTotals.engagement_count ?? 0,
-        ),
-        post_count: Number(
-          profileTotals.post_count ?? 0,
-        ),
+        impressions: Number(profileTotals.impressions ?? 0),
+        engagement_count: Number(profileTotals.engagement_count ?? 0),
+        post_count: Number(profileTotals.post_count ?? 0),
       },
       summary,
       posts,
