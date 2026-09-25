@@ -63,3 +63,17 @@ export async function checkEmail(email: string) {
   if (!response.ok) return { valid: false, available: false };
   return response.json() as Promise<{ valid: boolean; available: boolean }>;
 }
+
+export function requestEmailOtp(email: string) {
+  return request<{ ok: true; expiresAt: number }>("/api/auth/email/request-otp", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+export function verifyEmailOtp(email: string, code: string) {
+  return request<{ ok: true }>("/api/auth/email/verify-otp", {
+    method: "POST",
+    body: JSON.stringify({ email, code }),
+  });
+}
