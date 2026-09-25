@@ -171,8 +171,33 @@ export async function patchProfile(
       );
     }
 
+    const profilePhotoUrl =
+      stringValue(
+        body.profilePhotoUrl,
+        String(
+          p.profile_photo_url ?? "",
+        ),
+      ).trim();
+
+    if (
+      profilePhotoUrl &&
+      (
+        !/^data:image\/(png|jpe?g|webp);base64,/i.test(
+          profilePhotoUrl,
+        ) ||
+        profilePhotoUrl.length > 4000000
+      )
+    ) {
+      return error(
+        response,
+        422,
+        "INVALID_PROFILE_PHOTO",
+        "Upload a PNG, JPEG or WebP image smaller than 3 MB.",
+      );
+    }
+
     db.prepare(
-      "UPDATE creator_profiles SET name=?,headline=?,category=?,bio=?,linkedin_url=?,x_profile_url=?,price_cents=?,updated_at=? WHERE user_id=?",
+      "UPDATE creator_profiles SET name=?,headline=?,category=?,bio=?,linkedin_url=?,x_profile_url=?,profile_photo_url=?,price_cents=?,updated_at=? WHERE user_id=?",
     ).run(
       stringValue(
         body.name,
@@ -192,6 +217,7 @@ export async function patchProfile(
       ),
       linkedinUrl,
       xProfileUrl,
+      profilePhotoUrl || null,
       integerValue(
         body.priceCents,
         Number(p.price_cents ?? 0),
