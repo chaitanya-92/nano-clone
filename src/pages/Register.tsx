@@ -1480,10 +1480,7 @@ export default function Register() {
                         <Checkbox
                           checked={Boolean(formik.values[term.key])}
                           onCheckedChange={(checked) =>
-                            formik.setFieldValue(
-                              term.key,
-                              Boolean(checked),
-                            )
+                            formik.setFieldValue(term.key, Boolean(checked))
                           }
                           aria-label={term.label}
                           className="mt-0.5 cursor-pointer"
@@ -1535,7 +1532,6 @@ export default function Register() {
                         setActiveTerm(null);
                       }
                     }}
-
                   />
                 </div>
               )}{" "}

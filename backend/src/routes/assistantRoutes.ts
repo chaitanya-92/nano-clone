@@ -1,7 +1,4 @@
-import type {
-  IncomingMessage,
-  ServerResponse,
-} from "node:http";
+import type { IncomingMessage, ServerResponse } from "node:http";
 import {
   assistantContext,
   assistantMessage,
@@ -12,26 +9,12 @@ export async function assistantRoutes(
   response: ServerResponse,
   url: URL,
 ) {
-  if (
-    url.pathname ===
-      "/api/assistant/context" &&
-    request.method === "GET"
-  ) {
-    return assistantContext(
-      request,
-      response,
-    );
+  if (url.pathname === "/api/assistant/context" && request.method === "GET") {
+    return assistantContext(request, response);
   }
 
-  if (
-    url.pathname ===
-      "/api/assistant/message" &&
-    request.method === "POST"
-  ) {
-    return assistantMessage(
-      request,
-      response,
-    );
+  if (url.pathname === "/api/assistant/message" && request.method === "POST") {
+    return assistantMessage(request, response);
   }
 
   return false;

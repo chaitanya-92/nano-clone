@@ -26,10 +26,7 @@ export function TermsReaderDialog({
   onOpenChange,
 }: TermsReaderDialogProps) {
   return (
-    <Dialog
-      open={open}
-      onOpenChange={onOpenChange}
-    >
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton
         className="max-w-[720px] border-[#e2e7ee] bg-white p-0"
