@@ -12,6 +12,7 @@ import {
   registerUser,
   publicUser,
 } from "../services/authService";
+import { handleLinkedInCallback, getFrontendLinkedInErrorUrl, startLinkedInOAuth } from "../services/linkedinOAuthService";
 import {
   getFrontendDashboardUrl,
   getFrontendLoginErrorUrl,
@@ -237,5 +238,28 @@ export async function googleCallback(
         "google_failed",
       ),
     );
+  }
+}
+
+export function linkedin(_request: IncomingMessage, response: ServerResponse, url: URL) {
+  const role = url.searchParams.get("role") === "brand" ? "brand" : "creator";
+  const started = startLinkedInOAuth(response, role);
+  if (!started) return redirect(response, getFrontendLinkedInErrorUrl("linkedin_not_configured"));
+}
+
+export async function linkedinCallback(request: IncomingMessage, response: ServerResponse, url: URL) {
+  const params = Object.fromEntries(url.searchParams);
+  const cookies = Object.fromEntries((request.headers.cookie ?? "").split(";").filter(Boolean).map((part) => {
+    const index = part.indexOf("=");
+    return [part.slice(0, index).trim(), decodeURIComponent(part.slice(index + 1))];
+  }));
+  if (params.error || !params.code || params.state !== cookies.naano_oauth_state) return redirect(response, getFrontendLinkedInErrorUrl("linkedin_failed"));
+  try {
+    const role = cookies.naano_oauth_role === "brand" ? "brand" : "creator";
+    const user = await handleLinkedInCallback(params.code, role);
+    createSession(response, user.id);
+    return redirect(response, getFrontendDashboardUrl());
+  } catch {
+    return redirect(response, getFrontendLinkedInErrorUrl("linkedin_failed"));
   }
 }
