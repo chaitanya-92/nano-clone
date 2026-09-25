@@ -267,7 +267,7 @@ export async function linkedinCallback(request: IncomingMessage, response: Serve
 
 export function checkEmail(_request: IncomingMessage, response: ServerResponse, url: URL) {
   const email = (url.searchParams.get("email") ?? "").trim().toLowerCase();
-  if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return json(response, 200, { valid: false, available: false });
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json(response, 200, { valid: false, available: false });
   const existing = db.prepare("SELECT id FROM users WHERE email = ?").get(email);
   return json(response, 200, { valid: true, available: !existing });
 }
