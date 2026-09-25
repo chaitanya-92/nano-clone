@@ -47,63 +47,38 @@ function normalizeProfileUrl(provider: SocialProvider, value: string) {
   return url.toString().replace(/\/$/, "");
 }
 
-async function verifyProfileUrl(provider: SocialProvider, profileUrl: string) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 6000);
+async function verifyProfileUrl(
+  provider: SocialProvider,
+  profileUrl: string,
+) {
+  const parsed = new URL(profileUrl);
 
-  try {
-    const response = await fetch(profileUrl, {
-      method: "GET",
-      headers: {
-        "User-Agent": "Mozilla/5.0 NaanoSocialVerifier/1.0",
-        Accept: "text/html,application/xhtml+xml",
-      },
-      redirect: "follow",
-      signal: controller.signal,
-    });
+  const hostname =
+    parsed.hostname
+      .toLowerCase()
+      .replace(/^www\./, "");
 
-    if (response.status === 404) {
-      throw new Error(
-        "This " +
-          (provider === "linkedin" ? "LinkedIn" : "X") +
-          " profile was not found.",
-      );
-    }
+  if (
+    provider === "linkedin" &&
+    hostname !== "linkedin.com"
+  ) {
+    throw new Error(
+      "Enter a valid LinkedIn profile URL.",
+    );
+  }
 
-    if (response.status >= 500) {
-      throw new Error(
-        "The social profile could not be verified right now. Try again.",
-      );
-    }
-
-    if (response.status === 401 || response.status === 403) {
-      throw new Error(
-        "The social profile could not be verified. Check that the profile URL is public and correct.",
-      );
-    }
-
-    if (!response.ok) {
-      throw new Error(
-        "The social profile could not be verified. Check the profile URL and try again.",
-      );
-    }
-  } catch (verificationError) {
-    if (
-      verificationError instanceof Error &&
-      verificationError.name === "AbortError"
-    ) {
-      throw new Error("The social profile verification timed out. Try again.");
-    }
-
-    if (verificationError instanceof Error) {
-      throw verificationError;
-    }
-
-    throw new Error("The social profile could not be verified. Try again.");
-  } finally {
-    clearTimeout(timeout);
+  if (
+    provider === "x" &&
+    !["x.com", "twitter.com"].includes(
+      hostname,
+    )
+  ) {
+    throw new Error(
+      "Enter a valid X profile URL.",
+    );
   }
 }
+
 
 export function socialAccounts(
   request: IncomingMessage,
