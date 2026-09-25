@@ -153,8 +153,6 @@ export default function Settings() {
         setName(creator.name ?? "");
         setLinkedinUrl(creator.linkedin_url ?? "");
         setXProfileUrl(creator.x_profile_url ?? "");
-        setInitialLinkedin(creator.linkedin_url ?? "");
-        setInitialX(creator.x_profile_url ?? "");
       })
       .catch((value) => {
         if (cancelled) {
