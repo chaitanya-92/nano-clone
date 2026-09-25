@@ -12,6 +12,7 @@ import GoogleIcon from "@/components/ui/icons/GoogleIcon";
 import { LinkedinIcon } from "@/components/ui/icons/linkedin-icon";
 import { signIn } from "@/features/authSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { toast } from "@/components/ui/toast";
 
 const industries=["AI","SaaS","Software","Developer Tools","Fintech","Cybersecurity","Marketing","Sales","Productivity","Data / Analytics","E-commerce","EdTech"];
 const countries=["India","United States","United Kingdom","Germany","France","Canada","Australia","Singapore","Other"];
@@ -27,12 +28,14 @@ function EmailField({
   onStatus,
   verified,
   onVerified,
+  onExistingEmail,
 }: {
   formik: any;
   status: "idle" | "checking" | "available" | "taken";
   onStatus: (status: "idle" | "checking" | "available" | "taken") => void;
   verified: boolean;
   onVerified: (value: boolean) => void;
+  onExistingEmail: () => void;
 }) {
   const [otp, setOtp] = useState("");
   const [otpRequested, setOtpRequested] = useState(false);
@@ -80,11 +83,8 @@ function EmailField({
       const result = await checkEmail(normalizedEmail);
 
       if (!result.available) {
-        formik.setFieldError(
-          "email",
-          "An account already exists for this email.",
-        );
         onStatus("taken");
+        onExistingEmail();
         return;
       }
 
