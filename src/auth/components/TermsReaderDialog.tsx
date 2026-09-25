@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -17,7 +16,6 @@ interface TermsReaderDialogProps {
     body: string;
   }[];
   onOpenChange: (open: boolean) => void;
-  onReadComplete: () => void;
 }
 
 export function TermsReaderDialog({
@@ -26,49 +24,12 @@ export function TermsReaderDialog({
   description,
   sections,
   onOpenChange,
-  onReadComplete,
 }: TermsReaderDialogProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [hasReachedEnd, setHasReachedEnd] = useState(false);
-
-  useEffect(() => {
-    if (!open) {
-      setHasReachedEnd(false);
-      return;
-    }
-
-    const element = scrollRef.current;
-
-    if (!element) {
-      return;
-    }
-
-    const updateReadState = () => {
-      const reachedEnd =
-        element.scrollTop + element.clientHeight >= element.scrollHeight - 16;
-
-      setHasReachedEnd(reachedEnd);
-    };
-
-    updateReadState();
-    element.addEventListener("scroll", updateReadState);
-
-    return () => {
-      element.removeEventListener("scroll", updateReadState);
-    };
-  }, [open]);
-
-  function handleComplete() {
-    if (!hasReachedEnd) {
-      return;
-    }
-
-    onReadComplete();
-    onOpenChange(false);
-  }
-
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={onOpenChange}
+    >
       <DialogContent
         showCloseButton
         className="max-w-[720px] border-[#e2e7ee] bg-white p-0"
@@ -83,7 +44,7 @@ export function TermsReaderDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div ref={scrollRef} className="max-h-[52vh] overflow-y-auto px-6 py-5">
+        <div className="max-h-[52vh] overflow-y-auto px-6 py-5">
           <div className="space-y-7 pr-2">
             {sections.map((section) => (
               <section key={section.heading}>
@@ -96,28 +57,16 @@ export function TermsReaderDialog({
                 </p>
               </section>
             ))}
-
-            <div className="rounded-xl border border-[#e4e8ee] bg-[#f8fafc] p-4 text-xs leading-6 text-[#687386]">
-              Please read through the complete text above. The acknowledgement
-              checkbox will become available after you reach the end.
-            </div>
           </div>
         </div>
 
-        <DialogFooter className="items-center justify-between border-[#edf0f4] bg-white">
-          <span className="text-xs font-medium text-[#8a92a0]">
-            {hasReachedEnd
-              ? "You have reached the end."
-              : "Scroll to the end to continue."}
-          </span>
-
+        <DialogFooter className="border-[#edf0f4] bg-white">
           <button
             type="button"
-            disabled={!hasReachedEnd}
-            onClick={handleComplete}
-            className="cursor-pointer rounded-xl bg-[#171d2b] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#111827] disabled:cursor-not-allowed disabled:opacity-40"
+            onClick={() => onOpenChange(false)}
+            className="cursor-pointer rounded-lg bg-[#171d2b] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#111827]"
           >
-            Done reading
+            Close
           </button>
         </DialogFooter>
       </DialogContent>
