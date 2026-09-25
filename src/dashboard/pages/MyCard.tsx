@@ -35,10 +35,10 @@ function fileToDataUrl(
 }
 
 import {
-  Check,
   Copy,
   ExternalLink,
   ImagePlus,
+  Loader2,
   Pencil,
   Save,
   Share2,
@@ -48,6 +48,8 @@ import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "@/components/ui/toast";
+import { AnimatedNumber } from "@/components/dashboard/AnimatedNumber";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -266,8 +268,22 @@ export default function MyCard() {
             {error}
           </div>
         ) : (
-          <div className="rounded-[22px] border border-[#e0e6ef] bg-white p-8 text-sm text-[#7d899f]">
-            Loading your creator card…
+          <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+            <div className="overflow-hidden rounded-[28px] border border-[#dce4ef] bg-white">
+              <Skeleton className="h-[170px] rounded-none" />
+              <div className="space-y-4 px-8 pb-9 pt-20">
+                <Skeleton className="mx-auto h-8 w-48" />
+                <Skeleton className="mx-auto h-4 w-28" />
+                <Skeleton className="mx-auto h-16 w-full max-w-xl" />
+              </div>
+            </div>
+
+            <div className="rounded-[24px] border border-[#dfe5ed] bg-white p-6">
+              <Skeleton className="h-3 w-20" />
+              <Skeleton className="mt-4 h-14 w-full rounded-xl" />
+              <Skeleton className="mt-4 h-10 w-full rounded-lg" />
+              <Skeleton className="mt-2 h-10 w-full rounded-lg" />
+            </div>
           </div>
         )}
       </div>
@@ -443,21 +459,33 @@ export default function MyCard() {
             <div className="mt-8 grid grid-cols-3 border-y border-[#e8ecf2] py-6">
               <div>
                 <p className="text-2xl font-semibold text-[#182239]">
-                  {Number(profile.followers ?? 0).toLocaleString()}
+                  <AnimatedNumber
+                    value={Number(
+                      profile.followers ?? 0,
+                    )}
+                  />
                 </p>
                 <p className="mt-1 text-xs text-[#8794aa]">Followers</p>
               </div>
 
               <div className="border-x border-[#e8ecf2]">
                 <p className="text-2xl font-semibold text-[#182239]">
-                  {Number(profile.impressions ?? 0).toLocaleString()}
+                  <AnimatedNumber
+                    value={Number(
+                      profile.impressions ?? 0,
+                    )}
+                  />
                 </p>
                 <p className="mt-1 text-xs text-[#8794aa]">Impressions</p>
               </div>
 
               <div>
                 <p className="text-2xl font-semibold text-[#182239]">
-                  {Number(profile.post_count ?? 0).toLocaleString()}
+                  <AnimatedNumber
+                    value={Number(
+                      profile.post_count ?? 0,
+                    )}
+                  />
                 </p>
                 <p className="mt-1 text-xs text-[#8794aa]">Posts</p>
               </div>
@@ -483,7 +511,7 @@ export default function MyCard() {
               className="cursor-pointer justify-start"
             >
               <Copy className="mr-2 h-4 w-4" />
-              {copied ? "Copied" : "Copy link"}
+              Copy link
             </Button>
 
             <Button
