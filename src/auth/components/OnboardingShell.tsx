@@ -2,14 +2,14 @@ import type { ReactNode } from "react";
 import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { Stepper } from "./Stepper";
-interface Props { title:string; description:string; steps:string[]; current:number; children:ReactNode; canBack:boolean; canNext:boolean; nextLabel?:string; onBack:()=>void; onNext:()=>void; saving?:boolean; }
-export function OnboardingShell({title,description,steps,current,children,canBack,canNext,nextLabel="Continue",onBack,onNext,saving}:Props){
- return <div className="min-h-screen bg-[#f5f7fb] text-[#151923]">
-  <div className="mx-auto flex min-h-screen max-w-[1540px]">
+interface Props { title:string; description:string; steps:string[]; current:number; children:ReactNode; canBack:boolean; canNext:boolean; nextLabel?:string; onBack:()=>void; onNext:()=>void; saving?:boolean; modal?:boolean; onClose?:()=>void; }
+export function OnboardingShell({title,description,steps,current,children,canBack,canNext,nextLabel="Continue",onBack,onNext,saving,modal=false,onClose}:Props){
+ return <div className={modal?"fixed inset-0 z-50 flex items-center justify-center bg-[#0b1020]/55 p-3 backdrop-blur-md md:p-6":"min-h-screen bg-[#f5f7fb] text-[#151923]"}>
+  <div className={modal?"relative flex h-[min(900px,calc(100vh-24px))] w-full max-w-[1180px] overflow-hidden rounded-[28px] bg-white shadow-[0_40px_120px_rgba(8,15,30,.28)]":"mx-auto flex min-h-screen max-w-[1540px]"}>
    <aside className="relative hidden w-[39%] overflow-hidden bg-[#0c1220] px-10 py-10 text-white lg:flex lg:flex-col xl:px-14">
     <div className="absolute -left-28 top-24 h-72 w-72 rounded-full bg-[#2864f0]/30 blur-3xl"/>
     <div className="absolute -right-20 bottom-20 h-80 w-80 rounded-full bg-[#63b8ff]/20 blur-3xl"/>
-    <div className="relative flex items-center gap-2 text-2xl font-bold tracking-[-.05em]">naano<span className="text-[#63b8ff]">.</span></div>
+    <div className="relative flex items-center justify-between gap-2 text-2xl font-bold tracking-[-.05em]">naano<span className="text-[#63b8ff]">.</span>{modal&&onClose&&<button type="button" onClick={onClose} className="rounded-full border border-white/10 px-3 py-1.5 text-xs font-semibold text-white/65 transition hover:bg-white/10 hover:text-white lg:hidden">Close</button>}</div>
     <div className="relative mt-auto max-w-md pb-10">
       <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[.06] px-3 py-1.5 text-xs font-semibold text-[#bcd8ff]"><Sparkles className="h-3.5 w-3.5"/>Build your presence once</div>
       <h2 className="text-[clamp(2.6rem,4vw,4.5rem)] font-semibold leading-[.98] tracking-[-.06em]">Turn your profile into your next opportunity.</h2>
@@ -21,7 +21,7 @@ export function OnboardingShell({title,description,steps,current,children,canBac
     <div className="relative flex items-center justify-between border-t border-white/10 pt-5 text-xs text-white/35"><span>Creator & brand marketplace</span><span>Secure onboarding</span></div>
    </aside>
    <main className="flex min-w-0 flex-1 flex-col bg-white">
-    <header className="flex items-center justify-between border-b border-[#edf0f4] px-6 py-5 md:px-10">
+    <header className="flex items-center justify-between border-b border-[#edf0f4] px-6 py-5 md:px-10">{modal&&onClose&&<button type="button" onClick={onClose} className="order-2 rounded-full border border-[#e2e6ed] px-3 py-1.5 text-xs font-semibold text-[#6f7787] transition hover:bg-[#f6f8fb]">Esc · Close</button>}
       <div className="text-xl font-bold tracking-[-.05em] lg:hidden">naano<span className="text-[#2864f0]">.</span></div>
       <div className="ml-auto flex items-center gap-4 text-xs font-medium text-[#8992a2]"><span>Step {current+1} of {steps.length}</span><span className="h-1 w-1 rounded-full bg-[#cbd1da]"/><span>English</span></div>
     </header>
