@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { requireAuth } from "../middleware/authMiddleware";
 import { db } from "../db/client";
 import { error, json, now, stringValue } from "../utils/api";
+import { fetchPublicSocialProfile } from "../services/socialProfileService";
 type SocialProvider = "linkedin" | "x";
 
 function normalizeProfileUrl(provider: SocialProvider, value: string) {
@@ -166,30 +167,77 @@ export async function connectSocial(
     );
   }
 
+  let fetchedProfile;
+
+  try {
+    fetchedProfile =
+      await fetchPublicSocialProfile(
+        provider,
+        profileUrl,
+      );
+  } catch (profileError) {
+    return error(
+      response,
+      422,
+      "PROFILE_FETCH_FAILED",
+      profileError instanceof Error
+        ? profileError.message
+        : "The public social profile could not be fetched.",
+    );
+  }
+
   const t = now();
   const id = randomUUID();
 
   db.prepare(
-    "INSERT INTO social_accounts (id,user_id,provider,profile_url,status,verified_at,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?) ON CONFLICT(user_id,provider) DO UPDATE SET profile_url=excluded.profile_url,status='connected',verified_at=excluded.verified_at,updated_at=excluded.updated_at",
-  ).run(id, user.id, provider, profileUrl, "connected", t, t, t);
+    "INSERT INTO social_accounts (id,user_id,provider,username,profile_url,profile_image_url,status,verified_at,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?) ON CONFLICT(user_id,provider) DO UPDATE SET username=excluded.username,profile_url=excluded.profile_url,profile_image_url=excluded.profile_image_url,status='connected',verified_at=excluded.verified_at,updated_at=excluded.updated_at",
+  ).run(
+    id,
+    user.id,
+    provider,
+    fetchedProfile.username,
+    profileUrl,
+    fetchedProfile.profileImageUrl,
+    "connected",
+    t,
+    t,
+    t,
+  );
 
   if (provider === "linkedin") {
     db.prepare(
-      "UPDATE creator_profiles SET linkedin_url=?,updated_at=? WHERE user_id=?",
-    ).run(profileUrl, t, user.id);
+      "UPDATE creator_profiles SET linkedin_url=?,name=COALESCE(NULLIF(?,''),name),headline=COALESCE(NULLIF(?,''),headline),profile_photo_url=COALESCE(NULLIF(?,''),profile_photo_url),followers=COALESCE(?,followers),updated_at=? WHERE user_id=?",
+    ).run(
+      profileUrl,
+      fetchedProfile.name,
+      fetchedProfile.headline,
+      fetchedProfile.profileImageUrl,
+      fetchedProfile.followers,
+      t,
+      user.id,
+    );
   }
 
   if (provider === "x") {
     db.prepare(
-      "UPDATE creator_profiles SET x_profile_url=?,updated_at=? WHERE user_id=?",
-    ).run(profileUrl, t, user.id);
+      "UPDATE creator_profiles SET x_profile_url=?,name=COALESCE(NULLIF(?,''),name),bio=COALESCE(NULLIF(?,''),bio),profile_photo_url=COALESCE(NULLIF(?,''),profile_photo_url),followers=COALESCE(?,followers),updated_at=? WHERE user_id=?",
+    ).run(
+      profileUrl,
+      fetchedProfile.name,
+      fetchedProfile.bio,
+      fetchedProfile.profileImageUrl,
+      fetchedProfile.followers,
+      t,
+      user.id,
+    );
   }
 
   return json(response, 200, {
-    data: db
-      .prepare(
-        "SELECT id,provider,profile_url,status,verified_at FROM social_accounts WHERE user_id=? AND provider=?",
-      )
-      .get(user.id, provider),
+    data: {
+      provider,
+      profileUrl,
+      fetchedProfile,
+    },
   });
+
 }
