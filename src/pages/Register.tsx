@@ -942,10 +942,7 @@ export default function Register() {
                         }
                         className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-xl border border-[#0a66c2]/20 bg-[#f2f8fc] px-4 py-2.5 text-sm font-semibold text-[#0a66c2] disabled:cursor-not-allowed disabled:opacity-50"
                       >
-                        <LinkedinIcon
-                          className="h-4 w-4"
-                          variant="brand"
-                        />
+                        <LinkedinIcon className="h-4 w-4" variant="brand" />
                         {socialStatus.linkedin === "Connected"
                           ? "Connected"
                           : "Connect LinkedIn"}
