@@ -505,98 +505,94 @@ export default function Settings() {
                   </p>
 
                   <div className="mt-5 space-y-5">
-                    {socialRows.map(
-                      ({ provider, label, state, setState }) => (
-                        <div key={provider} className="space-y-2">
-                          <label
-                            htmlFor={provider + "-url"}
-                            className="text-xs font-semibold text-[#626a78]"
-                          >
-                            {label}
-                          </label>
+                    {socialRows.map(({ provider, label, state, setState }) => (
+                      <div key={provider} className="space-y-2">
+                        <label
+                          htmlFor={provider + "-url"}
+                          className="text-xs font-semibold text-[#626a78]"
+                        >
+                          {label}
+                        </label>
 
-                          <div className="flex flex-col gap-2 sm:flex-row">
-                            <input
-                              id={provider + "-url"}
-                              value={state.url}
-                              onChange={(event) =>
-                                setState({
-                                  url: event.target.value,
-                                  status: "idle",
-                                  message: "",
-                                })
-                              }
-                              className="auth-input flex-1"
-                              placeholder={
-                                provider === "linkedin"
-                                  ? "https://linkedin.com/in/your-profile"
-                                  : "https://x.com/your-handle"
-                              }
-                            />
+                        <div className="flex flex-col gap-2 sm:flex-row">
+                          <input
+                            id={provider + "-url"}
+                            value={state.url}
+                            onChange={(event) =>
+                              setState({
+                                url: event.target.value,
+                                status: "idle",
+                                message: "",
+                              })
+                            }
+                            className="auth-input flex-1"
+                            placeholder={
+                              provider === "linkedin"
+                                ? "https://linkedin.com/in/your-profile"
+                                : "https://x.com/your-handle"
+                            }
+                          />
 
-                            {state.url && (
-                              <Button
-                                type="button"
-                                variant="outline"
-                                disabled={
-                                  !isValidSocialUrl(provider, state.url)
-                                }
-                                onClick={() =>
-                                  window.open(
-                                    state.url,
-                                    "_blank",
-                                    "noopener,noreferrer",
-                                  )
-                                }
-                                className="cursor-pointer"
-                              >
-                                <ExternalLink className="mr-2 h-4 w-4" />
-                                Open
-                              </Button>
-                            )}
-
+                          {state.url && (
                             <Button
                               type="button"
-                              variant={
-                                state.status === "valid" ? "outline" : "default"
+                              variant="outline"
+                              disabled={!isValidSocialUrl(provider, state.url)}
+                              onClick={() =>
+                                window.open(
+                                  state.url,
+                                  "_blank",
+                                  "noopener,noreferrer",
+                                )
                               }
-                              onClick={() => void validateSocial(provider)}
-                              disabled={
-                                state.status === "checking" || !state.url.trim()
-                              }
-                              className="cursor-pointer sm:min-w-[150px]"
+                              className="cursor-pointer"
                             >
-                              {state.status === "checking" ? (
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              ) : state.status === "valid" ? (
-                                <Check className="mr-2 h-4 w-4" />
-                              ) : (
-                                <RefreshCw className="mr-2 h-4 w-4" />
-                              )}
-                              {state.status === "checking"
-                                ? "Checking..."
-                                : state.status === "valid"
-                                  ? "Verified"
-                                  : "Validate profile"}
+                              <ExternalLink className="mr-2 h-4 w-4" />
+                              Open
                             </Button>
-                          </div>
-
-                          {state.message && (
-                            <p
-                              className={
-                                state.status === "valid"
-                                  ? "text-xs text-[#188b56]"
-                                  : state.status === "invalid"
-                                    ? "text-xs text-[#bd4b4b]"
-                                    : "text-xs text-[#7b879a]"
-                              }
-                            >
-                              {state.message}
-                            </p>
                           )}
+
+                          <Button
+                            type="button"
+                            variant={
+                              state.status === "valid" ? "outline" : "default"
+                            }
+                            onClick={() => void validateSocial(provider)}
+                            disabled={
+                              state.status === "checking" || !state.url.trim()
+                            }
+                            className="cursor-pointer sm:min-w-[150px]"
+                          >
+                            {state.status === "checking" ? (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : state.status === "valid" ? (
+                              <Check className="mr-2 h-4 w-4" />
+                            ) : (
+                              <RefreshCw className="mr-2 h-4 w-4" />
+                            )}
+                            {state.status === "checking"
+                              ? "Checking..."
+                              : state.status === "valid"
+                                ? "Verified"
+                                : "Validate profile"}
+                          </Button>
                         </div>
-                      ),
-                    )}
+
+                        {state.message && (
+                          <p
+                            className={
+                              state.status === "valid"
+                                ? "text-xs text-[#188b56]"
+                                : state.status === "invalid"
+                                  ? "text-xs text-[#bd4b4b]"
+                                  : "text-xs text-[#7b879a]"
+                            }
+                          >
+                            {state.message}
+                          </p>
+                        )}
+                      </div>
+                    ))}
 
                     <Button
                       type="button"
