@@ -13,35 +13,19 @@ function ensureCreatorProfile(userId: string, name: string) {
 
     db.prepare(
       "INSERT INTO creator_profiles (user_id, name, created_at, updated_at) VALUES (?, ?, ?, ?)",
-    ).run(
-      userId,
-      name,
-      timestamp,
-      timestamp,
-    );
+    ).run(userId, name, timestamp, timestamp);
 
     profile = db
-      .prepare(
-        "SELECT * FROM creator_profiles WHERE user_id = ?",
-      )
+      .prepare("SELECT * FROM creator_profiles WHERE user_id = ?")
       .get(userId) as Record<string, unknown>;
   }
 
-  const profileName = String(
-    profile.name ?? "",
-  ).trim();
+  const profileName = String(profile.name ?? "").trim();
 
-  if (
-    !profileName ||
-    profileName === "Creator"
-  ) {
+  if (!profileName || profileName === "Creator") {
     db.prepare(
       "UPDATE creator_profiles SET name = ?, updated_at = ? WHERE user_id = ?",
-    ).run(
-      name,
-      now(),
-      userId,
-    );
+    ).run(name, now(), userId);
 
     profile.name = name;
   }
@@ -100,10 +84,7 @@ export function dashboard(request: IncomingMessage, response: ServerResponse) {
     });
   }
 
-  const profile = ensureCreatorProfile(
-    user.id,
-    user.name,
-  );
+  const profile = ensureCreatorProfile(user.id, user.name);
 
   const analyticsTotals = db
     .prepare(
@@ -115,10 +96,10 @@ export function dashboard(request: IncomingMessage, response: ServerResponse) {
        WHERE creator_id = ?`,
     )
     .get(user.id) as {
-      posts: number;
-      impressions: number;
-      engagements: number;
-    };
+    posts: number;
+    impressions: number;
+    engagements: number;
+  };
 
   const applications = db
     .prepare("SELECT COUNT(*) AS count FROM applications WHERE creator_id = ?")
@@ -155,15 +136,9 @@ export function dashboard(request: IncomingMessage, response: ServerResponse) {
       profile,
       metrics: {
         followers: Number(profile.followers ?? 0),
-        posts: Number(
-          analyticsTotals.posts ?? 0,
-        ),
-        impressions: Number(
-          analyticsTotals.impressions ?? 0,
-        ),
-        engagements: Number(
-          analyticsTotals.engagements ?? 0,
-        ),
+        posts: Number(analyticsTotals.posts ?? 0),
+        impressions: Number(analyticsTotals.impressions ?? 0),
+        engagements: Number(analyticsTotals.engagements ?? 0),
         applications: applications.count,
         collaborations: collaborations.count,
       },
