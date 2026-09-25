@@ -1,0 +1,7 @@
+import type { IncomingMessage,ServerResponse } from "node:http";
+import { randomBytes } from "node:crypto";
+import { requireAuth } from "../middleware/authMiddleware";
+import { db } from "../db/client";
+import { error,json,readJson,stringValue,now } from "../utils/api";
+export function affiliate(request:IncomingMessage,response:ServerResponse){const user=requireAuth(request,response);if(!user)return;const referrals=db.prepare("SELECT ar.*,u.name AS referred_name FROM affiliate_referrals ar LEFT JOIN users u ON u.id=ar.referred_user_id WHERE ar.referrer_id=? ORDER BY ar.created_at DESC").all(user.id);const rewards=db.prepare("SELECT * FROM affiliate_rewards WHERE referrer_id=? ORDER BY created_at DESC").all(user.id);return json(response,200,{data:{referrals,rewards}});}
+export async function createReferral(request:IncomingMessage,response:ServerResponse){const user=requireAuth(request,response);if(!user)return;const body=await readJson(request);const type=stringValue(body.type,"creator");if(type!=="creator"&&type!=="brand")return error(response,422,"INVALID_REFERRAL_TYPE","Referral type must be creator or brand.");const id=randomBytes(16).toString("base64url"),code=randomBytes(6).toString("base64url"),t=now();db.prepare("INSERT INTO affiliate_referrals (id,referrer_id,type,code,status,created_at,updated_at) VALUES (?,?,?,?,?,?,?)").run(id,user.id,type,code,"created",t,t);return json(response,201,{data:{id,type,code,status:"created"}});}
