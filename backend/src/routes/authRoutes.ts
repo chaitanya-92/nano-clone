@@ -9,6 +9,7 @@ import {
   logout,
   me,
   register,
+  checkEmail,
   linkedin,
   linkedinCallback,
 } from "../controllers/authController";
@@ -37,6 +38,10 @@ export async function authRoutes(
     request.method === "POST"
   ) {
     return register(request, response);
+  }
+
+  if (url.pathname === "/api/auth/check-email" && request.method === "GET") {
+    return checkEmail(request, response, url);
   }
 
   if (
