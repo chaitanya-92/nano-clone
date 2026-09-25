@@ -119,28 +119,19 @@ export default function Settings() {
     setError("");
 
     try {
-      const { user: currentUser } =
-        await getCurrentUser();
+      const { user: currentUser } = await getCurrentUser();
 
       if (!currentUser) {
-        setError(
-          "Your session has expired. Please sign in again.",
-        );
+        setError("Your session has expired. Please sign in again.");
         return;
       }
 
       if (currentUser.role !== "creator") {
-        setError(
-          "Creator settings are only available for creator accounts.",
-        );
+        setError("Creator settings are only available for creator accounts.");
         return;
       }
 
-      const [
-        profileResult,
-        payoutResult,
-        socialResult,
-      ] = await Promise.all([
+      const [profileResult, payoutResult, socialResult] = await Promise.all([
         getCreatorProfile(),
         getPayoutMethods(),
         getSocialAccounts(),
@@ -548,10 +539,7 @@ export default function Settings() {
                                 type="button"
                                 variant="outline"
                                 disabled={
-                                  !isValidSocialUrl(
-                                    provider,
-                                    state.url,
-                                  )
+                                  !isValidSocialUrl(provider, state.url)
                                 }
                                 onClick={() =>
                                   window.open(
