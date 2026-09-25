@@ -1392,7 +1392,7 @@ export default function Register() {
                     </select>
                   </label>
 
-                  {[
+                  {([
                     {
                       key: "taxResponsibilityConfirmed",
                       label: "I confirm I am responsible for applicable taxes.",
