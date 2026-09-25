@@ -49,6 +49,12 @@ export async function registerUser({
     (@id, @email, @passwordHash, @name, @role, @provider, @createdAt)
   `).run(user);
 
+  if (role === "creator") {
+    db.prepare("INSERT INTO creator_profiles (user_id, name, created_at, updated_at) VALUES (?, ?, ?, ?)").run(user.id, user.name, user.createdAt, user.createdAt);
+  } else {
+    db.prepare("INSERT INTO brand_profiles (user_id, company_name, created_at, updated_at) VALUES (?, ?, ?, ?)").run(user.id, user.name, user.createdAt, user.createdAt);
+  }
+
   return publicUser(user);
 }
 
@@ -99,6 +105,8 @@ export function createGoogleUser({
     VALUES
     (@id, @email, @name, @role, @provider, @createdAt)
   `).run(user);
+
+  db.prepare("INSERT INTO creator_profiles (user_id, name, created_at, updated_at) VALUES (?, ?, ?, ?)").run(user.id, user.name, user.createdAt, user.createdAt);
 
   return user;
 }
