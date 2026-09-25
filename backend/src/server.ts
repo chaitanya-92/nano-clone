@@ -10,11 +10,26 @@ import {
   type ServerResponse,
 } from "node:http";
 
-import { PORT, APP_ORIGIN } from "./config/env";
+import { PORT, APP_ORIGIN, FRONTEND_ORIGIN } from "./config/env";
 
 import { initializeDatabaseConnection } from "./config/database";
 
 import { authRoutes } from "./routes/authRoutes";
+import { onboardingRoutes } from "./routes/onboardingRoutes";
+import { dashboardRoutes } from "./routes/dashboardRoutes";
+import { campaignRoutes } from "./routes/campaignRoutes";
+import { applicationRoutes } from "./routes/applicationRoutes";
+import { collaborationRoutes } from "./routes/collaborationRoutes";
+import { analyticsRoutes } from "./routes/analyticsRoutes";
+import { earningsRoutes } from "./routes/earningsRoutes";
+import { messageRoutes } from "./routes/messageRoutes";
+import { notificationRoutes } from "./routes/notificationRoutes";
+import { communityRoutes } from "./routes/communityRoutes";
+import { affiliateRoutes } from "./routes/affiliateRoutes";
+import { profileRoutes } from "./routes/profileRoutes";
+import { brandOnboardingRoutes } from "./routes/brandOnboardingRoutes";
+import { healthRoutes } from "./routes/healthRoutes";
+import { targetRoutes } from "./routes/targetRoutes";
 
 import { handleError } from "./middleware/errorMiddleware";
 
@@ -37,10 +52,11 @@ const mimeTypes: Record<string, string> = {
   ".woff2": "font/woff2",
 };
 
-const allowedOrigins = [
+const allowedOrigins = Array.from(new Set([
+  process.env.FRONTEND_ORIGIN ?? FRONTEND_ORIGIN,
   "https://nano-clone.vercel.app",
   "http://localhost:5173",
-];
+]));
 
 initializeDatabaseConnection();
 
@@ -64,7 +80,7 @@ function setCorsHeaders(
 
   response.setHeader(
     "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS",
+    "GET, POST, PATCH, PUT, DELETE, OPTIONS",
   );
 
   response.setHeader(
@@ -151,15 +167,11 @@ const server = createServer(
       if (
         url.pathname.startsWith("/api/")
       ) {
-        const handled =
-          await authRoutes(
-            request,
-            response,
-            url,
-          );
+        const handlers = [authRoutes, onboardingRoutes, dashboardRoutes, campaignRoutes, applicationRoutes, collaborationRoutes, analyticsRoutes, earningsRoutes, messageRoutes, notificationRoutes, communityRoutes, affiliateRoutes, profileRoutes, brandOnboardingRoutes, healthRoutes, targetRoutes];
 
-        if (handled !== false) {
-          return;
+        for (const handler of handlers) {
+          const handled = await handler(request, response, url);
+          if (handled !== false) return;
         }
       }
 
