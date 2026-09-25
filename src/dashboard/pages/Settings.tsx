@@ -140,11 +140,6 @@ export default function Settings() {
   const [xProfileUrl, setXProfileUrl] =
     useState("");
 
-  const [initialLinkedin, setInitialLinkedin] =
-    useState("");
-  const [initialX, setInitialX] =
-    useState("");
-
   const [methodLabel, setMethodLabel] =
     useState("");
   const [showMethod, setShowMethod] =
@@ -202,12 +197,6 @@ export default function Settings() {
           creator.linkedin_url ?? "",
         );
         setXProfileUrl(
-          creator.x_profile_url ?? "",
-        );
-        setInitialLinkedin(
-          creator.linkedin_url ?? "",
-        );
-        setInitialX(
           creator.x_profile_url ?? "",
         );
       })
@@ -316,12 +305,6 @@ export default function Settings() {
         data.linkedin_url ?? "",
       );
       setXProfileUrl(
-        data.x_profile_url ?? "",
-      );
-      setInitialLinkedin(
-        data.linkedin_url ?? "",
-      );
-      setInitialX(
         data.x_profile_url ?? "",
       );
 
@@ -1030,10 +1013,6 @@ function SocialField({
   onChange: (value: string) => void;
   onVerify: () => void;
 }) {
-  const Icon = provider === "linkedin"
-    ? Link2
-    : Link2;
-
   const normalizedError =
     validateSocialUrl(
       provider,
