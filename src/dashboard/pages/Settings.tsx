@@ -160,11 +160,6 @@ export default function Settings() {
     useState(false);
   const [busy, setBusy] = useState(false);
 
-  const [nameSaved, setNameSaved] =
-    useState(false);
-  const [socialSaved, setSocialSaved] =
-    useState(false);
-
   const [socialStatus, setSocialStatus] =
     useState<
       Record<
@@ -239,67 +234,36 @@ export default function Settings() {
   }, []);
 
   useEffect(() => {
-    if (
-      tab !== "payments" ||
-      loadingPayments
-    ) {
+    if (tab !== "payments") {
       return;
     }
 
     setLoadingPayments(true);
+    setError("");
 
     void getPayoutMethods()
       .then(({ data }) => {
         setMethods(data);
       })
       .catch((value) => {
-        setError(
+        const message =
           value instanceof Error
             ? value.message
-            : "Unable to load payout methods.",
-        );
+            : "Unable to load payout methods.";
+
+        setError(message);
+
+        toast.add({
+          title: "Unable to load payments",
+          description: message,
+          type: "error",
+          timeout: 4000,
+        });
       })
       .finally(() => {
         setLoadingPayments(false);
       });
-  }, [tab, loadingPayments]);
-
-  const saveName = async () => {
-    const value = name.trim();
-
-    if (!value) {
-      setError("Display name is required.");
-      return;
-    }
-
-    setBusy(true);
-    setError("");
-    setNameSaved(false);
-
-    try {
-      const { data } =
-        await updateCreatorProfile({
-          name: value,
-        });
-
-      setProfile(data);
-      setName(data.name ?? value);
-      setNameSaved(true);
-
-      window.setTimeout(
-        () => setNameSaved(false),
-        1800,
-      );
-    } catch (value) {
-      setError(
-        value instanceof Error
-          ? value.message
-          : "Unable to save display name.",
-      );
-    } finally {
-      setBusy(false);
-    }
-  };
+  }, [tab]);
 
   const verifySocial = async (
     provider: SocialProvider,
@@ -383,17 +347,28 @@ export default function Settings() {
     }
   };
 
-  const saveSocialLinks = async () => {
-    const linkedinValue =
-      linkedinUrl.trim();
-    const xValue =
-      xProfileUrl.trim();
+  const saveProfileSettings = async () => {
+    const displayName = name.trim();
+    const linkedinValue = linkedinUrl.trim();
+    const xValue = xProfileUrl.trim();
+
+    if (!displayName) {
+      toast.add({
+        title: "Name is required",
+        description:
+          "Enter a display name before saving.",
+        type: "error",
+        timeout: 3500,
+      });
+      return;
+    }
 
     const linkedinValidation =
       validateSocialUrl(
         "linkedin",
         linkedinValue,
       );
+
     const xValidation =
       validateSocialUrl(
         "x",
@@ -424,52 +399,30 @@ export default function Settings() {
         }));
       }
 
+      toast.add({
+        title: "Check your social links",
+        description:
+          linkedinValidation ||
+          xValidation,
+        type: "error",
+        timeout: 3500,
+      });
       return;
     }
 
     setBusy(true);
     setError("");
-    setSocialSaved(false);
 
     try {
-      if (
-        linkedinValue &&
-        linkedinValue !== initialLinkedin
-      ) {
-        const valid =
-          await verifySocial(
-            "linkedin",
-            linkedinValue,
-          );
-
-        if (!valid) {
-          return;
-        }
-      }
-
-      if (
-        xValue &&
-        xValue !== initialX
-      ) {
-        const valid =
-          await verifySocial(
-            "x",
-            xValue,
-          );
-
-        if (!valid) {
-          return;
-        }
-      }
-
       const { data } =
         await updateCreatorProfile({
-          linkedinUrl:
-            linkedinValue,
+          name: displayName,
+          linkedinUrl: linkedinValue,
           xProfileUrl: xValue,
         });
 
       setProfile(data);
+      setName(data.name ?? displayName);
       setLinkedinUrl(
         data.linkedin_url ?? "",
       );
@@ -482,18 +435,28 @@ export default function Settings() {
       setInitialX(
         data.x_profile_url ?? "",
       );
-      setSocialSaved(true);
 
-      window.setTimeout(
-        () => setSocialSaved(false),
-        1800,
-      );
+      toast.add({
+        title: "Changes saved",
+        description:
+          "Your profile changes were saved successfully.",
+        type: "success",
+        timeout: 2500,
+      });
     } catch (value) {
-      setError(
+      const message =
         value instanceof Error
           ? value.message
-          : "Unable to save social links.",
-      );
+          : "Unable to save your profile.";
+
+      setError(message);
+
+      toast.add({
+        title: "Save failed",
+        description: message,
+        type: "error",
+        timeout: 4000,
+      });
     } finally {
       setBusy(false);
     }
@@ -503,9 +466,13 @@ export default function Settings() {
     const value = methodLabel.trim();
 
     if (!value) {
-      setError(
-        "Enter a name for the payout method.",
-      );
+      toast.add({
+        title: "Payout method required",
+        description:
+          "Enter a name for the payout method.",
+        type: "error",
+        timeout: 3500,
+      });
       return;
     }
 
@@ -525,12 +492,28 @@ export default function Settings() {
       ]);
       setMethodLabel("");
       setShowMethod(false);
+
+      toast.add({
+        title: "Payout method added",
+        description:
+          "Your payout method was saved successfully.",
+        type: "success",
+        timeout: 2500,
+      });
     } catch (value) {
-      setError(
+      const message =
         value instanceof Error
           ? value.message
-          : "Unable to save payout method.",
-      );
+          : "Unable to save payout method.";
+
+      setError(message);
+
+      toast.add({
+        title: "Payout method failed",
+        description: message,
+        type: "error",
+        timeout: 4000,
+      });
     } finally {
       setBusy(false);
     }
@@ -677,22 +660,7 @@ export default function Settings() {
                       className="auth-input flex-1"
                     />
 
-                    <Button
-                      type="button"
-                      onClick={() =>
-                        void saveName()
-                      }
-                      disabled={
-                        busy ||
-                        !name.trim()
-                      }
-                      className="h-10 cursor-pointer rounded-lg bg-[#171d2b] px-4 hover:bg-[#111827]"
-                    >
-                      <Save className="mr-2 h-4 w-4" />
-                      {nameSaved
-                        ? "Saved"
-                        : "Save name"}
-                    </Button>
+
                   </div>
                 </div>
 
@@ -719,11 +687,19 @@ export default function Settings() {
                       error={socialError.linkedin}
                       busy={busy}
                       placeholder="https://linkedin.com/in/your-profile"
-                      onChange={(value) =>
+                      onChange={(value) => {
                         setLinkedinUrl(
                           value,
-                        )
-                      }
+                        );
+                        setSocialStatus((current) => ({
+                          ...current,
+                          linkedin: "idle",
+                        }));
+                        setSocialError((current) => ({
+                          ...current,
+                          linkedin: "",
+                        }));
+                      }}
                       onVerify={() =>
                         void verifySocial(
                           "linkedin",
@@ -740,9 +716,17 @@ export default function Settings() {
                       error={socialError.x}
                       busy={busy}
                       placeholder="https://x.com/your-handle"
-                      onChange={(value) =>
-                        setXProfileUrl(value)
-                      }
+                      onChange={(value) => {
+                        setXProfileUrl(value);
+                        setSocialStatus((current) => ({
+                          ...current,
+                          x: "idle",
+                        }));
+                        setSocialError((current) => ({
+                          ...current,
+                          x: "",
+                        }));
+                      }}
                       onVerify={() =>
                         void verifySocial(
                           "x",
@@ -751,18 +735,20 @@ export default function Settings() {
                       }
                     />
 
+
+                  </div>
+
+                  <div className="flex justify-end border-t border-[#e8ecf2] pt-6">
                     <Button
                       type="button"
                       onClick={() =>
-                        void saveSocialLinks()
+                        void saveProfileSettings()
                       }
                       disabled={busy}
-                      className="h-10 cursor-pointer rounded-lg bg-[#171d2b] px-4 hover:bg-[#111827]"
+                      className="h-10 cursor-pointer rounded-lg bg-[#171d2b] px-5 hover:bg-[#111827]"
                     >
                       <Save className="mr-2 h-4 w-4" />
-                      {socialSaved
-                        ? "Saved"
-                        : "Save social links"}
+                      Save changes
                     </Button>
                   </div>
                 </div>
