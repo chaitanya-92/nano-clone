@@ -1,11 +1,7 @@
 import { randomBytes } from "node:crypto";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { db } from "../db/client";
-import {
-  COOKIE_NAME,
-  IS_PRODUCTION,
-  SESSION_LIFETIME,
-} from "../config/env";
+import { COOKIE_NAME, IS_PRODUCTION, SESSION_LIFETIME } from "../config/env";
 
 function parseCookies(request: IncomingMessage) {
   return Object.fromEntries(
@@ -44,20 +40,32 @@ export function setCookie(
     attributes.push(`Max-Age=${options.maxAge}`);
   }
 
-  response.setHeader("Set-Cookie", attributes.join("; "));
+  const cookie = attributes.join("; ");
+  const existing = response.getHeader("Set-Cookie");
+
+  if (!existing) {
+    response.setHeader("Set-Cookie", [cookie]);
+    return;
+  }
+
+  if (Array.isArray(existing)) {
+    response.setHeader("Set-Cookie", [...existing.map(String), cookie]);
+    return;
+  }
+
+  response.setHeader("Set-Cookie", [String(existing), cookie]);
 }
 
-export function createSession(
-  response: ServerResponse,
-  userId: string,
-) {
+export function createSession(response: ServerResponse, userId: string) {
   const sessionId = randomBytes(32).toString("base64url");
 
-  db.prepare(`
+  db.prepare(
+    `
     INSERT INTO sessions
     (id, user_id, expires_at, created_at)
     VALUES (?, ?, ?, ?)
-  `).run(
+  `,
+  ).run(
     sessionId,
     userId,
     Date.now() + SESSION_LIFETIME,
@@ -96,7 +104,8 @@ export function getCurrentUser(request: IncomingMessage) {
   }
 
   const user = db
-    .prepare(`
+    .prepare(
+      `
       SELECT
         users.id,
         users.email,
@@ -106,7 +115,8 @@ export function getCurrentUser(request: IncomingMessage) {
       JOIN users ON users.id = sessions.user_id
       WHERE sessions.id = ?
       AND sessions.expires_at > ?
-    `)
+    `,
+    )
     .get(sessionId, Date.now());
 
   return user ?? null;

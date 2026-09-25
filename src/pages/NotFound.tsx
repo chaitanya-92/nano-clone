@@ -44,9 +44,7 @@ export default function NotFound() {
           </Button>
         </div>
 
-        <p className="mt-10 text-[12px] text-[#9aa4b5]">
-          Error 404
-        </p>
+        <p className="mt-10 text-[12px] text-[#9aa4b5]">Error 404</p>
       </div>
     </main>
   );

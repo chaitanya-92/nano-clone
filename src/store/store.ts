@@ -1,8 +1,5 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import {
-  persistReducer,
-  persistStore,
-} from "redux-persist";
+import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import authReducer from "@/features/authSlice";
 import scrollReducer from "@/features/scrollSlice";
@@ -18,10 +15,7 @@ const persistConfig = {
   whitelist: ["scroll"],
 };
 
-const persistedReducer = persistReducer(
-  persistConfig,
-  rootReducer,
-);
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
   reducer: persistedReducer,

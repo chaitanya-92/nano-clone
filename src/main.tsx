@@ -5,6 +5,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import App from "./App";
 import { AuthBootstrap } from "@/components/auth/AuthBootstrap";
 import { store, persistor } from "@/store/store";
+import { Toaster } from "@/components/ui/toast";
 import "./index.css";
 
 createRoot(document.getElementById("root")!).render(
@@ -13,6 +14,7 @@ createRoot(document.getElementById("root")!).render(
       <PersistGate loading={null} persistor={persistor}>
         <AuthBootstrap />
         <App />
+        <Toaster />
       </PersistGate>
     </Provider>
   </StrictMode>,

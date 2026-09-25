@@ -27,17 +27,11 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setSelectedRole: (
-      state,
-      action: PayloadAction<UserRole>,
-    ) => {
+    setSelectedRole: (state, action: PayloadAction<UserRole>) => {
       state.selectedRole = action.payload;
     },
 
-    signIn: (
-      state,
-      action: PayloadAction<User>,
-    ) => {
+    signIn: (state, action: PayloadAction<User>) => {
       state.user = action.payload;
       state.isAuthenticated = true;
       state.isLoading = false;
@@ -58,11 +52,7 @@ const authSlice = createSlice({
   },
 });
 
-export const {
-  setSelectedRole,
-  signIn,
-  signOut,
-  finishAuthCheck,
-} = authSlice.actions;
+export const { setSelectedRole, signIn, signOut, finishAuthCheck } =
+  authSlice.actions;
 
 export default authSlice.reducer;

@@ -1,219 +1,220 @@
-import { useState } from "react";
-import {
-  Activity,
-  BarChart3,
-  Eye,
-  FileText,
-  Users,
-  ChevronDown,
-  ShieldCheck,
-} from "lucide-react";
-import { analyticsData } from "../data/dashboardData";
+import { Activity, BarChart3, Eye, FileText, Users } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { getAnalytics, type AnalyticsResponse } from "@/lib/dashboard";
+import { useSearchParams } from "react-router-dom";
 
-const icons = {
-  posts: FileText,
-  reach: Eye,
-  engagements: Activity,
-  followers: Users,
-};
+const metrics = [
+  {
+    key: "posts",
+    label: "Posts",
+    icon: FileText,
+  },
+  {
+    key: "reach",
+    label: "Reach",
+    icon: Eye,
+  },
+  {
+    key: "engagements",
+    label: "Engagements",
+    icon: Activity,
+  },
+  {
+    key: "followers",
+    label: "Followers",
+    icon: Users,
+  },
+] as const;
 
 export default function Analytics() {
-  const [timeRange, setTimeRange] = useState<string>(
-    analyticsData.defaultTimeRange,
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [range, setRange] = useState<"all" | "30d" | "90d">(
+    searchParams.get("range") === "30d"
+      ? "30d"
+      : searchParams.get("range") === "90d"
+        ? "90d"
+        : "all",
+  );
+  const [data, setData] = useState<AnalyticsResponse["data"] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    setLoading(true);
+
+    void getAnalytics(range)
+      .then(({ data: response }) => setData(response))
+      .catch((value) =>
+        setError(
+          value instanceof Error ? value.message : "Unable to load analytics.",
+        ),
+      )
+      .finally(() => setLoading(false));
+  }, [range]);
+
+  const values = useMemo(
+    () => ({
+      posts: data?.summary.posts ?? 0,
+      reach: data?.summary.reach ?? 0,
+      engagements: data?.summary.engagements ?? 0,
+      followers: data?.profile?.followers ?? 0,
+    }),
+    [data],
   );
 
+  const updateRange = (value: "all" | "30d" | "90d") => {
+    setRange(value);
+
+    const next = new URLSearchParams(searchParams);
+    next.set("range", value);
+    setSearchParams(next);
+  };
+
   return (
-    <div className="min-h-[calc(100vh-72px)] w-full bg-[#f7f9fc] px-8 py-8">
-      <div className="mx-auto max-w-[1380px]">
-        <div className="flex items-start justify-between gap-6">
-          <div>
-            <h1 className="text-[40px] font-semibold tracking-[-2px] text-[#141a29]">
-              {analyticsData.title}
-            </h1>
+    <div className="mx-auto w-full max-w-[1180px]">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#2864f0]">
+            Performance
+          </p>
 
-            <p className="mt-1 text-[18px] text-[#74819a]">
-              {analyticsData.description}
-            </p>
-          </div>
+          <h1 className="mt-2 text-[38px] font-semibold tracking-[-1.8px] text-[#141a29]">
+            Analytics
+          </h1>
 
-          <div className="relative">
-            <select
-              value={timeRange}
-              onChange={(event) => setTimeRange(event.target.value)}
-              className="h-[52px] w-[172px] appearance-none rounded-[13px] border border-[#cbd5e4] bg-white px-4 pr-10 text-[14px] font-medium text-[#59667e] outline-none transition-all focus:border-[#2864f0] focus:ring-2 focus:ring-[#2864f0]/20"
-            >
-              {analyticsData.timeRanges.map((range) => (
-                <option key={range} value={range}>
-                  {range}
-                </option>
-              ))}
-            </select>
-
-            <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#68758c]" />
-          </div>
+          <p className="mt-1 text-[17px] text-[#74819a]">
+            Live performance from your connected profile data.
+          </p>
         </div>
 
-        <section className="relative mt-6 overflow-hidden rounded-[20px] border border-[#d9e4f4] bg-white">
-          <img
-            src="/src/assets/images/cloud-background.png"
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover opacity-[0.28]"
-          />
-
-          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-white/20" />
-
-          <div className="relative flex min-h-[162px] items-center justify-between gap-10 px-8 py-7">
-            <div className="max-w-[820px]">
-              <div className="flex items-center gap-2">
-                <span className="h-2.5 w-2.5 rounded-full bg-[#20b26b]" />
-
-                <span className="text-[11px] font-semibold tracking-[0.13em] text-[#536887]">
-                  {analyticsData.snapshot.eyebrow}
-                </span>
-              </div>
-
-              <h2 className="mt-3 text-[30px] font-semibold tracking-[-1.4px] text-[#182239]">
-                {analyticsData.snapshot.title}
-              </h2>
-
-              <p className="mt-2 text-[14px] leading-6 text-[#64738e]">
-                {analyticsData.snapshot.description}
-              </p>
-            </div>
-
-            <div className="flex min-w-[335px] items-center gap-8 border-l border-[#d8e0eb] pl-8">
-              <div>
-                <div className="text-[34px] font-semibold tracking-[-1.5px] text-[#182239]">
-                  {analyticsData.snapshot.percentage}
-                </div>
-
-                <p className="mt-0.5 max-w-[170px] text-[12px] leading-5 text-[#63728d]">
-                  {analyticsData.snapshot.percentageDescription}
-                </p>
-
-                <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#d8e2ed] bg-white/90 px-3 py-1.5">
-                  <span className="h-2 w-2 rounded-full bg-[#69d7a3]" />
-                  <span className="text-[11px] font-medium text-[#63728d]">
-                    {analyticsData.snapshot.status}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="mt-4 grid grid-cols-4 gap-4">
-          {analyticsData.stats.map((stat) => {
-            const Icon = icons[stat.icon];
-
-            return (
-              <div
-                key={stat.label}
-                className="rounded-[18px] border border-[#dfe5ed] bg-white px-5 py-5 shadow-[0_4px_14px_rgba(32,52,82,0.035)]"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-[12px] font-medium text-[#77839a]">
-                    {stat.label}
-                  </span>
-
-                  <div className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#eef4ff]">
-                    <Icon
-                      className="h-[17px] w-[17px] text-[#2864f0]"
-                      strokeWidth={1.8}
-                    />
-                  </div>
-                </div>
-
-                <div className="mt-4 text-[24px] font-semibold tracking-[-1px] text-[#151b2b]">
-                  {stat.value}
-                </div>
-
-                <p className="mt-1 text-[12px] text-[#7d899f]">
-                  {stat.description}
-                </p>
-              </div>
-            );
-          })}
-        </section>
-
-        <section className="mt-4 grid grid-cols-[minmax(0,2fr)_minmax(330px,1fr)] gap-4">
-          <div className="min-h-[255px] rounded-[18px] border border-[#dfe5ed] bg-white p-6 shadow-[0_4px_14px_rgba(32,52,82,0.035)]">
-            <h2 className="text-[16px] font-semibold text-[#171d2c]">
-              {analyticsData.recentPosts.title}
-            </h2>
-
-            <p className="mt-1 text-[12px] text-[#7c879d]">
-              {analyticsData.recentPosts.description}
-            </p>
-
-            <div className="flex min-h-[170px] flex-col items-center justify-center text-center">
-              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#f1f4fa]">
-                <BarChart3
-                  className="h-5 w-5 text-[#8490a6]"
-                  strokeWidth={1.7}
-                />
-              </div>
-
-              <h3 className="mt-4 text-[14px] font-semibold text-[#747f96]">
-                {analyticsData.recentPosts.emptyTitle}
-              </h3>
-
-              <p className="mt-1 max-w-[400px] text-[12px] leading-5 text-[#8994a9]">
-                {analyticsData.recentPosts.emptyDescription}
-              </p>
-            </div>
-          </div>
-
-          <div className="min-h-[255px] rounded-[18px] border border-[#dfe5ed] bg-white p-6 shadow-[0_4px_14px_rgba(32,52,82,0.035)]">
-            <h2 className="text-[16px] font-semibold text-[#171d2c]">
-              {analyticsData.profileSummary.title}
-            </h2>
-
-            <p className="mt-1 text-[12px] text-[#7c879d]">
-              {analyticsData.profileSummary.description}
-            </p>
-
-            <div className="mt-5 space-y-4">
-              {analyticsData.profileSummary.metrics.map((metric) => (
-                <div key={metric.label}>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[12px] text-[#59677f]">
-                      {metric.label}
-                    </span>
-
-                    <span className="text-[12px] font-semibold text-[#202637]">
-                      {metric.value}
-                    </span>
-                  </div>
-
-                  <div className="mt-2 h-[5px] overflow-hidden rounded-full bg-[#edf1f6]">
-                    <div className="h-full w-0 rounded-full bg-[#2864f0]" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="mt-4 flex items-center gap-4 rounded-[17px] border border-[#d7e3fa] bg-[#f5f8ff] px-5 py-4">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[#e9f0ff]">
-            <ShieldCheck
-              className="h-[18px] w-[18px] text-[#2864f0]"
-              strokeWidth={1.8}
-            />
-          </div>
-
-          <div>
-            <h3 className="text-[13px] font-semibold text-[#182239]">
-              {analyticsData.informationBanner.title}
-            </h3>
-
-            <p className="mt-0.5 text-[12px] text-[#7b879e]">
-              {analyticsData.informationBanner.description}
-            </p>
-          </div>
-        </section>
+        <select
+          value={range}
+          onChange={(event) =>
+            updateRange(event.target.value as "all" | "30d" | "90d")
+          }
+          className="h-11 cursor-pointer rounded-xl border border-[#dce3ec] bg-white px-4 text-sm font-medium text-[#59667e] outline-none"
+        >
+          <option value="all">All time</option>
+          <option value="30d">Last 30 days</option>
+          <option value="90d">Last 90 days</option>
+        </select>
       </div>
+
+      {error && (
+        <div className="mt-5 rounded-xl border border-[#f1c7c7] bg-[#fff7f7] px-4 py-3 text-sm text-[#9b3e3e]">
+          {error}
+        </div>
+      )}
+
+      {loading ? (
+        <div className="mt-7 flex items-center justify-center rounded-[22px] border border-[#e0e6ee] bg-white py-24">
+          Loading analytics…
+        </div>
+      ) : (
+        <>
+          <section className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {metrics.map((metric) => {
+              const Icon = metric.icon;
+
+              return (
+                <div
+                  key={metric.key}
+                  className="rounded-[18px] border border-[#dfe5ed] bg-white p-5"
+                >
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-medium text-[#77839a]">
+                      {metric.label}
+                    </p>
+
+                    <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#eef4ff] text-[#2864f0]">
+                      <Icon className="h-4 w-4" />
+                    </span>
+                  </div>
+
+                  <p className="mt-5 text-[28px] font-semibold tracking-[-1px] text-[#172033]">
+                    {values[metric.key as keyof typeof values].toLocaleString()}
+                  </p>
+                </div>
+              );
+            })}
+          </section>
+
+          <section className="mt-5 rounded-[22px] border border-[#dfe5ed] bg-white p-6">
+            <div className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4 text-[#2864f0]" />
+              <h2 className="text-base font-semibold text-[#182239]">
+                Recent posts
+              </h2>
+            </div>
+
+            {data?.posts.length ? (
+              <div className="mt-5 space-y-3">
+                {data.posts.map((post) => (
+                  <article
+                    key={post.id}
+                    className="rounded-xl border border-[#e5e9ef] p-4"
+                  >
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <p className="max-w-[700px] text-sm leading-6 text-[#334057]">
+                        {post.text || "Published LinkedIn post"}
+                      </p>
+
+                      <span className="shrink-0 text-[11px] text-[#8d99ac]">
+                        {new Date(post.published_at).toLocaleDateString()}
+                      </span>
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-5">
+                      <Mini label="Impressions" value={post.impressions} />
+                      <Mini label="Reach" value={post.reach} />
+                      <Mini label="Likes" value={post.likes} />
+                      <Mini label="Comments" value={post.comments} />
+                      <Mini label="Reposts" value={post.reposts} />
+                    </div>
+
+                    {post.url && (
+                      <a
+                        href={post.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-4 inline-flex cursor-pointer text-xs font-semibold text-[#2864f0]"
+                      >
+                        Open post
+                      </a>
+                    )}
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <div className="flex min-h-[280px] items-center justify-center text-center">
+                <div>
+                  <BarChart3 className="mx-auto h-8 w-8 text-[#9aa6b8]" />
+                  <p className="mt-4 text-sm font-semibold text-[#5d6a80]">
+                    No post data yet
+                  </p>
+                  <p className="mt-1 max-w-md text-xs leading-5 text-[#8b97aa]">
+                    Connected public post metrics will populate this section.
+                  </p>
+                </div>
+              </div>
+            )}
+          </section>
+        </>
+      )}
+    </div>
+  );
+}
+
+function Mini({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-lg bg-[#f7f9fc] px-3 py-2">
+      <p className="text-[9px] uppercase tracking-[0.08em] text-[#9aa5b5]">
+        {label}
+      </p>
+
+      <p className="mt-1 text-xs font-semibold text-[#344059]">
+        {value.toLocaleString()}
+      </p>
     </div>
   );
 }
