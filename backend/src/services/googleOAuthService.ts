@@ -139,8 +139,6 @@ export async function handleGoogleCallback(code: string, role: "creator" | "bran
   const email = String(profile.email).toLowerCase();
 
   let user: any = findUserByEmail(email);
-  let isNewUser = false;
-
   if (!user) {
     user = createOAuthUser({
       email,
@@ -152,7 +150,6 @@ export async function handleGoogleCallback(code: string, role: "creator" | "bran
       provider: "google",
     });
 
-    isNewUser = true;
   }
 
   const profileTable =
@@ -177,7 +174,6 @@ export async function handleGoogleCallback(code: string, role: "creator" | "bran
 
   return {
     user,
-    isNewUser,
     needsOnboarding,
   };
 }
