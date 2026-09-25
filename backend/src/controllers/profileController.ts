@@ -24,10 +24,7 @@ export function getPublicCard(
     return error(response, 404, "CARD_NOT_FOUND", "Creator card not found.");
   return json(response, 200, { data: profile });
 }
-export function getProfile(
-  request: IncomingMessage,
-  response: ServerResponse,
-) {
+export function getProfile(request: IncomingMessage, response: ServerResponse) {
   const user = requireAuth(request, response);
 
   if (!user) {
@@ -35,14 +32,9 @@ export function getProfile(
   }
 
   const isCreatorRoute =
-    request.url?.startsWith(
-      "/api/creator/profile",
-    ) ?? false;
+    request.url?.startsWith("/api/creator/profile") ?? false;
 
-  if (
-    isCreatorRoute &&
-    user.role !== "creator"
-  ) {
+  if (isCreatorRoute && user.role !== "creator") {
     return error(
       response,
       403,
@@ -51,10 +43,7 @@ export function getProfile(
     );
   }
 
-  if (
-    !isCreatorRoute &&
-    user.role !== "brand"
-  ) {
+  if (!isCreatorRoute && user.role !== "brand") {
     return error(
       response,
       403,
@@ -65,29 +54,18 @@ export function getProfile(
 
   if (user.role === "creator") {
     let profile = db
-      .prepare(
-        "SELECT * FROM creator_profiles WHERE user_id = ?",
-      )
-      .get(user.id) as
-      | Record<string, unknown>
-      | undefined;
+      .prepare("SELECT * FROM creator_profiles WHERE user_id = ?")
+      .get(user.id) as Record<string, unknown> | undefined;
 
     if (!profile) {
       const timestamp = now();
 
       db.prepare(
         "INSERT INTO creator_profiles (user_id, name, created_at, updated_at) VALUES (?, ?, ?, ?)",
-      ).run(
-        user.id,
-        user.name,
-        timestamp,
-        timestamp,
-      );
+      ).run(user.id, user.name, timestamp, timestamp);
 
       profile = db
-        .prepare(
-          "SELECT * FROM creator_profiles WHERE user_id = ?",
-        )
+        .prepare("SELECT * FROM creator_profiles WHERE user_id = ?")
         .get(user.id) as Record<string, unknown>;
     }
 
@@ -98,9 +76,7 @@ export function getProfile(
 
   return json(response, 200, {
     data: db
-      .prepare(
-        "SELECT * FROM brand_profiles WHERE user_id = ?",
-      )
+      .prepare("SELECT * FROM brand_profiles WHERE user_id = ?")
       .get(user.id),
   });
 }
@@ -122,29 +98,18 @@ export async function patchProfile(
     }
 
     let p = db
-      .prepare(
-        "SELECT * FROM creator_profiles WHERE user_id = ?",
-      )
-      .get(user.id) as
-      | Record<string, unknown>
-      | undefined;
+      .prepare("SELECT * FROM creator_profiles WHERE user_id = ?")
+      .get(user.id) as Record<string, unknown> | undefined;
 
     if (!p) {
       const timestamp = now();
 
       db.prepare(
         "INSERT INTO creator_profiles (user_id, name, created_at, updated_at) VALUES (?, ?, ?, ?)",
-      ).run(
-        user.id,
-        user.name,
-        timestamp,
-        timestamp,
-      );
+      ).run(user.id, user.name, timestamp, timestamp);
 
       p = db
-        .prepare(
-          "SELECT * FROM creator_profiles WHERE user_id = ?",
-        )
+        .prepare("SELECT * FROM creator_profiles WHERE user_id = ?")
         .get(user.id) as Record<string, unknown>;
     }
 
