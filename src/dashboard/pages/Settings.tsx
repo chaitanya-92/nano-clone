@@ -11,7 +11,10 @@ import {
   UserRound,
   X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,15 +35,25 @@ import {
   type CreatorProfile,
   type PayoutMethod,
 } from "@/lib/dashboard";
-import { getCurrentUser, logout } from "@/lib/auth";
+import {
+  getCurrentUser,
+  logout,
+} from "@/lib/auth";
 import { signOut } from "@/features/authSlice";
 import {
   useAppDispatch,
   useAppSelector,
 } from "@/store/hooks";
 
-type Tab = "profile" | "payments" | "account";
-type SocialProvider = "linkedin" | "x";
+type Tab =
+  | "profile"
+  | "payments"
+  | "account";
+
+type SocialProvider =
+  | "linkedin"
+  | "x";
+
 type SocialStatus =
   | "idle"
   | "valid"
@@ -74,95 +87,118 @@ function validateSocialUrl(
   provider: SocialProvider,
   value: string,
 ) {
-  if (!value.trim()) {
+  const normalized = value.trim();
+
+  if (!normalized) {
     return "";
   }
 
+  let url: URL;
+
   try {
-    const url = new URL(value.trim());
-    const hostname = url.hostname
-      .toLowerCase()
-      .replace(/^www\./, "");
-    const pathname = url.pathname
-      .replace(/\/$/, "");
-
-    if (url.protocol !== "https:") {
-      return "Use an HTTPS profile URL.";
-    }
-
-    if (
-      provider === "linkedin" &&
-      (hostname !== "linkedin.com" ||
-        !/^\/in\/[A-Za-z0-9][A-Za-z0-9._-]*$/.test(
-          pathname,
-        ))
-    ) {
-      return "Enter a valid LinkedIn profile URL.";
-    }
-
-    if (
-      provider === "x" &&
-      (!["x.com", "twitter.com"].includes(
-        hostname,
-      ) ||
-        !/^\/[A-Za-z0-9_]{1,15}$/.test(
-          pathname,
-        ))
-    ) {
-      return "Enter a valid X profile URL.";
-    }
-
-    return "";
+    url = new URL(normalized);
   } catch {
     return "Enter a valid profile URL.";
   }
+
+  const hostname = url.hostname
+    .toLowerCase()
+    .replace(/^www\./, "");
+
+  if (url.protocol !== "https:") {
+    return "Use an HTTPS profile URL.";
+  }
+
+  if (provider === "linkedin") {
+    const validHost =
+      hostname === "linkedin.com";
+    const validPath =
+      /^\/in\/[A-Za-z0-9][A-Za-z0-9._-]*$/.test(
+        url.pathname.replace(/\/$/, ""),
+      );
+
+    if (!validHost || !validPath) {
+      return "Enter a valid LinkedIn profile URL.";
+    }
+  }
+
+  if (provider === "x") {
+    const validHost = [
+      "x.com",
+      "twitter.com",
+    ].includes(hostname);
+    const validPath =
+      /^\/[A-Za-z0-9_]{1,15}$/.test(
+        url.pathname.replace(/\/$/, ""),
+      );
+
+    if (!validHost || !validPath) {
+      return "Enter a valid X profile URL.";
+    }
+  }
+
+  return "";
 }
 
 export default function Settings() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
   const authUser = useAppSelector(
     (state) => state.auth.user,
   );
 
   const [tab, setTab] =
     useState<Tab>("profile");
-  const [user, setUser] =
-    useState(authUser);
+
   const [profile, setProfile] =
-    useState<CreatorProfile | null>(null);
+    useState<CreatorProfile | null>(
+      null,
+    );
+
   const [methods, setMethods] =
     useState<PayoutMethod[]>([]);
 
-  const [name, setName] = useState("");
+  const [name, setName] =
+    useState("");
+
   const [linkedinUrl, setLinkedinUrl] =
     useState("");
+
   const [xProfileUrl, setXProfileUrl] =
     useState("");
 
-  const [initialLinkedin, setInitialLinkedin] =
+  const [initialLinkedinUrl, setInitialLinkedinUrl] =
     useState("");
-  const [initialX, setInitialX] =
+
+  const [initialXProfileUrl, setInitialXProfileUrl] =
     useState("");
 
   const [methodLabel, setMethodLabel] =
     useState("");
+
   const [showMethod, setShowMethod] =
     useState(false);
+
   const [showDelete, setShowDelete] =
     useState(false);
+
   const [deleteConfirmation, setDeleteConfirmation] =
     useState("");
 
   const [loadingProfile, setLoadingProfile] =
     useState(true);
+
   const [loadingPayments, setLoadingPayments] =
     useState(false);
-  const [busy, setBusy] = useState(false);
 
-  const [nameSaved, setNameSaved] =
+  const [paymentsLoaded, setPaymentsLoaded] =
     useState(false);
-  const [socialSaved, setSocialSaved] =
+
+  const [busy, setBusy] =
+    useState(false);
+
+  const [saved, setSaved] =
     useState(false);
 
   const [socialStatus, setSocialStatus] =
@@ -178,13 +214,17 @@ export default function Settings() {
 
   const [socialError, setSocialError] =
     useState<
-      Record<SocialProvider, string>
+      Record<
+        SocialProvider,
+        string
+      >
     >({
       linkedin: "",
       x: "",
     });
 
-  const [error, setError] = useState("");
+  const [error, setError] =
+    useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -193,29 +233,80 @@ export default function Settings() {
       getCurrentUser(),
       getCreatorProfile(),
     ])
-      .then(([userResult, profileResult]) => {
-        if (cancelled) {
-          return;
-        }
+      .then(
+        ([
+          userResult,
+          profileResult,
+        ]) => {
+          if (cancelled) {
+            return;
+          }
 
-        setUser(userResult.user);
-        const creator = profileResult.data;
+          const creator =
+            profileResult.data;
 
-        setProfile(creator);
-        setName(creator.name ?? "");
-        setLinkedinUrl(
-          creator.linkedin_url ?? "",
-        );
-        setXProfileUrl(
-          creator.x_profile_url ?? "",
-        );
-        setInitialLinkedin(
-          creator.linkedin_url ?? "",
-        );
-        setInitialX(
-          creator.x_profile_url ?? "",
-        );
-      })
+          setProfile(creator);
+          setName(
+            creator.name ?? "",
+          );
+          setLinkedinUrl(
+            creator.linkedin_url ??
+              "",
+          );
+          setXProfileUrl(
+            creator.x_profile_url ??
+              "",
+          );
+          setInitialLinkedinUrl(
+            creator.linkedin_url ??
+              "",
+          );
+          setInitialXProfileUrl(
+            creator.x_profile_url ??
+              "",
+          );
+
+          if (
+            creator.linkedin_url
+          ) {
+            setSocialStatus(
+              (current) => ({
+                ...current,
+                linkedin:
+                  validateSocialUrl(
+                    "linkedin",
+                    creator.linkedin_url,
+                  )
+                    ? "invalid"
+                    : "valid",
+              }),
+            );
+          }
+
+          if (
+            creator.x_profile_url
+          ) {
+            setSocialStatus(
+              (current) => ({
+                ...current,
+                x: validateSocialUrl(
+                  "x",
+                  creator.x_profile_url,
+                )
+                  ? "invalid"
+                  : "valid",
+              }),
+            );
+          }
+
+          setError(
+            userResult.user?.role ===
+              "creator"
+              ? ""
+              : "These settings are configured for creator accounts.",
+          );
+        },
+      )
       .catch((value) => {
         if (cancelled) {
           return;
@@ -224,7 +315,7 @@ export default function Settings() {
         setError(
           value instanceof Error
             ? value.message
-            : "Unable to load creator settings.",
+            : "Unable to load settings.",
         );
       })
       .finally(() => {
@@ -241,6 +332,7 @@ export default function Settings() {
   useEffect(() => {
     if (
       tab !== "payments" ||
+      paymentsLoaded ||
       loadingPayments
     ) {
       return;
@@ -251,6 +343,7 @@ export default function Settings() {
     void getPayoutMethods()
       .then(({ data }) => {
         setMethods(data);
+        setPaymentsLoaded(true);
       })
       .catch((value) => {
         setError(
@@ -262,142 +355,37 @@ export default function Settings() {
       .finally(() => {
         setLoadingPayments(false);
       });
-  }, [tab, loadingPayments]);
+  }, [
+    tab,
+    paymentsLoaded,
+    loadingPayments,
+  ]);
 
-  const saveName = async () => {
-    const value = name.trim();
+  const saveChanges = async () => {
+    const trimmedName =
+      name.trim();
+    const trimmedLinkedin =
+      linkedinUrl.trim();
+    const trimmedX =
+      xProfileUrl.trim();
 
-    if (!value) {
-      setError("Display name is required.");
+    if (!trimmedName) {
+      setError(
+        "Display name is required.",
+      );
       return;
     }
-
-    setBusy(true);
-    setError("");
-    setNameSaved(false);
-
-    try {
-      const { data } =
-        await updateCreatorProfile({
-          name: value,
-        });
-
-      setProfile(data);
-      setName(data.name ?? value);
-      setNameSaved(true);
-
-      window.setTimeout(
-        () => setNameSaved(false),
-        1800,
-      );
-    } catch (value) {
-      setError(
-        value instanceof Error
-          ? value.message
-          : "Unable to save display name.",
-      );
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const verifySocial = async (
-    provider: SocialProvider,
-    value: string,
-  ) => {
-    const normalized = value.trim();
-    const validationError =
-      validateSocialUrl(
-        provider,
-        normalized,
-      );
-
-    if (validationError) {
-      setSocialError((current) => ({
-        ...current,
-        [provider]: validationError,
-      }));
-      setSocialStatus((current) => ({
-        ...current,
-        [provider]: "invalid",
-      }));
-      return false;
-    }
-
-    if (!normalized) {
-      return true;
-    }
-
-    setSocialError((current) => ({
-      ...current,
-      [provider]: "",
-    }));
-    setSocialStatus((current) => ({
-      ...current,
-      [provider]: "verifying",
-    }));
-
-    try {
-      await connectSocial(
-        provider,
-        normalized,
-      );
-
-      const { data } =
-        await getCreatorProfile();
-
-      setProfile(data);
-      setName(data.name ?? "");
-      setLinkedinUrl(
-        data.linkedin_url ?? "",
-      );
-      setXProfileUrl(
-        data.x_profile_url ?? "",
-      );
-      setInitialLinkedin(
-        data.linkedin_url ?? "",
-      );
-      setInitialX(
-        data.x_profile_url ?? "",
-      );
-
-      setSocialStatus((current) => ({
-        ...current,
-        [provider]: "verified",
-      }));
-
-      return true;
-    } catch (value) {
-      setSocialStatus((current) => ({
-        ...current,
-        [provider]: "invalid",
-      }));
-      setSocialError((current) => ({
-        ...current,
-        [provider]:
-          value instanceof Error
-            ? value.message
-            : "The profile could not be verified.",
-      }));
-      return false;
-    }
-  };
-
-  const saveSocialLinks = async () => {
-    const linkedinValue =
-      linkedinUrl.trim();
-    const xValue =
-      xProfileUrl.trim();
 
     const linkedinValidation =
       validateSocialUrl(
         "linkedin",
-        linkedinValue,
+        trimmedLinkedin,
       );
+
     const xValidation =
       validateSocialUrl(
         "x",
-        xValue,
+        trimmedX,
       );
 
     if (
@@ -411,165 +399,278 @@ export default function Settings() {
       });
 
       if (linkedinValidation) {
-        setSocialStatus((current) => ({
-          ...current,
-          linkedin: "invalid",
-        }));
+        setSocialStatus(
+          (current) => ({
+            ...current,
+            linkedin: "invalid",
+          }),
+        );
       }
 
       if (xValidation) {
-        setSocialStatus((current) => ({
-          ...current,
-          x: "invalid",
-        }));
+        setSocialStatus(
+          (current) => ({
+            ...current,
+            x: "invalid",
+          }),
+        );
       }
 
+      setError(
+        "Please fix the highlighted social link before saving.",
+      );
       return;
     }
 
     setBusy(true);
+    setSaved(false);
     setError("");
-    setSocialSaved(false);
 
     try {
-      if (
-        linkedinValue &&
-        linkedinValue !== initialLinkedin
-      ) {
-        const valid =
-          await verifySocial(
-            "linkedin",
-            linkedinValue,
-          );
-
-        if (!valid) {
-          return;
-        }
-      }
-
-      if (
-        xValue &&
-        xValue !== initialX
-      ) {
-        const valid =
-          await verifySocial(
-            "x",
-            xValue,
-          );
-
-        if (!valid) {
-          return;
-        }
-      }
-
       const { data } =
         await updateCreatorProfile({
+          name: trimmedName,
           linkedinUrl:
-            linkedinValue,
-          xProfileUrl: xValue,
+            trimmedLinkedin,
+          xProfileUrl:
+            trimmedX,
         });
 
       setProfile(data);
+      setName(
+        data.name ?? trimmedName,
+      );
       setLinkedinUrl(
-        data.linkedin_url ?? "",
+        data.linkedin_url ??
+          trimmedLinkedin,
       );
       setXProfileUrl(
-        data.x_profile_url ?? "",
+        data.x_profile_url ??
+          trimmedX,
       );
-      setInitialLinkedin(
-        data.linkedin_url ?? "",
+      setInitialLinkedinUrl(
+        data.linkedin_url ??
+          trimmedLinkedin,
       );
-      setInitialX(
-        data.x_profile_url ?? "",
+      setInitialXProfileUrl(
+        data.x_profile_url ??
+          trimmedX,
       );
-      setSocialSaved(true);
+
+      setSocialError({
+        linkedin: "",
+        x: "",
+      });
+
+      setSocialStatus({
+        linkedin:
+          data.linkedin_url
+            ? "valid"
+            : "idle",
+        x: data.x_profile_url
+          ? "valid"
+          : "idle",
+      });
+
+      setSaved(true);
 
       window.setTimeout(
-        () => setSocialSaved(false),
+        () => setSaved(false),
         1800,
       );
     } catch (value) {
       setError(
         value instanceof Error
           ? value.message
-          : "Unable to save social links.",
+          : "Unable to save settings.",
       );
     } finally {
       setBusy(false);
     }
   };
 
-  const saveMethod = async () => {
-    const value = methodLabel.trim();
+  const verifySocial = async (
+    provider: SocialProvider,
+  ) => {
+    const value =
+      provider === "linkedin"
+        ? linkedinUrl
+        : xProfileUrl;
 
-    if (!value) {
-      setError(
-        "Enter a name for the payout method.",
+    const validationError =
+      validateSocialUrl(
+        provider,
+        value,
+      );
+
+    if (validationError) {
+      setSocialStatus(
+        (current) => ({
+          ...current,
+          [provider]: "invalid",
+        }),
+      );
+      setSocialError(
+        (current) => ({
+          ...current,
+          [provider]:
+            validationError,
+        }),
       );
       return;
     }
 
+    if (!value.trim()) {
+      return;
+    }
+
     setBusy(true);
-    setError("");
-
-    try {
-      const { data } =
-        await addPayoutMethod({
-          type: "stripe",
-          label: value,
-        });
-
-      setMethods((current) => [
-        data,
+    setSocialStatus(
+      (current) => ({
         ...current,
-      ]);
-      setMethodLabel("");
-      setShowMethod(false);
+        [provider]:
+          "verifying",
+      }),
+    );
+    setSocialError(
+      (current) => ({
+        ...current,
+        [provider]: "",
+      }),
+    );
+    setError("");
+
+    try {
+      await connectSocial(
+        provider,
+        value.trim(),
+      );
+
+      const { data } =
+        await getCreatorProfile();
+
+      setProfile(data);
+      setName(
+        data.name ?? "",
+      );
+      setLinkedinUrl(
+        data.linkedin_url ?? "",
+      );
+      setXProfileUrl(
+        data.x_profile_url ?? "",
+      );
+      setInitialLinkedinUrl(
+        data.linkedin_url ?? "",
+      );
+      setInitialXProfileUrl(
+        data.x_profile_url ?? "",
+      );
+
+      setSocialStatus(
+        (current) => ({
+          ...current,
+          [provider]:
+            "verified",
+        }),
+      );
     } catch (value) {
-      setError(
-        value instanceof Error
-          ? value.message
-          : "Unable to save payout method.",
+      setSocialStatus(
+        (current) => ({
+          ...current,
+          [provider]: "invalid",
+        }),
+      );
+
+      setSocialError(
+        (current) => ({
+          ...current,
+          [provider]:
+            value instanceof Error
+              ? value.message
+              : "The public profile could not be refreshed.",
+        }),
       );
     } finally {
       setBusy(false);
     }
   };
 
-  const handleDelete = async () => {
-    if (
-      deleteConfirmation !==
-      "DELETE"
-    ) {
-      return;
-    }
+  const savePayoutMethod =
+    async () => {
+      const label =
+        methodLabel.trim();
 
-    setBusy(true);
-    setError("");
+      if (!label) {
+        setError(
+          "Enter a name for the payout method.",
+        );
+        return;
+      }
 
-    try {
-      await deleteAccount();
-      dispatch(signOut());
-      await logout().catch(
-        () => undefined,
-      );
+      setBusy(true);
+      setError("");
 
-      navigate("/login", {
-        replace: true,
-      });
-    } catch (value) {
-      setError(
-        value instanceof Error
-          ? value.message
-          : "Unable to delete your account.",
-      );
-      setBusy(false);
-    }
-  };
+      try {
+        const { data } =
+          await addPayoutMethod({
+            type: "stripe",
+            label,
+          });
 
-  if (
-    loadingProfile
-  ) {
+        setMethods(
+          (current) => [
+            data,
+            ...current,
+          ],
+        );
+        setMethodLabel("");
+        setShowMethod(false);
+        setPaymentsLoaded(true);
+      } catch (value) {
+        setError(
+          value instanceof Error
+            ? value.message
+            : "Unable to add payout method.",
+        );
+      } finally {
+        setBusy(false);
+      }
+    };
+
+  const handleDelete =
+    async () => {
+      if (
+        deleteConfirmation !==
+        "DELETE"
+      ) {
+        return;
+      }
+
+      setBusy(true);
+      setError("");
+
+      try {
+        await deleteAccount();
+
+        dispatch(signOut());
+        await logout().catch(
+          () => undefined,
+        );
+
+        navigate("/login", {
+          replace: true,
+        });
+      } catch (value) {
+        setError(
+          value instanceof Error
+            ? value.message
+            : "Unable to delete your account.",
+        );
+        setBusy(false);
+      }
+    };
+
+  if (loadingProfile) {
     return (
       <div className="mx-auto w-full max-w-[1180px]">
         <div className="flex items-center gap-2 rounded-[22px] border border-[#e0e6ee] bg-white p-8 text-sm text-[#7d899f]">
@@ -583,9 +684,9 @@ export default function Settings() {
   if (!profile) {
     return (
       <div className="mx-auto w-full max-w-[1180px]">
-        <div className="rounded-xl border border-[#f1c7c7] bg-[#fff7f7] px-4 py-3 text-sm text-[#9b3e3e]">
+        <div className="rounded-[22px] border border-[#f1c7c7] bg-[#fff7f7] px-5 py-4 text-sm text-[#9b3e3e]">
           {error ||
-            "Creator settings are unavailable for this account."}
+            "Creator settings are unavailable."}
         </div>
       </div>
     );
@@ -603,15 +704,16 @@ export default function Settings() {
         </h1>
 
         <p className="mt-1 text-[17px] text-[#74819a]">
-          Manage your profile, payments and account.
+          Manage your profile,
+          payments and account.
         </p>
       </section>
 
-      {user &&
-        user.role !== "creator" && (
+      {authUser &&
+        authUser.role !==
+          "creator" && (
           <div className="mt-5 rounded-xl border border-[#f0d7a6] bg-[#fffaf0] px-4 py-3 text-sm text-[#8a6a2d]">
-            These settings are currently configured
-            for creator accounts.
+            These settings are currently configured for creator accounts.
           </div>
         )}
 
@@ -636,7 +738,7 @@ export default function Settings() {
                 className={
                   tab === item.id
                     ? "flex w-full cursor-pointer items-center gap-3 rounded-xl bg-[#eef4ff] px-4 py-3 text-left text-sm font-semibold text-[#2864f0]"
-                    : "flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-semibold text-[#64728a] hover:bg-[#f5f7fa]"
+                    : "flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-semibold text-[#64728a] transition hover:bg-[#f5f7fa]"
                 }
               >
                 <Icon className="h-4 w-4" />
@@ -655,45 +757,31 @@ export default function Settings() {
                 </h2>
 
                 <p className="mt-1 text-sm text-[#7d899f]">
-                  Manage the public profile information
-                  connected to your creator card.
+                  Manage the public profile information connected to your creator card.
                 </p>
               </div>
 
               <div className="space-y-7 pt-6">
                 <div>
-                  <label className="text-xs font-semibold text-[#626a78]">
+                  <label
+                    htmlFor="display-name"
+                    className="text-xs font-semibold text-[#626a78]"
+                  >
                     Display name
                   </label>
 
-                  <div className="mt-2 flex gap-2">
-                    <input
-                      value={name}
-                      onChange={(event) =>
-                        setName(
-                          event.target.value,
-                        )
-                      }
-                      className="auth-input flex-1"
-                    />
-
-                    <Button
-                      type="button"
-                      onClick={() =>
-                        void saveName()
-                      }
-                      disabled={
-                        busy ||
-                        !name.trim()
-                      }
-                      className="cursor-pointer bg-[#171d2b] hover:bg-[#111827]"
-                    >
-                      <Save className="mr-2 h-4 w-4" />
-                      {nameSaved
-                        ? "Saved"
-                        : "Save name"}
-                    </Button>
-                  </div>
+                  <input
+                    id="display-name"
+                    value={name}
+                    onChange={(event) =>
+                      setName(
+                        event.target
+                          .value,
+                      )
+                    }
+                    className="auth-input mt-2"
+                    placeholder="Your display name"
+                  />
                 </div>
 
                 <div className="border-t border-[#e8ecf2] pt-6">
@@ -705,16 +793,14 @@ export default function Settings() {
                   </div>
 
                   <p className="mt-1 text-sm text-[#7d899f]">
-                    Save public profile links and
-                    verify them before they are used
-                    for profile data.
+                    Save the links separately from profile refresh. A refresh may fail when a platform blocks automated public-page access.
                   </p>
 
                   <div className="mt-5 space-y-5">
                     <SocialField
                       label="LinkedIn"
-                      value={linkedinUrl}
                       provider="linkedin"
+                      value={linkedinUrl}
                       status={socialStatus.linkedin}
                       error={socialError.linkedin}
                       busy={busy}
@@ -727,45 +813,51 @@ export default function Settings() {
                       onVerify={() =>
                         void verifySocial(
                           "linkedin",
-                          linkedinUrl,
                         )
                       }
                     />
 
                     <SocialField
                       label="X"
-                      value={xProfileUrl}
                       provider="x"
+                      value={xProfileUrl}
                       status={socialStatus.x}
                       error={socialError.x}
                       busy={busy}
                       placeholder="https://x.com/your-handle"
                       onChange={(value) =>
-                        setXProfileUrl(value)
+                        setXProfileUrl(
+                          value,
+                        )
                       }
                       onVerify={() =>
                         void verifySocial(
                           "x",
-                          xProfileUrl,
                         )
                       }
                     />
-
-                    <Button
-                      type="button"
-                      onClick={() =>
-                        void saveSocialLinks()
-                      }
-                      disabled={busy}
-                      className="cursor-pointer bg-[#171d2b] hover:bg-[#111827]"
-                    >
-                      <Save className="mr-2 h-4 w-4" />
-                      {socialSaved
-                        ? "Saved"
-                        : "Save social links"}
-                    </Button>
                   </div>
                 </div>
+              </div>
+
+              <div className="mt-8 flex items-center justify-end border-t border-[#e8ecf2] pt-5">
+                <Button
+                  type="button"
+                  onClick={() =>
+                    void saveChanges()
+                  }
+                  disabled={busy}
+                  className="cursor-pointer bg-[#171d2b] px-5 hover:bg-[#111827]"
+                >
+                  {busy ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Save className="mr-2 h-4 w-4" />
+                  )}
+                  {saved
+                    ? "Saved"
+                    : "Save changes"}
+                </Button>
               </div>
             </div>
           )}
@@ -778,8 +870,7 @@ export default function Settings() {
                 </h2>
 
                 <p className="mt-1 text-sm text-[#7d899f]">
-                  Manage saved payout methods for
-                  creator earnings.
+                  Manage saved payout methods for creator earnings.
                 </p>
               </div>
 
@@ -798,8 +889,7 @@ export default function Settings() {
                         </h3>
 
                         <p className="mt-1 text-xs text-[#8794aa]">
-                          Saved payout destinations for
-                          withdrawals.
+                          Saved payout destinations for withdrawals.
                         </p>
                       </div>
 
@@ -808,8 +898,8 @@ export default function Settings() {
                         variant="outline"
                         onClick={() =>
                           setShowMethod(
-                            (value) =>
-                              !value,
+                            (current) =>
+                              !current,
                           )
                         }
                         className="cursor-pointer"
@@ -826,7 +916,8 @@ export default function Settings() {
                           value={methodLabel}
                           onChange={(event) =>
                             setMethodLabel(
-                              event.target.value,
+                              event.target
+                                .value,
                             )
                           }
                           className="auth-input flex-1"
@@ -836,7 +927,7 @@ export default function Settings() {
                         <Button
                           type="button"
                           onClick={() =>
-                            void saveMethod()
+                            void savePayoutMethod()
                           }
                           disabled={
                             busy ||
@@ -845,7 +936,7 @@ export default function Settings() {
                           className="cursor-pointer bg-[#171d2b] hover:bg-[#111827]"
                         >
                           <Save className="mr-2 h-4 w-4" />
-                          Save
+                          Save method
                         </Button>
                       </div>
                     )}
@@ -866,8 +957,7 @@ export default function Settings() {
                                 </p>
 
                                 <p className="mt-1 text-xs text-[#8b97aa]">
-                                  {method.type}{" "}
-                                  ·{" "}
+                                  {method.type} ·{" "}
                                   {
                                     method.status
                                   }
@@ -904,9 +994,7 @@ export default function Settings() {
                     </h2>
 
                     <p className="mt-2 max-w-[680px] text-sm leading-6 text-[#8d6262]">
-                      Permanently delete your account
-                      and associated workspace data.
-                      This action cannot be undone.
+                      Permanently delete your account and associated workspace data. This action cannot be undone.
                     </p>
                   </div>
                 </div>
@@ -934,30 +1022,30 @@ export default function Settings() {
           setShowDelete(open);
 
           if (!open) {
-            setDeleteConfirmation("");
+            setDeleteConfirmation(
+              "",
+            );
           }
         }}
       >
-        <DialogContent className="max-w-[520px] border-[#eed0d0]">
+        <DialogContent className="max-w-[520px]">
           <DialogHeader>
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#fff1f1] text-[#d23838]">
               <Trash2 className="h-5 w-5" />
             </div>
 
-            <DialogTitle className="text-xl text-[#1d2433]">
+            <DialogTitle className="text-xl">
               Delete your account?
             </DialogTitle>
 
             <DialogDescription className="text-sm leading-6 text-[#6f7c92]">
-              This permanently deletes your Naano
-              account and associated workspace data.
-              This cannot be undone.
+              This permanently deletes your Naano account and associated workspace data. There is no undo.
             </DialogDescription>
           </DialogHeader>
 
           <div className="rounded-xl border border-[#f1d7d7] bg-[#fff8f8] p-4">
             <p className="text-xs leading-5 text-[#8a5d5d]">
-              Type DELETE below to confirm.
+              Type DELETE below to enable the permanent deletion action.
             </p>
           </div>
 
@@ -974,7 +1062,8 @@ export default function Settings() {
               value={deleteConfirmation}
               onChange={(event) =>
                 setDeleteConfirmation(
-                  event.target.value,
+                  event.target
+                    .value,
                 )
               }
               autoComplete="off"
@@ -988,7 +1077,9 @@ export default function Settings() {
               type="button"
               variant="outline"
               onClick={() =>
-                setShowDelete(false)
+                setShowDelete(
+                  false,
+                )
               }
               disabled={busy}
               className="cursor-pointer"
@@ -1025,8 +1116,8 @@ export default function Settings() {
 
 function SocialField({
   label,
-  value,
   provider,
+  value,
   status,
   error,
   busy,
@@ -1035,8 +1126,8 @@ function SocialField({
   onVerify,
 }: {
   label: string;
-  value: string;
   provider: SocialProvider;
+  value: string;
   status: SocialStatus;
   error: string;
   busy: boolean;
@@ -1044,11 +1135,7 @@ function SocialField({
   onChange: (value: string) => void;
   onVerify: () => void;
 }) {
-  const Icon = provider === "linkedin"
-    ? Link2
-    : Link2;
-
-  const normalizedError =
+  const validationError =
     validateSocialUrl(
       provider,
       value,
@@ -1067,49 +1154,55 @@ function SocialField({
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <label
-          className="text-xs font-semibold text-[#626a78]"
-        >
+      <div className="flex items-center justify-between gap-3">
+        <label className="text-xs font-semibold text-[#626a78]">
           {label}
         </label>
 
-        <span
-          className={
-            status === "verified"
-              ? "text-[11px] font-semibold text-[#18945a]"
-              : status === "invalid"
-                ? "text-[11px] font-semibold text-[#c24d4d]"
-                : "text-[11px] text-[#8b97aa]"
-          }
-        >
-          {statusLabel}
-        </span>
+        {statusLabel && (
+          <span
+            className={
+              status ===
+              "verified"
+                ? "text-[11px] font-semibold text-[#18945a]"
+                : status ===
+                    "invalid"
+                  ? "text-[11px] font-semibold text-[#c24d4d]"
+                  : "text-[11px] font-medium text-[#7d899f]"
+            }
+          >
+            {statusLabel}
+          </span>
+        )}
       </div>
 
       <div className="mt-2 flex gap-2">
         <div className="relative flex-1">
           <input
             value={value}
-            onChange={(event) =>
-              onChange(event.target.value)
-            }
+            onChange={(event) => {
+              onChange(
+                event.target
+                  .value,
+              );
+            }}
             className={
               "auth-input pr-10 " +
-              ((error ||
-                normalizedError) &&
-              value
+              (validationError ||
+              error
                 ? "border-[#df6b6b] focus:border-[#df6b6b]"
                 : "")
             }
             placeholder={placeholder}
           />
 
-          {status === "verified" && (
+          {status ===
+            "verified" && (
             <Check className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#18945a]" />
           )}
 
-          {status === "invalid" && (
+          {status ===
+            "invalid" && (
             <X className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#d34a4a]" />
           )}
         </div>
@@ -1121,11 +1214,12 @@ function SocialField({
           disabled={
             busy ||
             !value.trim() ||
-            Boolean(normalizedError)
+            Boolean(validationError)
           }
           className="cursor-pointer whitespace-nowrap"
         >
-          {status === "verifying" ? (
+          {status ===
+          "verifying" ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : (
             <RefreshCw className="mr-2 h-4 w-4" />
@@ -1134,10 +1228,12 @@ function SocialField({
         </Button>
       </div>
 
-      {(error || normalizedError) && (
+      {(validationError ||
+        error) && (
         <p className="mt-2 flex items-center gap-1.5 text-xs text-[#c24d4d]">
           <CircleAlert className="h-3.5 w-3.5" />
-          {error || normalizedError}
+          {error ||
+            validationError}
         </p>
       )}
     </div>
