@@ -131,9 +131,7 @@ export default function Overview() {
               }}
               transition={{
                 duration: 0.35,
-                delay:
-                  0.05 +
-                  stats.indexOf(stat) * 0.06,
+                delay: 0.05 + stats.indexOf(stat) * 0.06,
               }}
               whileHover={{
                 y: -4,
@@ -143,10 +141,7 @@ export default function Overview() {
                 scale: 0.995,
               }}
               onClick={() =>
-                navigate(
-                  "/dashboard/analytics?metric=" +
-                    stat.key,
-                )
+                navigate("/dashboard/analytics?metric=" + stat.key)
               }
               className="cursor-pointer rounded-[18px] border border-[#e1e6ee] bg-white px-5 py-5 text-left shadow-[0_3px_12px_rgba(20,35,60,0.025)]"
             >
