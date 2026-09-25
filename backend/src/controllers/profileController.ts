@@ -39,6 +39,74 @@ export function getProfile(request: IncomingMessage, response: ServerResponse) {
       .get(user.id),
   });
 }
+function validateSocialUrl(
+  provider: "linkedin" | "x",
+  value: string,
+) {
+  if (!value) {
+    return null;
+  }
+
+  let parsed: URL;
+
+  try {
+    parsed = new URL(value);
+  } catch {
+    return (
+      "Enter a valid " +
+      (provider === "linkedin"
+        ? "LinkedIn"
+        : "X") +
+      " profile URL."
+    );
+  }
+
+  const hostname = parsed.hostname
+    .toLowerCase()
+    .replace(/^www\./, "");
+
+  if (
+    parsed.protocol !== "https:" ||
+    (provider === "linkedin" &&
+      hostname !== "linkedin.com") ||
+    (provider === "x" &&
+      !["x.com", "twitter.com"].includes(
+        hostname,
+      ))
+  ) {
+    return (
+      "Enter a valid " +
+      (provider === "linkedin"
+        ? "LinkedIn"
+        : "X") +
+      " profile URL."
+    );
+  }
+
+  const pathname =
+    parsed.pathname.replace(/\/$/, "");
+
+  if (
+    provider === "linkedin" &&
+    !/^\/in\/[A-Za-z0-9][A-Za-z0-9._-]*$/.test(
+      pathname,
+    )
+  ) {
+    return "Enter a valid LinkedIn profile URL.";
+  }
+
+  if (
+    provider === "x" &&
+    !/^\/[A-Za-z0-9_]{1,15}$/.test(
+      pathname,
+    )
+  ) {
+    return "Enter a valid X profile URL.";
+  }
+
+  return null;
+}
+
 export async function patchProfile(
   request: IncomingMessage,
   response: ServerResponse,
@@ -73,72 +141,6 @@ export async function patchProfile(
       body.xProfileUrl,
       String(p.x_profile_url ?? ""),
     ).trim();
-
-    const validateSocialUrl = (
-      provider: "linkedin" | "x",
-      value: string,
-    ) => {
-      if (!value) {
-        return null;
-      }
-
-      let parsed: URL;
-
-      try {
-        parsed = new URL(value);
-      } catch {
-        return "Enter a valid " +
-          (provider === "linkedin"
-            ? "LinkedIn"
-            : "X") +
-          " profile URL.";
-      }
-
-      if (
-        parsed.protocol !== "https:" ||
-        (provider === "linkedin" &&
-          parsed.hostname.toLowerCase().replace(/^www\./, "") !==
-            "linkedin.com") ||
-        (provider === "x" &&
-          !["x.com", "twitter.com"].includes(
-            parsed.hostname
-              .toLowerCase()
-              .replace(/^www\./, ""),
-          ))
-      ) {
-        return "Enter a valid " +
-          (provider === "linkedin"
-            ? "LinkedIn"
-            : "X") +
-          " profile URL.";
-      }
-
-      const pathname =
-        parsed.pathname.replace(
-          /\/$/,
-          "",
-        );
-
-      if (
-        provider === "linkedin" &&
-        !/^\/in\/[A-Za-z0-9][A-Za-z0-9._-]*$/.test(
-          pathname,
-        )
-      ) {
-        return "Enter a valid LinkedIn profile URL.";
-      }
-
-      if (
-        provider === "x" &&
-        !/^\/[A-Za-z0-9_]{1,15}$/.test(
-          pathname,
-        )
-      ) {
-        return "Enter a valid X profile URL.";
-      }
-
-      return null;
-    };
 
     const linkedinError =
       validateSocialUrl(
