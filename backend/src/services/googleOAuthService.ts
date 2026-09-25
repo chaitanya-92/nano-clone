@@ -6,6 +6,7 @@ import {
 } from "../config/env";
 import { setCookie } from "../utils/session";
 import {
+  createOAuthUser,
   createGoogleUser,
   findUserByEmail,
 } from "./authService";
@@ -24,7 +25,7 @@ function getGoogleConfig() {
   };
 }
 
-export function startGoogleOAuth(response: ServerResponse) {
+export function startGoogleOAuth(response: ServerResponse, role: "creator" | "brand" = "creator") {
   const {
     clientId,
     clientSecret,
@@ -40,6 +41,7 @@ export function startGoogleOAuth(response: ServerResponse) {
   setCookie(response, OAUTH_STATE_COOKIE, state, {
     maxAge: 600,
   });
+  setCookie(response, "naano_oauth_role", role, { maxAge: 600 });
 
   const params = new URLSearchParams({
     client_id: clientId,
@@ -61,7 +63,7 @@ export function startGoogleOAuth(response: ServerResponse) {
   return true;
 }
 
-export async function handleGoogleCallback(code: string) {
+export async function handleGoogleCallback(code: string, role: "creator" | "brand" = "creator") {
   const {
     clientId,
     clientSecret,
@@ -121,11 +123,11 @@ export async function handleGoogleCallback(code: string) {
   let user: any = findUserByEmail(email);
 
   if (!user) {
-    user = createGoogleUser({
+    user = createOAuthUser({
       email,
-      name: String(
-        profile.name || email.split("@")[0],
-      ),
+      name: String(profile.name || email.split("@")[0]),
+      role,
+      provider: "google",
     });
   }
 
