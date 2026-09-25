@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - building/auth-onboarding
+      - fix/dashboard-main
   pull_request:
     branches:
       - building/auth-onboarding
