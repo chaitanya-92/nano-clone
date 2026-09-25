@@ -106,7 +106,7 @@ export function createOAuthUser({
     emailVerified: 1,
     createdAt: new Date().toISOString(),
   };
-  db.prepare(`INSERT INTO users (id, email, name, role, provider, created_at) VALUES (@id, @email, @name, @role, @provider, @createdAt)`).run(user);
+  db.prepare(`INSERT INTO users (id, email, name, role, provider, email_verified, created_at) VALUES (@id, @email, @name, @role, @provider, @emailVerified, @createdAt)`).run(user);
   if (role === "creator") {
     db.prepare("INSERT INTO creator_profiles (user_id, name, created_at, updated_at) VALUES (?, ?, ?, ?)").run(user.id, user.name, user.createdAt, user.createdAt);
   } else {
@@ -128,14 +128,15 @@ export function createGoogleUser({
     name: name.slice(0, 80),
     role: "creator",
     provider: "google",
+    emailVerified: 1,
     createdAt: new Date().toISOString(),
   };
 
   db.prepare(`
     INSERT INTO users
-    (id, email, name, role, provider, created_at)
+    (id, email, name, role, provider, email_verified, created_at)
     VALUES
-    (@id, @email, @name, @role, @provider, @createdAt)
+    (@id, @email, @name, @role, @provider, @emailVerified, @createdAt)
   `).run(user);
 
   db.prepare("INSERT INTO creator_profiles (user_id, name, created_at, updated_at) VALUES (?, ?, ?, ?)").run(user.id, user.name, user.createdAt, user.createdAt);
