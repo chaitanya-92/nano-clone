@@ -365,11 +365,7 @@ export function deleteAccount() {
   });
 }
 
-
-export function connectSocial(
-  provider: "linkedin" | "x",
-  profileUrl: string,
-) {
+export function connectSocial(provider: "linkedin" | "x", profileUrl: string) {
   return request<{
     data: {
       provider: string;
@@ -391,7 +387,6 @@ export function connectSocial(
     }),
   });
 }
-
 
 export interface AssistantContext {
   profile: {
@@ -420,9 +415,7 @@ export function getAssistantContext() {
   }>("/api/assistant/context");
 }
 
-export function sendAssistantMessage(
-  message: string,
-) {
+export function sendAssistantMessage(message: string) {
   return request<{
     data: {
       answer: string;

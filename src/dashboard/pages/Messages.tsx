@@ -10,11 +10,7 @@ import {
   Sparkles,
   Users,
 } from "lucide-react";
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
@@ -44,87 +40,59 @@ const quickActions = [
     label: "Understand my performance",
     description: "Review your live analytics",
     icon: BarChart3,
-    prompt:
-      "Help me understand my current performance.",
+    prompt: "Help me understand my current performance.",
   },
   {
     id: "product",
     label: "Get product help",
     description: "Get an answer about Naano",
     icon: MessageCircle,
-    prompt:
-      "What can you help me with in Naano?",
+    prompt: "What can you help me with in Naano?",
   },
   {
     id: "bug",
     label: "Report a bug",
     description: "Describe a problem for support",
     icon: Bug,
-    prompt:
-      "I want to report a bug. What information should I provide?",
+    prompt: "I want to report a bug. What information should I provide?",
   },
   {
     id: "idea",
     label: "Suggest an idea",
     description: "Share product feedback",
     icon: Lightbulb,
-    prompt:
-      "I want to suggest an idea for Naano. What should I include?",
+    prompt: "I want to suggest an idea for Naano. What should I include?",
   },
 ] as const;
 
-function createAssistantMessage(
-  body: string,
-): ChatMessage {
+function createAssistantMessage(body: string): ChatMessage {
   return {
-    id:
-      "assistant-" +
-      Date.now() +
-      "-" +
-      Math.random()
-        .toString(36)
-        .slice(2),
+    id: "assistant-" + Date.now() + "-" + Math.random().toString(36).slice(2),
     role: "assistant",
     body,
     createdAt: new Date().toISOString(),
   };
 }
 
-function createUserMessage(
-  body: string,
-): ChatMessage {
+function createUserMessage(body: string): ChatMessage {
   return {
-    id:
-      "user-" +
-      Date.now() +
-      "-" +
-      Math.random()
-        .toString(36)
-        .slice(2),
+    id: "user-" + Date.now() + "-" + Math.random().toString(36).slice(2),
     role: "user",
     body,
     createdAt: new Date().toISOString(),
   };
 }
 
-function formatMetric(
-  value: number,
-) {
+function formatMetric(value: number) {
   return value.toLocaleString();
 }
 
 export default function Messages() {
-  const [context, setContext] =
-    useState<AssistantContext | null>(
-      null,
-    );
-  const [messages, setMessages] =
-    useState<ChatMessage[]>([]);
+  const [context, setContext] = useState<AssistantContext | null>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
-  const [loading, setLoading] =
-    useState(true);
-  const [sending, setSending] =
-    useState(false);
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -153,23 +121,19 @@ export default function Messages() {
     () => [
       {
         label: "Followers",
-        value:
-          context?.profile.followers ?? 0,
+        value: context?.profile.followers ?? 0,
       },
       {
         label: "Posts",
-        value:
-          context?.profile.posts ?? 0,
+        value: context?.profile.posts ?? 0,
       },
       {
         label: "Impressions",
-        value:
-          context?.profile.impressions ?? 0,
+        value: context?.profile.impressions ?? 0,
       },
       {
         label: "Engagements",
-        value:
-          context?.profile.engagements ?? 0,
+        value: context?.profile.engagements ?? 0,
       },
     ],
     [context],
@@ -178,33 +142,22 @@ export default function Messages() {
   const ask = async (prompt: string) => {
     const value = prompt.trim();
 
-    if (
-      !value ||
-      sending
-    ) {
+    if (!value || sending) {
       return;
     }
 
     setSending(true);
     setError("");
 
-    setMessages((current) => [
-      ...current,
-      createUserMessage(value),
-    ]);
+    setMessages((current) => [...current, createUserMessage(value)]);
     setDraft("");
 
     try {
-      const { data } =
-        await sendAssistantMessage(
-          value,
-        );
+      const { data } = await sendAssistantMessage(value);
 
       setMessages((current) => [
         ...current,
-        createAssistantMessage(
-          data.answer,
-        ),
+        createAssistantMessage(data.answer),
       ]);
 
       setContext(data.context);
@@ -254,9 +207,8 @@ export default function Messages() {
 
           <div className="px-5 py-6">
             <p className="text-xs leading-6 text-[#8b97aa]">
-              Your assistant uses live workspace
-              data. Brand conversations will also
-              appear here when created.
+              Your assistant uses live workspace data. Brand conversations will
+              also appear here when created.
             </p>
 
             <div className="mt-6 rounded-xl border border-[#e5e9ef] bg-[#fafbfd] p-4">
@@ -268,9 +220,7 @@ export default function Messages() {
               </div>
 
               <p className="mt-2 text-xs leading-5 text-[#8995aa]">
-                {context?.activity
-                  .collaborations ?? 0}{" "}
-                active collaboration(s).
+                {context?.activity.collaborations ?? 0} active collaboration(s).
               </p>
             </div>
           </div>
@@ -312,9 +262,7 @@ export default function Messages() {
                   className="bg-white"
                 >
                   <MessageScrollerContent className="px-5 py-6 sm:px-7">
-                    <MessageScrollerItem
-                      messageId="assistant-overview"
-                    >
+                    <MessageScrollerItem messageId="assistant-overview">
                       <div className="mb-5 rounded-[20px] border border-[#dbe6fa] bg-[#f7faff] p-5">
                         <div className="flex items-start gap-3">
                           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-[#2864f0] shadow-sm">
@@ -331,59 +279,46 @@ export default function Messages() {
                             </h3>
 
                             <p className="mt-2 max-w-[620px] text-sm leading-6 text-[#6e7d95]">
-                              Ask about your workspace,
-                              performance, opportunities
-                              or product questions.
+                              Ask about your workspace, performance,
+                              opportunities or product questions.
                             </p>
                           </div>
                         </div>
 
                         <div className="mt-5 grid gap-2 sm:grid-cols-2">
-                          {quickActions.map(
-                            (action) => {
-                              const Icon =
-                                action.icon;
+                          {quickActions.map((action) => {
+                            const Icon = action.icon;
 
-                              return (
-                                <button
-                                  key={action.id}
-                                  type="button"
-                                  onClick={() =>
-                                    void ask(
-                                      action.prompt,
-                                    )
-                                  }
-                                  disabled={
-                                    loading ||
-                                    sending
-                                  }
-                                  className="group flex cursor-pointer items-center gap-3 rounded-xl border border-[#dbe3ee] bg-white px-3 py-3 text-left transition hover:border-[#cbd6e6] hover:shadow-[0_5px_18px_rgba(30,50,80,0.05)] disabled:cursor-not-allowed disabled:opacity-60"
-                                >
-                                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#e0e6ef] bg-[#f8fafc] text-[#63728a]">
-                                    <Icon className="h-4 w-4" />
+                            return (
+                              <button
+                                key={action.id}
+                                type="button"
+                                onClick={() => void ask(action.prompt)}
+                                disabled={loading || sending}
+                                className="group flex cursor-pointer items-center gap-3 rounded-xl border border-[#dbe3ee] bg-white px-3 py-3 text-left transition hover:border-[#cbd6e6] hover:shadow-[0_5px_18px_rgba(30,50,80,0.05)] disabled:cursor-not-allowed disabled:opacity-60"
+                              >
+                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#e0e6ef] bg-[#f8fafc] text-[#63728a]">
+                                  <Icon className="h-4 w-4" />
+                                </span>
+
+                                <span className="min-w-0 flex-1">
+                                  <span className="block text-xs font-semibold text-[#324057]">
+                                    {action.label}
                                   </span>
-
-                                  <span className="min-w-0 flex-1">
-                                    <span className="block text-xs font-semibold text-[#324057]">
-                                      {action.label}
-                                    </span>
-                                    <span className="mt-0.5 block text-[10px] text-[#8b97aa]">
-                                      {action.description}
-                                    </span>
+                                  <span className="mt-0.5 block text-[10px] text-[#8b97aa]">
+                                    {action.description}
                                   </span>
+                                </span>
 
-                                  <ArrowRight className="h-4 w-4 text-[#9aa6b7]" />
-                                </button>
-                              );
-                            },
-                          )}
+                                <ArrowRight className="h-4 w-4 text-[#9aa6b7]" />
+                              </button>
+                            );
+                          })}
                         </div>
                       </div>
                     </MessageScrollerItem>
 
-                    <MessageScrollerItem
-                      messageId="performance-snapshot"
-                    >
+                    <MessageScrollerItem messageId="performance-snapshot">
                       <div className="mb-6 rounded-[18px] border border-[#e4e9f1] bg-[#fbfcfe] p-4">
                         <div className="flex items-center justify-between">
                           <div>
@@ -402,92 +337,69 @@ export default function Messages() {
                         </div>
 
                         <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                          {snapshot.map(
-                            (item) => (
-                              <div
-                                key={
-                                  item.label
-                                }
-                                className="rounded-xl bg-white px-3 py-3"
-                              >
-                                <p className="text-[9px] uppercase tracking-[0.08em] text-[#9aa5b5]">
-                                  {item.label}
-                                </p>
-                                <p className="mt-1 text-sm font-semibold text-[#334057]">
-                                  {formatMetric(
-                                    item.value,
-                                  )}
-                                </p>
-                              </div>
-                            ),
-                          )}
+                          {snapshot.map((item) => (
+                            <div
+                              key={item.label}
+                              className="rounded-xl bg-white px-3 py-3"
+                            >
+                              <p className="text-[9px] uppercase tracking-[0.08em] text-[#9aa5b5]">
+                                {item.label}
+                              </p>
+                              <p className="mt-1 text-sm font-semibold text-[#334057]">
+                                {formatMetric(item.value)}
+                              </p>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     </MessageScrollerItem>
 
-                    {messages.map(
-                      (message) => (
-                        <MessageScrollerItem
-                          key={message.id}
-                          messageId={message.id}
-                          scrollAnchor={
-                            message.role ===
-                            "user"
+                    {messages.map((message) => (
+                      <MessageScrollerItem
+                        key={message.id}
+                        messageId={message.id}
+                        scrollAnchor={message.role === "user"}
+                        className="mb-3"
+                      >
+                        <motion.div
+                          initial={{
+                            opacity: 0,
+                            y: message.role === "user" ? 12 : 5,
+                          }}
+                          animate={{
+                            opacity: 1,
+                            y: 0,
+                          }}
+                          transition={{
+                            duration: 0.25,
+                            ease: "easeOut",
+                          }}
+                          className={
+                            message.role === "user"
+                              ? "ml-auto max-w-[760px] rounded-[18px] bg-[#eef3fb] px-4 py-3 text-sm leading-6 text-[#263247]"
+                              : "max-w-[760px] rounded-[18px] border border-[#e4e9f1] bg-white px-4 py-3 text-sm leading-6 text-[#36445a]"
                           }
-                          className="mb-3"
                         >
-                          <motion.div
-                            initial={{
-                              opacity: 0,
-                              y:
-                                message.role ===
-                                "user"
-                                  ? 12
-                                  : 5,
-                            }}
-                            animate={{
-                              opacity: 1,
-                              y: 0,
-                            }}
-                            transition={{
-                              duration: 0.25,
-                              ease:
-                                "easeOut",
-                            }}
-                            className={
-                              message.role ===
-                              "user"
-                                ? "ml-auto max-w-[760px] rounded-[18px] bg-[#eef3fb] px-4 py-3 text-sm leading-6 text-[#263247]"
-                                : "max-w-[760px] rounded-[18px] border border-[#e4e9f1] bg-white px-4 py-3 text-sm leading-6 text-[#36445a]"
-                            }
-                          >
-                            <div className="mb-1 flex items-center justify-between gap-3">
-                              <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#8491a8]">
-                                {message.role ===
-                                "user"
-                                  ? "You"
-                                  : "Naano"}
-                              </span>
+                          <div className="mb-1 flex items-center justify-between gap-3">
+                            <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#8491a8]">
+                              {message.role === "user" ? "You" : "Naano"}
+                            </span>
 
-                              <span className="text-[10px] text-[#a0a9b7]">
-                                {new Date(
-                                  message.createdAt,
-                                ).toLocaleTimeString(
-                                  [],
-                                  {
-                                    hour: "2-digit",
-                                    minute:
-                                      "2-digit",
-                                  },
-                                )}
-                              </span>
-                            </div>
+                            <span className="text-[10px] text-[#a0a9b7]">
+                              {new Date(message.createdAt).toLocaleTimeString(
+                                [],
+                                {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                },
+                              )}
+                            </span>
+                          </div>
 
-                            {message.body}
-                          </motion.div>
-                        </MessageScrollerItem>
-                      ),
-                    )}
+                          {message.body}
+                        </motion.div>
+                      </MessageScrollerItem>
+                    ))}
 
                     {sending && (
                       <MessageScrollerItem
@@ -497,8 +409,7 @@ export default function Messages() {
                         <div className="flex max-w-[760px] items-center gap-2 rounded-[18px] border border-[#e4e9f1] bg-white px-4 py-3">
                           <Sparkles className="h-4 w-4 text-[#2864f0]" />
                           <span className="text-xs text-[#7c8aa0]">
-                            Naano is checking your
-                            workspace…
+                            Naano is checking your workspace…
                           </span>
                           <Loader2 className="ml-auto h-4 w-4 animate-spin text-[#7c8aa0]" />
                         </div>
@@ -529,23 +440,15 @@ export default function Messages() {
           >
             <input
               value={draft}
-              onChange={(event) =>
-                setDraft(event.target.value)
-              }
-              disabled={
-                loading || sending
-              }
+              onChange={(event) => setDraft(event.target.value)}
+              disabled={loading || sending}
               placeholder="Ask Naano a question…"
               className="auth-input h-12 flex-1 rounded-xl"
             />
 
             <Button
               type="submit"
-              disabled={
-                loading ||
-                sending ||
-                !draft.trim()
-              }
+              disabled={loading || sending || !draft.trim()}
               className="h-12 w-12 cursor-pointer rounded-xl bg-[#2864f0] p-0 hover:bg-[#1f58dc]"
               aria-label="Send message"
             >

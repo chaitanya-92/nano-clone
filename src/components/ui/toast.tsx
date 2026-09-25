@@ -162,8 +162,7 @@ function ToastIcon({ type }: { type: string | undefined }) {
 }
 
 function ToastList() {
-  const { toasts } =
-    ToastPrimitive.useToastManager();
+  const { toasts } = ToastPrimitive.useToastManager();
 
   return toasts.map((toastItem) => (
     <Toast
@@ -172,14 +171,10 @@ function ToastList() {
       swipeDirection="up"
       className={cn(
         "border-[#2a3650] bg-[#182238]",
-        toastItem.type === "success" &&
-          "border-[#1e6547] bg-[#12392c]",
-        toastItem.type === "warning" &&
-          "border-[#72531e] bg-[#403014]",
-        toastItem.type === "error" &&
-          "border-[#713235] bg-[#3f2025]",
-        toastItem.type === "info" &&
-          "border-[#354879] bg-[#1d2947]",
+        toastItem.type === "success" && "border-[#1e6547] bg-[#12392c]",
+        toastItem.type === "warning" && "border-[#72531e] bg-[#403014]",
+        toastItem.type === "error" && "border-[#713235] bg-[#3f2025]",
+        toastItem.type === "info" && "border-[#354879] bg-[#1d2947]",
       )}
     >
       <ToastContent>
