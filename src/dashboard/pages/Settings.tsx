@@ -25,7 +25,7 @@ import {
   addPayoutMethod,
   deleteAccount,
   getCreatorProfile,
-  getCurrentUser,
+  getDashboard,
   getPayoutMethods,
   getSocialAccounts,
   updateCreatorProfile,
@@ -119,51 +119,88 @@ export default function Settings() {
     setError("");
 
     try {
-      const { user: currentUser } = await getCurrentUser();
-
-      if (!currentUser) {
-        setError("Your session has expired. Please sign in again.");
-        return;
-      }
-
-      if (currentUser.role !== "creator") {
-        setError("Creator settings are only available for creator accounts.");
-        return;
-      }
-
-      const [profileResult, payoutResult, socialResult] = await Promise.all([
+      const [
+        { data: dashboard },
+        profileResult,
+        payoutResult,
+        socialResult,
+      ] = await Promise.all([
+        getDashboard(),
         getCreatorProfile(),
         getPayoutMethods(),
         getSocialAccounts(),
       ]);
 
+      if (dashboard.role !== "creator") {
+        setError(
+          "Creator settings are only available for creator accounts.",
+        );
+        return;
+      }
+
       const creator = profileResult.data;
 
       setProfile(creator);
-      setName(creator.name ?? "");
-      setMethods(payoutResult.data);
-
-      const linkedInAccount = socialResult.data.find(
-        (item) => item.provider === "linkedin",
+      setName(
+        creator.name ??
+          dashboard.profile?.name ??
+          "",
+      );
+      setMethods(
+        payoutResult.data,
       );
 
-      const xAccount = socialResult.data.find((item) => item.provider === "x");
+      const linkedInAccount =
+        socialResult.data.find(
+          (item) =>
+            item.provider ===
+            "linkedin",
+        );
+
+      const xAccount =
+        socialResult.data.find(
+          (item) =>
+            item.provider === "x",
+        );
 
       setLinkedin({
-        url: linkedInAccount?.profile_url ?? creator.linkedin_url ?? "",
-        status: linkedInAccount?.status === "connected" ? "valid" : "idle",
+        url:
+          linkedInAccount?.profile_url ??
+          creator.linkedin_url ??
+          "",
+        status:
+          linkedInAccount?.status ===
+          "connected"
+            ? "valid"
+            : "idle",
         message:
-          linkedInAccount?.status === "connected" ? "Profile connected." : "",
+          linkedInAccount?.status ===
+          "connected"
+            ? "Profile connected."
+            : "",
       });
 
       setXProfile({
-        url: xAccount?.profile_url ?? creator.x_profile_url ?? "",
-        status: xAccount?.status === "connected" ? "valid" : "idle",
-        message: xAccount?.status === "connected" ? "Profile connected." : "",
+        url:
+          xAccount?.profile_url ??
+          creator.x_profile_url ??
+          "",
+        status:
+          xAccount?.status ===
+          "connected"
+            ? "valid"
+            : "idle",
+        message:
+          xAccount?.status ===
+          "connected"
+            ? "Profile connected."
+            : "",
       });
     } catch (value) {
       setError(
-        value instanceof Error ? value.message : "Unable to load settings.",
+        value instanceof Error
+          ? value.message
+          : "Unable to load settings.",
       );
     }
   };
@@ -721,8 +758,10 @@ export default function Settings() {
                 <Button
                   type="button"
                   variant="destructive"
-                  onClick={() => setShowDelete(true)}
-                  className="mt-5 cursor-pointer"
+                  onClick={() =>
+                    setShowDelete(true)
+                  }
+                  className="mt-5 cursor-pointer !bg-[#d23838] !text-white hover:!bg-[#b92f2f]"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete my account
@@ -798,9 +837,15 @@ export default function Settings() {
             <Button
               type="button"
               variant="destructive"
-              onClick={() => void handleDelete()}
-              disabled={busy || deleteConfirmation !== "DELETE"}
-              className="cursor-pointer"
+              onClick={() =>
+                void handleDelete()
+              }
+              disabled={
+                busy ||
+                deleteConfirmation !==
+                  "DELETE"
+              }
+              className="cursor-pointer !bg-[#d23838] !text-white hover:!bg-[#b92f2f]"
             >
               {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {busy ? "Deleting..." : "Delete account permanently"}
