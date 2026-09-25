@@ -117,7 +117,7 @@ export async function updateApplication(
   if (!user) return;
   const application = db
     .prepare(
-      "SELECT a.*,c.brand_id FROM applications a JOIN campaigns c ON c.id=a.campaign_id WHERE a.id=?",
+      "SELECT a.*, c.brand_id, c.brief, c.application_deadline FROM applications a JOIN campaigns c ON c.id = a.campaign_id WHERE a.id = ?",
     )
     .get(id) as any;
   if (!application)
@@ -145,7 +145,10 @@ export async function updateApplication(
     now(),
     id,
   );
-  if (status === "accepted") {
+  if (
+    status === "accepted" &&
+    user.role === "brand"
+  ) {
     const existing = db
       .prepare("SELECT id FROM collaborations WHERE application_id=?")
       .get(id);
