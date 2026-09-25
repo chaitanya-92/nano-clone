@@ -88,15 +88,6 @@ export async function patchProfile(
   if (!user) return;
   const body = await readJson(request);
   if (user.role === "creator") {
-    if (user.role !== "creator") {
-      return error(
-        response,
-        403,
-        "CREATOR_ACCOUNT_REQUIRED",
-        "Creator account required.",
-      );
-    }
-
     let p = db
       .prepare("SELECT * FROM creator_profiles WHERE user_id = ?")
       .get(user.id) as Record<string, unknown> | undefined;

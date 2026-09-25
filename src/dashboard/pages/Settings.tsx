@@ -25,6 +25,7 @@ import {
   addPayoutMethod,
   deleteAccount,
   getCreatorProfile,
+  getCurrentUser,
   getPayoutMethods,
   getSocialAccounts,
   updateCreatorProfile,
@@ -117,13 +118,29 @@ export default function Settings() {
   const loadSettings = async () => {
     setError("");
 
-    if (user?.role !== "creator") {
-      setError("Creator account required.");
-      return;
-    }
-
     try {
-      const [profileResult, payoutResult, socialResult] = await Promise.all([
+      const { user: currentUser } =
+        await getCurrentUser();
+
+      if (!currentUser) {
+        setError(
+          "Your session has expired. Please sign in again.",
+        );
+        return;
+      }
+
+      if (currentUser.role !== "creator") {
+        setError(
+          "Creator settings are only available for creator accounts.",
+        );
+        return;
+      }
+
+      const [
+        profileResult,
+        payoutResult,
+        socialResult,
+      ] = await Promise.all([
         getCreatorProfile(),
         getPayoutMethods(),
         getSocialAccounts(),
@@ -525,6 +542,30 @@ export default function Settings() {
                                   : "https://x.com/your-handle"
                               }
                             />
+
+                            {state.url && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                disabled={
+                                  !isValidSocialUrl(
+                                    provider,
+                                    state.url,
+                                  )
+                                }
+                                onClick={() =>
+                                  window.open(
+                                    state.url,
+                                    "_blank",
+                                    "noopener,noreferrer",
+                                  )
+                                }
+                                className="cursor-pointer"
+                              >
+                                <ExternalLink className="mr-2 h-4 w-4" />
+                                Open
+                              </Button>
+                            )}
 
                             <Button
                               type="button"
