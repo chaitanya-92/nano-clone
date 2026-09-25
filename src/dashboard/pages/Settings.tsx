@@ -812,7 +812,7 @@ export default function Settings() {
                               !value,
                           )
                         }
-                        className="h-10 cursor-pointer rounded-lg px-4"
+                        className="h-10 min-w-[88px] cursor-pointer rounded-lg border-[#d9dee7] bg-white px-4 text-[#364152] hover:bg-[#f5f7fa]"
                       >
                         {showMethod
                           ? "Cancel"
@@ -917,7 +917,7 @@ export default function Settings() {
                   onClick={() =>
                     setShowDelete(true)
                   }
-                  className="mt-5 h-10 cursor-pointer rounded-lg px-4"
+                  className="mt-5 h-10 cursor-pointer rounded-lg bg-destructive px-4 text-white hover:bg-destructive/90"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete my account
@@ -938,7 +938,7 @@ export default function Settings() {
           }
         }}
       >
-        <DialogContent className="max-w-[520px] border-[#eed0d0]">
+        <DialogContent className="w-[calc(100vw-32px)] max-w-[520px] border-[#eed0d0] p-6 sm:p-6">
           <DialogHeader>
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#fff1f1] text-[#d23838]">
               <Trash2 className="h-5 w-5" />
@@ -983,7 +983,7 @@ export default function Settings() {
             />
           </div>
 
-          <DialogFooter className="border-0 bg-transparent p-0">
+          <DialogFooter className="!mx-0 !mb-0 !rounded-none !border-0 !bg-transparent !p-0 sm:flex-row sm:justify-end">
             <Button
               type="button"
               variant="outline"
@@ -1007,7 +1007,7 @@ export default function Settings() {
                 deleteConfirmation !==
                   "DELETE"
               }
-              className="h-10 cursor-pointer rounded-lg px-4"
+              className="h-10 min-w-[132px] cursor-pointer rounded-lg bg-destructive px-4 text-white hover:bg-destructive/90"
             >
               {busy && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
