@@ -222,7 +222,7 @@ export function OnboardingShell({
     >
       <DialogContent
         showCloseButton={false}
-        className="max-w-none border-0 bg-transparent p-0 shadow-none outline-none"
+        className="w-[calc(100vw-48px)] max-w-[1180px] border-0 bg-transparent p-0 shadow-none outline-none ring-0"
       >
         {content}
       </DialogContent>
