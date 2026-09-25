@@ -5,6 +5,7 @@ import Register from "@/pages/Register";
 import { useScrollRestoration } from "@/hooks/useScrollRestoration";
 import { dashboardRoutes } from "@/dashboard/dashboardRoutes";
 import NotFound from "@/pages/NotFound";
+import PublicCreatorCard from "@/pages/PublicCreatorCard";
 
 function RootLayout() {
   useScrollRestoration();
@@ -27,6 +28,10 @@ export const router = createBrowserRouter([
       {
         path: "/register",
         element: <Register />,
+      },
+      {
+        path: "/creator/:slug",
+        element: <PublicCreatorCard />,
       },
       {
         path: "*",

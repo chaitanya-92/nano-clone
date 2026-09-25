@@ -7,7 +7,7 @@ export function community(request: IncomingMessage, response: ServerResponse) {
   if (!user) return;
   const leaderboard = db
     .prepare(
-      "SELECT u.id,u.name,cp.headline,cp.followers,cp.impressions,cp.post_count,cp.engagement_count FROM creator_profiles cp JOIN users u ON u.id=cp.user_id WHERE u.role='creator' ORDER BY cp.impressions DESC LIMIT 50",
+      "SELECT u.id,u.name,cp.slug,cp.headline,cp.followers,cp.impressions,cp.post_count,cp.engagement_count FROM creator_profiles cp JOIN users u ON u.id=cp.user_id WHERE u.role='creator' ORDER BY cp.impressions DESC LIMIT 50",
     )
     .all();
   return json(response, 200, {
