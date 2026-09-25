@@ -63,7 +63,7 @@ export async function authRoutes(
     url.pathname === "/api/auth/google" &&
     request.method === "GET"
   ) {
-    return google(request, response);
+    return google(request, response, url);
   }
 
   if (
