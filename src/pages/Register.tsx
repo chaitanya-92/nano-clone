@@ -483,20 +483,17 @@ export default function Register() {
     linkedin: "",
     x: "",
   });
-  const [customIndustries, setCustomIndustries] =
-    useState<string[]>([]);
-  const [customIndustry, setCustomIndustry] =
-    useState("");
-  const [showIndustryInput, setShowIndustryInput] =
-    useState(false);
-  const [readTerms, setReadTerms] =
-    useState<Record<ProfessionalTermKey, boolean>>({
-      taxResponsibilityConfirmed: false,
-      selfBillingMandateAccepted: false,
-      certificationAccepted: false,
-    });
-  const [activeTerm, setActiveTerm] =
-    useState<ProfessionalTerm | null>(null);
+  const [customIndustries, setCustomIndustries] = useState<string[]>([]);
+  const [customIndustry, setCustomIndustry] = useState("");
+  const [showIndustryInput, setShowIndustryInput] = useState(false);
+  const [readTerms, setReadTerms] = useState<
+    Record<ProfessionalTermKey, boolean>
+  >({
+    taxResponsibilityConfirmed: false,
+    selfBillingMandateAccepted: false,
+    certificationAccepted: false,
+  });
+  const [activeTerm, setActiveTerm] = useState<ProfessionalTerm | null>(null);
   const [analysis, setAnalysis] = useState<any>(null);
   const [emailStatus, setEmailStatus] = useState<
     "idle" | "checking" | "available" | "taken"
@@ -642,25 +639,14 @@ export default function Register() {
                 country: formik.values.country,
                 industries: formik.values.industries,
               });
-              if (
-                typeof formik.values.priceCents !==
-                "number"
-              ) {
-                formik.setFieldTouched(
-                  "priceCents",
-                  true,
-                  false,
-                );
-                formik.setFieldError(
-                  "priceCents",
-                  "Set your price per post.",
-                );
+              if (typeof formik.values.priceCents !== "number") {
+                formik.setFieldTouched("priceCents", true, false);
+                formik.setFieldError("priceCents", "Set your price per post.");
                 return;
               }
 
               await saveCreatorCard({
-                priceCents:
-                  formik.values.priceCents,
+                priceCents: formik.values.priceCents,
               });
             } else if (role === "creator" && step === 3)
               await saveCreatorProfessional(formik.values);
@@ -1273,14 +1259,11 @@ export default function Register() {
 
                       <FieldError
                         error={
-                          typeof formik.errors.industries ===
-                          "string"
+                          typeof formik.errors.industries === "string"
                             ? formik.errors.industries
                             : undefined
                         }
-                        touched={Boolean(
-                          formik.touched.industries,
-                        )}
+                        touched={Boolean(formik.touched.industries)}
                       />
                     </div>
                   </div>
@@ -1486,9 +1469,7 @@ export default function Register() {
                         },
                       ],
                     },
-                  ].map(
-                    (term: ProfessionalTerm) => (
-
+                  ].map((term: ProfessionalTerm) => (
                     <div
                       key={term.key}
                       className="rounded-xl border border-[#e4e8ee] p-4"
@@ -1694,14 +1675,11 @@ export default function Register() {
                     </div>
                     <FieldError
                       error={
-                        typeof formik.errors.industries ===
-                        "string"
+                        typeof formik.errors.industries === "string"
                           ? formik.errors.industries
                           : undefined
                       }
-                      touched={Boolean(
-                        formik.touched.industries,
-                      )}
+                      touched={Boolean(formik.touched.industries)}
                     />
                   </div>
                   <div className="grid gap-4 md:grid-cols-3">
