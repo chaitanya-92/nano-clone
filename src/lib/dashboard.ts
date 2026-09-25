@@ -364,3 +364,30 @@ export function deleteAccount() {
     method: "DELETE",
   });
 }
+
+
+export function connectSocial(
+  provider: "linkedin" | "x",
+  profileUrl: string,
+) {
+  return request<{
+    data: {
+      provider: string;
+      profileUrl: string;
+      fetchedProfile: {
+        username: string | null;
+        name: string | null;
+        headline: string | null;
+        bio: string | null;
+        profileImageUrl: string | null;
+        followers: number | null;
+      };
+    };
+  }>("/api/social-accounts/connect", {
+    method: "POST",
+    body: JSON.stringify({
+      provider,
+      profileUrl,
+    }),
+  });
+}
