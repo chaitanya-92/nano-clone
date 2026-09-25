@@ -9,6 +9,7 @@ import Earnings from "./pages/Earnings";
 import Community from "./pages/Community";
 import AffiliateProgram from "./pages/AffiliateProgram";
 import Messages from "./pages/Messages";
+import Settings from "./pages/Settings";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 
 export const dashboardRoutes: RouteObject = {
@@ -54,6 +55,10 @@ export const dashboardRoutes: RouteObject = {
     {
       path: "messages",
       element: <Messages />,
+    },
+    {
+      path: "settings",
+      element: <Settings />,
     },
   ],
 };

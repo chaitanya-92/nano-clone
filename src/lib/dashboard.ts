@@ -358,3 +358,12 @@ export function getPublicCardUrl(slug: string) {
 export function getCurrentUser() {
   return request<{ user: User | null }>("/api/auth/me");
 }
+
+export function deleteAccount() {
+  return request<{ ok: true }>(
+    "/api/auth/account",
+    {
+      method: "DELETE",
+    },
+  );
+}

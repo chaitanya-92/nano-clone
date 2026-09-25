@@ -398,3 +398,58 @@ export function checkEmail(
     .get(email);
   return json(response, 200, { valid: true, available: !existing });
 }
+
+export async function deleteAccount(
+  request: IncomingMessage,
+  response: ServerResponse,
+) {
+  const user = getCurrentUser(request);
+
+  if (!user) {
+    return json(response, 401, {
+      error: "You must be signed in to delete your account.",
+    });
+  }
+
+  try {
+    const transaction = db.transaction(
+      (userId: string) => {
+        db.prepare(
+          "DELETE FROM withdrawals WHERE user_id = ?",
+        ).run(userId);
+
+        db.prepare(
+          "DELETE FROM payout_methods WHERE user_id = ?",
+        ).run(userId);
+
+        db.prepare(
+          "DELETE FROM email_verifications WHERE email = ?",
+        ).run(user.email);
+
+        db.prepare(
+          "DELETE FROM users WHERE id = ?",
+        ).run(userId);
+      },
+    );
+
+    transaction(user.id);
+
+    setCookie(response, "naano_session", "", {
+      maxAge: 0,
+    });
+
+    return json(response, 200, {
+      ok: true,
+    });
+  } catch (value) {
+    console.error(
+      "Account deletion failed:",
+      value,
+    );
+
+    return json(response, 500, {
+      error:
+        "Unable to delete your account. Please try again.",
+    });
+  }
+}

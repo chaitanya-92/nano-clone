@@ -129,7 +129,10 @@ export function DashboardNavbar() {
                 Guided tour
               </DropdownMenuItem>
 
-              <DropdownMenuItem className="h-10 cursor-pointer rounded-lg px-3 text-[13px] text-[#526078] focus:bg-[#f5f7fa] focus:text-[#202124]">
+              <DropdownMenuItem
+                onClick={() => navigate("/dashboard/settings")}
+                className="h-10 cursor-pointer rounded-lg px-3 text-[13px] text-[#526078] focus:bg-[#f5f7fa] focus:text-[#202124]"
+              >
                 <Settings className="mr-2 h-4 w-4" strokeWidth={1.8} />
                 Settings
               </DropdownMenuItem>
