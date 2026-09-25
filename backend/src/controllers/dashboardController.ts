@@ -42,9 +42,13 @@ function ensureCreatorProfile(userId: string, name: string) {
 
   if (!String(profile.slug ?? "").trim()) {
     const base =
-      profileName ||
-      name ||
-      "creator";
+      (
+        profile.name ??
+        name ??
+        "creator"
+      )
+        .toString()
+        .trim() || "creator";
 
     const normalizedBase =
       base
