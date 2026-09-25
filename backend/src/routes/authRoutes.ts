@@ -9,6 +9,8 @@ import {
   logout,
   me,
   register,
+  linkedin,
+  linkedinCallback,
 } from "../controllers/authController";
 
 export async function authRoutes(
@@ -42,6 +44,14 @@ export async function authRoutes(
     request.method === "POST"
   ) {
     return login(request, response);
+  }
+
+  if (url.pathname === "/api/auth/linkedin" && request.method === "GET") {
+    return linkedin(request, response, url);
+  }
+
+  if (url.pathname === "/api/auth/linkedin/callback" && request.method === "GET") {
+    return linkedinCallback(request, response, url);
   }
 
   if (
