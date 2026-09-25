@@ -15,6 +15,7 @@ import { PORT, APP_ORIGIN } from "./config/env";
 import { initializeDatabaseConnection } from "./config/database";
 
 import { authRoutes } from "./routes/authRoutes";
+import { onboardingRoutes } from "./routes/onboardingRoutes";
 
 import { handleError } from "./middleware/errorMiddleware";
 
@@ -151,15 +152,11 @@ const server = createServer(
       if (
         url.pathname.startsWith("/api/")
       ) {
-        const handled =
-          await authRoutes(
-            request,
-            response,
-            url,
-          );
+        const handlers = [authRoutes, onboardingRoutes];
 
-        if (handled !== false) {
-          return;
+        for (const handler of handlers) {
+          const handled = await handler(request, response, url);
+          if (handled !== false) return;
         }
       }
 
