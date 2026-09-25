@@ -170,11 +170,7 @@ export async function connectSocial(
   let fetchedProfile;
 
   try {
-    fetchedProfile =
-      await fetchPublicSocialProfile(
-        provider,
-        profileUrl,
-      );
+    fetchedProfile = await fetchPublicSocialProfile(provider, profileUrl);
   } catch (profileError) {
     return error(
       response,
@@ -239,5 +235,4 @@ export async function connectSocial(
       fetchedProfile,
     },
   });
-
 }
