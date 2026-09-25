@@ -66,10 +66,29 @@ export default function Overview() {
       return;
     }
 
-    await navigator.clipboard.writeText(cardUrl);
+    try {
+      await navigator.clipboard.writeText(
+        cardUrl,
+      );
+    } catch {
+      const textarea =
+        document.createElement("textarea");
+
+      textarea.value = cardUrl;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      textarea.remove();
+    }
+
     setCopied(true);
 
-    window.setTimeout(() => setCopied(false), 1800);
+    window.setTimeout(
+      () => setCopied(false),
+      1800,
+    );
   };
 
   const shareCard = async () => {

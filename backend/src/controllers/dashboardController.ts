@@ -1,4 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { randomBytes } from "node:crypto";
 import { requireAuth } from "../middleware/authMiddleware";
 import { db } from "../db/client";
 import { json, now } from "../utils/api";
@@ -20,14 +21,52 @@ function ensureCreatorProfile(userId: string, name: string) {
       .get(userId) as Record<string, unknown>;
   }
 
-  const profileName = String(profile.name ?? "").trim();
+  const profileName = String(
+    profile.name ?? "",
+  ).trim();
 
-  if (!profileName || profileName === "Creator") {
+  if (
+    !profileName ||
+    profileName === "Creator"
+  ) {
     db.prepare(
       "UPDATE creator_profiles SET name = ?, updated_at = ? WHERE user_id = ?",
-    ).run(name, now(), userId);
+    ).run(
+      name,
+      now(),
+      userId,
+    );
 
     profile.name = name;
+  }
+
+  if (!String(profile.slug ?? "").trim()) {
+    const base =
+      profileName ||
+      name ||
+      "creator";
+
+    const normalizedBase =
+      base
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "") ||
+      "creator";
+
+    const slug =
+      normalizedBase +
+      "-" +
+      randomBytes(4).toString("hex");
+
+    db.prepare(
+      "UPDATE creator_profiles SET slug = ?, updated_at = ? WHERE user_id = ?",
+    ).run(
+      slug,
+      now(),
+      userId,
+    );
+
+    profile.slug = slug;
   }
 
   return profile;
