@@ -10,7 +10,7 @@ import {
   type ServerResponse,
 } from "node:http";
 
-import { PORT, APP_ORIGIN } from "./config/env";
+import { PORT, APP_ORIGIN, FRONTEND_ORIGIN } from "./config/env";
 
 import { initializeDatabaseConnection } from "./config/database";
 
@@ -51,10 +51,11 @@ const mimeTypes: Record<string, string> = {
   ".woff2": "font/woff2",
 };
 
-const allowedOrigins = [
+const allowedOrigins = Array.from(new Set([
+  process.env.FRONTEND_ORIGIN ?? FRONTEND_ORIGIN,
   "https://nano-clone.vercel.app",
   "http://localhost:5173",
-];
+]));
 
 initializeDatabaseConnection();
 
