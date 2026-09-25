@@ -217,8 +217,20 @@ export function google(
   response: ServerResponse,
   url: URL,
 ) {
-  const role = url.searchParams.get("role") === "brand" ? "brand" : "creator";
-  const started = startGoogleOAuth(response, role);
+  const role =
+    url.searchParams.get("role") === "brand"
+      ? "brand"
+      : "creator";
+  const flow =
+    url.searchParams.get("flow") === "signup"
+      ? "signup"
+      : "login";
+
+  const started = startGoogleOAuth(
+    response,
+    role,
+    flow,
+  );
 
   if (!started) {
     return redirect(
@@ -311,6 +323,10 @@ export async function googleCallback(
       cookies.naano_oauth_role === "brand"
         ? "brand"
         : "creator";
+    const flow =
+      cookies.naano_oauth_flow === "signup"
+        ? "signup"
+        : "login";
 
     const { user, isNewUser } =
       await handleGoogleCallback(
@@ -319,10 +335,28 @@ export async function googleCallback(
       );
 
     createSession(response, user.id);
+    setCookie(
+      response,
+      "naano_oauth_state",
+      "",
+      { maxAge: 0 },
+    );
+    setCookie(
+      response,
+      "naano_oauth_role",
+      "",
+      { maxAge: 0 },
+    );
+    setCookie(
+      response,
+      "naano_oauth_flow",
+      "",
+      { maxAge: 0 },
+    );
 
     return redirect(
       response,
-      isNewUser
+      isNewUser && flow === "signup"
         ? getFrontendOnboardingUrl(role)
         : getFrontendDashboardUrl(),
     );

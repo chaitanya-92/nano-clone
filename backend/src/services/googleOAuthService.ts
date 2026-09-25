@@ -7,7 +7,6 @@ import {
 import { setCookie } from "../utils/session";
 import {
   createOAuthUser,
-  createGoogleUser,
   findUserByEmail,
 } from "./authService";
 
@@ -25,7 +24,11 @@ function getGoogleConfig() {
   };
 }
 
-export function startGoogleOAuth(response: ServerResponse, role: "creator" | "brand" = "creator") {
+export function startGoogleOAuth(
+  response: ServerResponse,
+  role: "creator" | "brand" = "creator",
+  flow: "login" | "signup" = "login",
+) {
   const {
     clientId,
     clientSecret,
@@ -38,10 +41,24 @@ export function startGoogleOAuth(response: ServerResponse, role: "creator" | "br
 
   const state = randomBytes(24).toString("base64url");
 
-  setCookie(response, OAUTH_STATE_COOKIE, state, {
-    maxAge: 600,
-  });
-  setCookie(response, "naano_oauth_role", role, { maxAge: 600 });
+  setCookie(
+    response,
+    OAUTH_STATE_COOKIE,
+    state,
+    { maxAge: 600 },
+  );
+  setCookie(
+    response,
+    "naano_oauth_role",
+    role,
+    { maxAge: 600 },
+  );
+  setCookie(
+    response,
+    "naano_oauth_flow",
+    flow,
+    { maxAge: 600 },
+  );
 
   const params = new URLSearchParams({
     client_id: clientId,

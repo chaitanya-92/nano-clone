@@ -96,7 +96,7 @@ export default function Login() {
           </AuthSocialButton>
 
           <a
-            href={`${import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8787"}/api/auth/google`}
+            href={`${import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8787"}/api/auth/google?flow=login`}
             className="block"
           >
             <AuthSocialButton
