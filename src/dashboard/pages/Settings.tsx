@@ -111,12 +111,7 @@ export default function Settings() {
 
   const [name, setName] = useState("");
   const [linkedinUrl, setLinkedinUrl] = useState("");
-  const [xProfileUrl, setXProfileUrl] = useState("");
-
-  const [initialLinkedin, setInitialLinkedin] = useState("");
-  const [initialX, setInitialX] = useState("");
-
-  const [methodLabel, setMethodLabel] = useState("");
+  const [xProfileUrl, setXProfileUrl] = useState("");const [methodLabel, setMethodLabel] = useState("");
   const [showMethod, setShowMethod] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
@@ -337,10 +332,7 @@ export default function Settings() {
       setName(data.name ?? displayName);
       setLinkedinUrl(data.linkedin_url ?? "");
       setXProfileUrl(data.x_profile_url ?? "");
-      setInitialLinkedin(data.linkedin_url ?? "");
-      setInitialX(data.x_profile_url ?? "");
-
-      toast.add({
+toast.add({
         title: "Changes saved",
         description: "Your profile changes were saved successfully.",
         type: "success",
@@ -847,10 +839,7 @@ function SocialField({
   placeholder: string;
   onChange: (value: string) => void;
   onVerify: () => void;
-}) {
-  const Icon = provider === "linkedin" ? Link2 : Link2;
-
-  const normalizedError = validateSocialUrl(provider, value);
+}) {const normalizedError = validateSocialUrl(provider, value);
 
   const statusLabel =
     status === "verifying"
