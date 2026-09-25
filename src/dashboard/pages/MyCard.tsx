@@ -9,7 +9,11 @@ import {
   Upload,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { Link } from "react-router-dom";
 import { toast } from "@/components/ui/toast";
 import { AnimatedNumber } from "@/components/dashboard/AnimatedNumber";
@@ -36,41 +40,143 @@ function fileToDataUrl(
       const reader =
         new FileReader();
 
+      reader.onload = () => {
+        if (
+          typeof reader.result !==
+          "string"
+        ) {
+          reject(
+            new Error(
+              "Unable to read the image.",
+            ),
+          );
+          return;
+        }
+
+        resolve(reader.result);
+      };
+
+      reader.onerror = () => {
+        reject(
+          new Error(
+            "Unable to read the image.",
+          ),
+        );
+      };
+
+      reader.readAsDataURL(file);
+    },
+  );
+}
+
+function creatorInitials(
+  name: string | null | undefined,
+) {
+  return (
+    name
+      ?.trim()
+      .split(/\\s+/)
+      .filter(Boolean)
+      .map((part) => part[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase() || "N"
+  );
+}
+
+function parseIndustries(
+  value: string | null | undefined,
+) {
+  if (!value) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(value);
+
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    return parsed.filter(
+      (item): item is string =>
+        typeof item === "string",
+    );
+  } catch {
+    return [];
+  }
+}
+
 export default function MyCard() {
-  const [profile, setProfile] = useState<CreatorProfile | null>(null);
-  const [open, setOpen] = useState(false);
-  const [draft, setDraft] = useState({
-    headline: "",
-    category: "",
-    bio: "",
-  });
-  const [photoOpen, setPhotoOpen] = useState(false);
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const [photoPreview, setPhotoPreview] = useState("");
-  const [photoSaving, setPhotoSaving] = useState(false);
-  const [error, setError] = useState("");
+  const [profile, setProfile] =
+    useState<CreatorProfile | null>(
+      null,
+    );
+  const [open, setOpen] =
+    useState(false);
+  const [draft, setDraft] =
+    useState({
+      headline: "",
+      category: "",
+      bio: "",
+    });
+  const [photoOpen, setPhotoOpen] =
+    useState(false);
+  const [photoFile, setPhotoFile] =
+    useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] =
+    useState("");
+  const [photoSaving, setPhotoSaving] =
+    useState(false);
+  const [saving, setSaving] =
+    useState(false);
+  const [copied, setCopied] =
+    useState(false);
+  const [error, setError] =
+    useState("");
 
   useEffect(() => {
+    let cancelled = false;
+
     void getCreatorProfile()
       .then(({ data }) => {
+        if (cancelled) {
+          return;
+        }
+
         setProfile(data);
         setDraft({
-          headline: data.headline,
-          category: data.category,
-          bio: data.bio,
+          headline:
+            data.headline ?? "",
+          category:
+            data.category ?? "",
+          bio: data.bio ?? "",
         });
       })
-      .catch((value) =>
+      .catch((value) => {
+        if (cancelled) {
+          return;
+        }
+
         setError(
           value instanceof Error
             ? value.message
             : "Unable to load your creator card.",
-        ),
-      );
+        );
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const publicUrl = useMemo(
-    () => (profile?.slug ? getPublicCardUrl(profile.slug) : ""),
+    () =>
+      profile?.slug
+        ? getPublicCardUrl(
+            profile.slug,
+          )
+        : "",
     [profile?.slug],
   );
 
@@ -80,7 +186,9 @@ export default function MyCard() {
     }
 
     if (
-      !photoFile.type.startsWith("image/")
+      !photoFile.type.startsWith(
+        "image/",
+      )
     ) {
       toast.add({
         title: "Invalid image",
@@ -92,7 +200,10 @@ export default function MyCard() {
       return;
     }
 
-    if (photoFile.size > 3 * 1024 * 1024) {
+    if (
+      photoFile.size >
+      3 * 1024 * 1024
+    ) {
       toast.add({
         title: "Image is too large",
         description:
@@ -108,11 +219,14 @@ export default function MyCard() {
 
     try {
       const photoData =
-        await fileToDataUrl(photoFile);
+        await fileToDataUrl(
+          photoFile,
+        );
 
       const { data } =
         await updateCreatorProfile({
-          profilePhotoUrl: photoData,
+          profilePhotoUrl:
+            photoData,
         });
 
       setProfile(data);
@@ -121,7 +235,8 @@ export default function MyCard() {
       setPhotoOpen(false);
 
       toast.add({
-        title: "Profile photo updated",
+        title:
+          "Profile photo updated",
         description:
           "Your creator card now uses the new photo.",
         type: "success",
@@ -151,11 +266,13 @@ export default function MyCard() {
 
     setPhotoFile(file);
 
-    const reader = new FileReader();
+    const reader =
+      new FileReader();
 
     reader.onload = () => {
       setPhotoPreview(
-        typeof reader.result === "string"
+        typeof reader.result ===
+          "string"
           ? reader.result
           : "",
       );
@@ -165,15 +282,41 @@ export default function MyCard() {
   };
 
   const save = async () => {
+    setSaving(true);
+    setError("");
+
     try {
-      const { data } = await updateCreatorProfile(draft);
+      const { data } =
+        await updateCreatorProfile(
+          draft,
+        );
 
       setProfile(data);
+      setDraft({
+        headline:
+          data.headline ?? "",
+        category:
+          data.category ?? "",
+        bio: data.bio ?? "",
+      });
       setOpen(false);
+
+      toast.add({
+        title:
+          "Creator card updated",
+        description:
+          "Your public card has been updated.",
+        type: "success",
+        timeout: 2200,
+      });
     } catch (value) {
       setError(
-        value instanceof Error ? value.message : "Unable to save your card.",
+        value instanceof Error
+          ? value.message
+          : "Unable to save your creator card.",
       );
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -187,8 +330,11 @@ export default function MyCard() {
         publicUrl,
       );
 
+      setCopied(true);
+
       toast.add({
-        title: "Card link copied",
+        title:
+          "Card link copied",
         description:
           "Your public creator card link is ready to share.",
         type: "success",
@@ -221,8 +367,11 @@ export default function MyCard() {
         );
         textarea.remove();
 
+        setCopied(true);
+
         toast.add({
-          title: "Card link copied",
+          title:
+            "Card link copied",
           description:
             "The public creator card link is ready to share.",
           type: "success",
@@ -250,18 +399,31 @@ export default function MyCard() {
       return;
     }
 
-    if (navigator.share) {
-      await navigator
-        .share({
-          title: (profile?.name ?? "Creator") + " on Naano",
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title:
+            (profile?.name ??
+              "Creator") +
+            " on Naano",
           url: publicUrl,
-        })
-        .catch(() => undefined);
+        });
 
+        toast.add({
+          title: "Card shared",
+          description:
+            "Your public creator card was shared.",
+          type: "success",
+          timeout: 2200,
+        });
+
+        return;
+      }
+
+      await copyLink();
+    } catch {
       return;
     }
-
-    await copyLink();
   };
 
   if (!profile) {
@@ -275,6 +437,7 @@ export default function MyCard() {
           <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
             <div className="overflow-hidden rounded-[28px] border border-[#dce4ef] bg-white">
               <Skeleton className="h-[170px] rounded-none" />
+
               <div className="space-y-4 px-8 pb-9 pt-20">
                 <Skeleton className="mx-auto h-8 w-48" />
                 <Skeleton className="mx-auto h-4 w-28" />
@@ -294,13 +457,10 @@ export default function MyCard() {
     );
   }
 
-  let industries: string[] = [];
-
-  try {
-    industries = JSON.parse(profile.industries || "[]");
-  } catch {
-    industries = [];
-  }
+  const industries =
+    parseIndustries(
+      profile.industries,
+    );
 
   return (
     <div className="mx-auto w-full max-w-[1180px]">
@@ -315,7 +475,8 @@ export default function MyCard() {
           </h1>
 
           <p className="mt-2 max-w-[680px] text-[16px] leading-7 text-[#78869e]">
-            Review exactly what brands can discover from your Naano card.
+            Review exactly what brands can
+            discover from your Naano card.
           </p>
         </div>
 
@@ -323,7 +484,9 @@ export default function MyCard() {
           <Button
             type="button"
             variant="outline"
-            onClick={() => setOpen(true)}
+            onClick={() =>
+              setOpen(true)
+            }
             className="cursor-pointer"
           >
             <Pencil className="mr-2 h-4 w-4" />
@@ -332,14 +495,18 @@ export default function MyCard() {
 
           <a
             href={publicUrl || "#"}
-            target={publicUrl ? "_blank" : undefined}
+            target={
+              publicUrl
+                ? "_blank"
+                : undefined
+            }
             rel="noreferrer"
             onClick={(event) => {
               if (!publicUrl) {
                 event.preventDefault();
               }
             }}
-            className="inline-flex cursor-pointer items-center rounded-md border border-[#dce3ec] px-4 text-sm font-medium text-[#59667e]"
+            className="inline-flex h-9 cursor-pointer items-center rounded-lg border border-[#dce3ec] px-3 text-xs font-medium text-[#59667e] transition hover:bg-[#f8fafc]"
           >
             <ExternalLink className="mr-2 h-4 w-4" />
             Preview
@@ -378,7 +545,8 @@ export default function MyCard() {
             </div>
 
             <div className="absolute right-7 top-6 rounded-full bg-white/90 px-4 py-2 text-xs font-semibold text-[#2864f0]">
-              {profile.country || "Global"}
+              {profile.country ||
+                "Global"}
             </div>
 
             <motion.button
@@ -386,113 +554,82 @@ export default function MyCard() {
               onClick={() =>
                 setPhotoOpen(true)
               }
-              initial={{
-                scale: 0.72,
-                opacity: 0,
-              }}
-              animate={{
-                scale: 1,
-                opacity: 1,
-              }}
-              transition={{
-                type: "spring",
-                stiffness: 250,
-                damping: 18,
-                delay: 0.12,
-              }}
               whileHover={{
                 scale: 1.03,
               }}
-              className="group absolute -bottom-14 left-1/2 flex h-28 w-28 -translate-x-1/2 cursor-pointer items-center justify-center overflow-hidden rounded-full border-4 border-[#316df0] bg-[#6572cc] text-4xl text-white"
+              whileTap={{
+                scale: 0.98,
+              }}
+              className="absolute -bottom-14 left-1/2 flex h-28 w-28 -translate-x-1/2 cursor-pointer items-center justify-center overflow-hidden rounded-full border-4 border-[#316df0] bg-[#6572cc] text-4xl text-white"
               aria-label="Change profile photo"
             >
               {profile.profile_photo_url ? (
                 <img
-                  src={profile.profile_photo_url}
+                  src={
+                    profile.profile_photo_url
+                  }
                   alt=""
                   className="h-full w-full object-cover"
                 />
               ) : (
-                profile.name
-                  ?.trim()
-                  .split(/\s+/)
-                  .filter(Boolean)
-                  .map(
-                    (value) => value[0],
-                  )
-                  .slice(0, 2)
-                  .join("")
-                  .toUpperCase() ||
-                "N"
+                creatorInitials(
+                  profile.name,
+                )
               )}
-
-              <span className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition group-hover:bg-black/35 group-hover:opacity-100">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#28344b] shadow-lg">
-                  <Pencil className="h-4 w-4" />
-                </span>
-              </span>
             </motion.button>
           </div>
 
           <div className="px-8 pb-9 pt-20 text-center">
             <h2 className="text-[32px] font-semibold tracking-[-1.2px] text-[#141a29]">
-              {profile.name || "Creator"}
+              {profile.name ||
+                "Creator"}
             </h2>
 
             <p className="mt-2 text-[16px] text-[#7b879d]">
-              {profile.category || profile.headline || "Creator"}
+              {profile.category ||
+                profile.headline ||
+                "Creator"}
             </p>
 
             <p className="mx-auto mt-6 max-w-[640px] text-[15px] leading-7 text-[#64728a]">
-              {profile.bio || profile.headline || "Complete your card profile."}
+              {profile.bio ||
+                profile.headline ||
+                "Complete your card profile."}
             </p>
 
             {industries.length > 0 && (
               <div className="mt-7 flex flex-wrap justify-center gap-2">
-                {industries.map((industry) => (
-                  <span
-                    key={industry}
-                    className="rounded-full border border-[#dfe5ed] bg-[#fafbfc] px-3 py-1.5 text-xs font-medium text-[#60708a]"
-                  >
-                    {industry}
-                  </span>
-                ))}
+                {industries.map(
+                  (industry) => (
+                    <span
+                      key={industry}
+                      className="rounded-full border border-[#dfe5ed] bg-[#fafbfc] px-3 py-1.5 text-xs font-medium text-[#60708a]"
+                    >
+                      {industry}
+                    </span>
+                  ),
+                )}
               </div>
             )}
 
             <div className="mt-8 grid grid-cols-3 border-y border-[#e8ecf2] py-6">
-              <div>
-                <p className="text-2xl font-semibold text-[#182239]">
-                  <AnimatedNumber
-                    value={Number(
-                      profile.followers ?? 0,
-                    )}
-                  />
-                </p>
-                <p className="mt-1 text-xs text-[#8794aa]">Followers</p>
-              </div>
+              <CardMetric
+                label="Followers"
+                value={profile.followers}
+              />
 
-              <div className="border-x border-[#e8ecf2]">
-                <p className="text-2xl font-semibold text-[#182239]">
-                  <AnimatedNumber
-                    value={Number(
-                      profile.impressions ?? 0,
-                    )}
-                  />
-                </p>
-                <p className="mt-1 text-xs text-[#8794aa]">Impressions</p>
-              </div>
+              <CardMetric
+                label="Impressions"
+                value={
+                  profile.impressions
+                }
+                bordered
+              />
 
-              <div>
-                <p className="text-2xl font-semibold text-[#182239]">
-                  <AnimatedNumber
-                    value={Number(
-                      profile.post_count ?? 0,
-                    )}
-                  />
-                </p>
-                <p className="mt-1 text-xs text-[#8794aa]">Posts</p>
-              </div>
+              <CardMetric
+                label="Posts"
+                value={profile.post_count}
+              />
             </div>
           </div>
         </motion.div>
@@ -503,24 +640,31 @@ export default function MyCard() {
           </p>
 
           <p className="mt-3 break-all rounded-xl border border-[#e4e8ee] bg-[#f8fafc] px-4 py-3 text-sm text-[#52617b]">
-            {publicUrl || "Publish your card to create a public link."}
+            {publicUrl ||
+              "Publish your card to create a public link."}
           </p>
 
           <div className="mt-4 grid gap-2">
             <Button
               type="button"
               variant="outline"
-              onClick={() => void copyLink()}
+              onClick={() =>
+                void copyLink()
+              }
               disabled={!publicUrl}
               className="cursor-pointer justify-start"
             >
               <Copy className="mr-2 h-4 w-4" />
-              Copy link
+              {copied
+                ? "Copied"
+                : "Copy link"}
             </Button>
 
             <Button
               type="button"
-              onClick={() => void share()}
+              onClick={() =>
+                void share()
+              }
               disabled={!publicUrl}
               className="cursor-pointer justify-start bg-[#2864f0] hover:bg-[#1f58dc]"
             >
@@ -574,18 +718,9 @@ export default function MyCard() {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  profile.name
-                    ?.trim()
-                    .split(/\s+/)
-                    .filter(Boolean)
-                    .map(
-                      (value) =>
-                        value[0],
-                    )
-                    .slice(0, 2)
-                    .join("")
-                    .toUpperCase() ||
-                  "N"
+                  creatorInitials(
+                    profile.name,
+                  )
                 )}
               </div>
             </div>
@@ -595,9 +730,11 @@ export default function MyCard() {
               className="flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-[#d8e0eb] bg-[#fafbfd] px-6 py-8 text-center transition hover:bg-[#f7f9fc]"
             >
               <ImagePlus className="h-7 w-7 text-[#66758d]" />
+
               <span className="mt-3 text-sm font-semibold text-[#344059]">
                 Choose a new photo
               </span>
+
               <span className="mt-1 text-xs text-[#8995aa]">
                 PNG, JPEG or WebP · Max 3 MB
               </span>
@@ -637,28 +774,45 @@ export default function MyCard() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog
+        open={open}
+        onOpenChange={setOpen}
+      >
         <DialogContent className="max-w-[620px]">
           <DialogHeader>
-            <DialogTitle>Edit creator card</DialogTitle>
+            <DialogTitle>
+              Edit creator card
+            </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
-            {[
-              ["headline", "Headline"],
-              ["category", "Category"],
-            ].map(([key, label]) => (
-              <label key={key} className="block">
+            {(
+              [
+                [
+                  "headline",
+                  "Headline",
+                ],
+                [
+                  "category",
+                  "Category",
+                ],
+              ] as const
+            ).map(([key, label]) => (
+              <label
+                key={key}
+                className="block"
+              >
                 <span className="mb-2 block text-xs font-semibold text-[#626a78]">
                   {label}
                 </span>
 
                 <input
-                  value={draft[key as keyof typeof draft]}
+                  value={draft[key]}
                   onChange={(event) =>
                     setDraft({
                       ...draft,
-                      [key]: event.target.value,
+                      [key]:
+                        event.target.value,
                     })
                   }
                   className="auth-input"
@@ -687,16 +841,60 @@ export default function MyCard() {
             <div className="flex justify-end">
               <Button
                 type="button"
-                onClick={() => void save()}
+                onClick={() =>
+                  void save()
+                }
+                disabled={saving}
                 className="cursor-pointer bg-[#171d2b] hover:bg-[#111827]"
               >
-                <Save className="mr-2 h-4 w-4" />
-                Save changes
+                {saving ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="mr-2 h-4 w-4" />
+                )}
+                {saving
+                  ? "Saving…"
+                  : "Save changes"}
               </Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+function CardMetric({
+  label,
+  value,
+  bordered = false,
+}: {
+  label: string;
+  value:
+    | number
+    | null
+    | undefined;
+  bordered?: boolean;
+}) {
+  return (
+    <div
+      className={
+        bordered
+          ? "border-x border-[#e8ecf2]"
+          : ""
+      }
+    >
+      <p className="text-2xl font-semibold text-[#182239]">
+        <AnimatedNumber
+          value={Number(
+            value ?? 0,
+          )}
+        />
+      </p>
+
+      <p className="mt-1 text-xs text-[#8794aa]">
+        {label}
+      </p>
     </div>
   );
 }
