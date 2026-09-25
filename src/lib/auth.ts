@@ -58,3 +58,8 @@ export function logout() {
     method: "POST",
   });
 }
+export async function checkEmail(email: string) {
+  const response = await fetch(`${API_URL}/api/auth/check-email?email=${encodeURIComponent(email.trim())}`, { credentials: "include" });
+  if (!response.ok) return { valid: false, available: false };
+  return response.json() as Promise<{ valid: boolean; available: boolean }>;
+}
