@@ -332,7 +332,11 @@ export default function Settings() {
   };
 
   const handleDelete = async () => {
-    if (deleteConfirmation !== "DELETE") {
+    if (
+      deleteConfirmation
+        .trim()
+        .toUpperCase() !== "DELETE"
+    ) {
       return;
     }
 
@@ -794,8 +798,25 @@ export default function Settings() {
               type="button"
               variant="destructive"
               onClick={() => void handleDelete()}
-              disabled={busy || deleteConfirmation !== "DELETE"}
-              className="cursor-pointer !bg-[#d23838] !text-white hover:!bg-[#b92f2f]"
+              disabled={
+                busy ||
+                deleteConfirmation
+                  .trim()
+                  .toUpperCase() !== "DELETE"
+              }
+              onKeyDown={(event) => {
+                if (
+                  event.key === "Enter" &&
+                  deleteConfirmation
+                    .trim()
+                    .toUpperCase() === "DELETE" &&
+                  !busy
+                ) {
+                  event.preventDefault();
+                  void handleDelete();
+                }
+              }}
+              className="h-10 min-w-[148px] cursor-pointer rounded-lg !bg-[#d83f3f] px-4 !text-white shadow-none hover:!bg-[#bd3535] focus-visible:!ring-2 focus-visible:!ring-[#d83f3f]/30 disabled:!cursor-not-allowed disabled:!bg-[#f3a1a1] disabled:!text-white disabled:!opacity-100"
             >
               {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {busy ? "Deleting..." : "Delete account permanently"}
