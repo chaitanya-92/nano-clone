@@ -1,0 +1,3 @@
+import type { IncomingMessage,ServerResponse } from "node:http";
+import { affiliate,createReferral } from "../controllers/affiliateController";
+export async function affiliateRoutes(request:IncomingMessage,response:ServerResponse,url:URL){if(url.pathname==="/api/affiliate"&&request.method==="GET")return affiliate(request,response);if(url.pathname==="/api/affiliate/referral-links"&&request.method==="POST")return createReferral(request,response);if(url.pathname==="/api/affiliate/referrals"&&request.method==="GET")return affiliate(request,response);if(url.pathname==="/api/affiliate/rewards"&&request.method==="GET")return affiliate(request,response);return false;}
