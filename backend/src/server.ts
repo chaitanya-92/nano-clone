@@ -29,6 +29,7 @@ import { affiliateRoutes } from "./routes/affiliateRoutes";
 import { profileRoutes } from "./routes/profileRoutes";
 import { brandOnboardingRoutes } from "./routes/brandOnboardingRoutes";
 import { healthRoutes } from "./routes/healthRoutes";
+import { targetRoutes } from "./routes/targetRoutes";
 
 import { handleError } from "./middleware/errorMiddleware";
 
@@ -166,7 +167,7 @@ const server = createServer(
       if (
         url.pathname.startsWith("/api/")
       ) {
-        const handlers = [authRoutes, onboardingRoutes, dashboardRoutes, campaignRoutes, applicationRoutes, collaborationRoutes, analyticsRoutes, earningsRoutes, messageRoutes, notificationRoutes, communityRoutes, affiliateRoutes, profileRoutes, brandOnboardingRoutes, healthRoutes];
+        const handlers = [authRoutes, onboardingRoutes, dashboardRoutes, campaignRoutes, applicationRoutes, collaborationRoutes, analyticsRoutes, earningsRoutes, messageRoutes, notificationRoutes, communityRoutes, affiliateRoutes, profileRoutes, brandOnboardingRoutes, healthRoutes, targetRoutes];
 
         for (const handler of handlers) {
           const handled = await handler(request, response, url);
