@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Sparkles, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { Stepper } from "./Stepper";
 
@@ -42,7 +42,7 @@ export function OnboardingShell({
           <div className="absolute -right-20 bottom-20 h-80 w-80 rounded-full bg-[#63b8ff]/20 blur-3xl" />
           <div className="relative flex items-center justify-between gap-2 text-2xl font-bold tracking-[-.05em]">
             <span>naano<span className="text-[#63b8ff]">.</span></span>
-            {modal && onClose && <button type="button" onClick={onClose} className="rounded-full border border-white/10 px-3 py-1.5 text-xs font-semibold text-white/65 transition hover:bg-white/10 hover:text-white lg:hidden">Close</button>}
+            {modal && onClose && <button type="button" onClick={onClose} aria-label="Close onboarding" className="cursor-pointer rounded-lg p-2 text-white/55 transition hover:bg-white/10 hover:text-white lg:hidden"><X className="h-5 w-5" /></button>}
           </div>
           <div className="relative mt-auto max-w-md pb-10">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[.06] px-3 py-1.5 text-xs font-semibold text-[#bcd8ff]"><Sparkles className="h-3.5 w-3.5" />Build your presence once</div>
@@ -61,7 +61,7 @@ export function OnboardingShell({
               <span>Step {current + 1} of {steps.length}</span>
               <span className="h-1 w-1 rounded-full bg-[#cbd1da]" />
               <span>English</span>
-              {modal && onClose && <button type="button" onClick={onClose} className="rounded-full border border-[#e2e6ed] px-3 py-1.5 text-xs font-semibold text-[#6f7787] transition hover:bg-[#f6f8fb]">Esc · Close</button>}
+              {modal && onClose && <button type="button" onClick={onClose} aria-label="Close onboarding" className="cursor-pointer rounded-lg p-2 text-[#8a92a0] transition hover:bg-[#f3f4f6] hover:text-[#252a34]"><X className="h-5 w-5" /></button>}
             </div>
           </header>
           <div className="relative z-10 shrink-0 border-b border-[#edf0f4] bg-[#fbfcfe] px-6 py-5 md:px-10">
@@ -77,7 +77,7 @@ export function OnboardingShell({
               <motion.div key={current} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .22 }} className="mt-9">{children}</motion.div>
               <div className="mt-10 flex items-center justify-between border-t border-[#edf0f4] pt-5">
                 <button type="button" disabled={!canBack || saving} onClick={onBack} className="inline-flex items-center gap-2 rounded-xl px-2 py-3 text-sm font-semibold text-[#737c8d] hover:text-[#202635] disabled:pointer-events-none disabled:opacity-25"><ArrowLeft className="h-4 w-4" />Back</button>
-                <button type="button" disabled={!canNext || saving} onClick={onNext} className="group inline-flex min-w-[150px] items-center justify-center gap-2 rounded-xl bg-[#171d2b] px-5 py-3.5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(23,29,43,.15)] transition hover:-translate-y-0.5 hover:bg-[#2864f0] disabled:cursor-not-allowed disabled:opacity-45">{saving ? "Saving…" : nextLabel}<ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" /></button>
+                <button type="button" disabled={!canNext || saving} onClick={onNext} className="group inline-flex min-w-[150px] items-center justify-center gap-2 rounded-xl bg-[#171d2b] px-5 py-3.5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(23,29,43,.15)] transition hover:-translate-y-0.5 hover:bg-[#111827] disabled:cursor-not-allowed disabled:opacity-45">{saving ? "Saving…" : nextLabel}<ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" /></button>
               </div>
             </div>
           </div>
