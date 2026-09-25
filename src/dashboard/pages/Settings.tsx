@@ -96,11 +96,11 @@ function validateSocialUrl(
     const hostname =
       url.hostname
         .toLowerCase()
-        .replace(/^www\\./, "");
+        .replace(/^www\./, "");
 
     const pathname =
       url.pathname.replace(
-        /\\/+$/,
+        /\/+$/,
         "",
       );
 
@@ -108,7 +108,7 @@ function validateSocialUrl(
       provider === "linkedin" &&
       (
         hostname !== "linkedin.com" ||
-        !/^\\/in\\/[A-Za-z0-9][A-Za-z0-9._-]*$/.test(
+        !/^\/in\/[A-Za-z0-9][A-Za-z0-9._-]*$/.test(
           pathname,
         )
       )
@@ -122,7 +122,7 @@ function validateSocialUrl(
         !["x.com", "twitter.com"].includes(
           hostname,
         ) ||
-        !/^\\/[A-Za-z0-9_]{1,15}$/.test(
+        !/^\/[A-Za-z0-9_]{1,15}$/.test(
           pathname,
         )
       )
