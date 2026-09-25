@@ -8,6 +8,7 @@ import {
   Eye,
   EyeOff,
   Globe2,
+  Linkedin,
   Plus,
   UserRound,
 } from "lucide-react";
@@ -51,6 +52,22 @@ import { LinkedinIcon } from "@/components/ui/icons/linkedin-icon";
 import { signIn } from "@/features/authSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { toast } from "@/components/ui/toast";
+
+type ProfessionalTermKey =
+  | "taxResponsibilityConfirmed"
+  | "selfBillingMandateAccepted"
+  | "certificationAccepted";
+
+type ProfessionalTerm = {
+  key: ProfessionalTermKey;
+  label: string;
+  title: string;
+  description: string;
+  sections: Array<{
+    heading: string;
+    body: string;
+  }>;
+};
 
 const creatorSteps = [
   "Account",
@@ -460,6 +477,26 @@ export default function Register() {
   const [saving, setSaving] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [socialStatus, setSocialStatus] = useState<Record<string, string>>({});
+  const [socialErrors, setSocialErrors] = useState<
+    Record<"linkedin" | "x", string>
+  >({
+    linkedin: "",
+    x: "",
+  });
+  const [customIndustries, setCustomIndustries] =
+    useState<string[]>([]);
+  const [customIndustry, setCustomIndustry] =
+    useState("");
+  const [showIndustryInput, setShowIndustryInput] =
+    useState(false);
+  const [readTerms, setReadTerms] =
+    useState<Record<ProfessionalTermKey, boolean>>({
+      taxResponsibilityConfirmed: false,
+      selfBillingMandateAccepted: false,
+      certificationAccepted: false,
+    });
+  const [activeTerm, setActiveTerm] =
+    useState<ProfessionalTerm | null>(null);
   const [analysis, setAnalysis] = useState<any>(null);
   const [emailStatus, setEmailStatus] = useState<
     "idle" | "checking" | "available" | "taken"
@@ -605,7 +642,26 @@ export default function Register() {
                 country: formik.values.country,
                 industries: formik.values.industries,
               });
-              await saveCreatorCard({ priceCents: formik.values.priceCents });
+              if (
+                typeof formik.values.priceCents !==
+                "number"
+              ) {
+                formik.setFieldTouched(
+                  "priceCents",
+                  true,
+                  false,
+                );
+                formik.setFieldError(
+                  "priceCents",
+                  "Set your price per post.",
+                );
+                return;
+              }
+
+              await saveCreatorCard({
+                priceCents:
+                  formik.values.priceCents,
+              });
             } else if (role === "creator" && step === 3)
               await saveCreatorProfessional(formik.values);
             else if (role === "brand")
@@ -1216,8 +1272,15 @@ export default function Register() {
                       </div>
 
                       <FieldError
-                        error={formik.errors.industries}
-                        touched={formik.touched.industries}
+                        error={
+                          typeof formik.errors.industries ===
+                          "string"
+                            ? formik.errors.industries
+                            : undefined
+                        }
+                        touched={Boolean(
+                          formik.touched.industries,
+                        )}
                       />
                     </div>
                   </div>
@@ -1423,7 +1486,9 @@ export default function Register() {
                         },
                       ],
                     },
-                  ].map((term) => (
+                  ].map(
+                    (term: ProfessionalTerm) => (
+
                     <div
                       key={term.key}
                       className="rounded-xl border border-[#e4e8ee] p-4"
@@ -1628,8 +1693,15 @@ export default function Register() {
                       })}
                     </div>
                     <FieldError
-                      error={formik.errors.industries}
-                      touched={formik.touched.industries}
+                      error={
+                        typeof formik.errors.industries ===
+                        "string"
+                          ? formik.errors.industries
+                          : undefined
+                      }
+                      touched={Boolean(
+                        formik.touched.industries,
+                      )}
                     />
                   </div>
                   <div className="grid gap-4 md:grid-cols-3">
