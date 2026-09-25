@@ -365,29 +365,16 @@ export function deleteAccount() {
   });
 }
 
-
-export function connectSocial(
-  provider: "linkedin" | "x",
-  profileUrl: string,
-) {
+export function getSocialAccounts() {
   return request<{
-    data: {
-      provider: string;
-      profileUrl: string;
-      fetchedProfile: {
-        username: string | null;
-        name: string | null;
-        headline: string | null;
-        bio: string | null;
-        profileImageUrl: string | null;
-        followers: number | null;
-      };
-    };
-  }>("/api/social-accounts/connect", {
-    method: "POST",
-    body: JSON.stringify({
-      provider,
-      profileUrl,
-    }),
-  });
+    data: Array<{
+      id: string;
+      provider: "linkedin" | "x";
+      username: string | null;
+      profile_url: string | null;
+      profile_image_url: string | null;
+      status: string;
+      verified_at: string | null;
+    }>;
+  }>("/api/social-accounts");
 }
