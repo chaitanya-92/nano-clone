@@ -10,6 +10,8 @@ import {
   me,
   register,
   checkEmail,
+  requestEmailOtp,
+  verifyEmailOtp,
   linkedin,
   linkedinCallback,
 } from "../controllers/authController";
@@ -42,6 +44,20 @@ export async function authRoutes(
 
   if (url.pathname === "/api/auth/check-email" && request.method === "GET") {
     return checkEmail(request, response, url);
+  }
+
+  if (
+    url.pathname === "/api/auth/email/request-otp" &&
+    request.method === "POST"
+  ) {
+    return requestEmailOtp(request, response);
+  }
+
+  if (
+    url.pathname === "/api/auth/email/verify-otp" &&
+    request.method === "POST"
+  ) {
+    return verifyEmailOtp(request, response);
   }
 
   if (
