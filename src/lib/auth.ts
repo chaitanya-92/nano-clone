@@ -78,3 +78,12 @@ export function verifyEmailOtp(email: string, code: string) {
     body: JSON.stringify({ email, code }),
   });
 }
+
+export async function deleteAccount() {
+  return request<{ ok: true }>(
+    "/api/auth/account",
+    {
+      method: "DELETE",
+    },
+  );
+}

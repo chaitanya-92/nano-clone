@@ -4,6 +4,7 @@ import {
   googleCallback,
   login,
   logout,
+  deleteAccount,
   me,
   register,
   checkEmail,
@@ -24,6 +25,13 @@ export async function authRoutes(
 
   if (url.pathname === "/api/auth/logout" && request.method === "POST") {
     return logout(request, response);
+  }
+
+  if (
+    url.pathname === "/api/auth/account" &&
+    request.method === "DELETE"
+  ) {
+    return deleteAccount(request, response);
   }
 
   if (url.pathname === "/api/auth/register" && request.method === "POST") {
