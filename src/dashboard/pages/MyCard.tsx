@@ -311,8 +311,7 @@ export default function MyCard() {
             >
               View analytics
             </Link>
-          </div>
-        </aside>
+          </motion.div>       </aside>
       </section>
 
       <Dialog open={open} onOpenChange={setOpen}>

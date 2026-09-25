@@ -74,7 +74,25 @@ export function dashboard(request: IncomingMessage, response: ServerResponse) {
     });
   }
 
-  const profile = ensureCreatorProfile(user.id, user.name);
+  const profile = ensureCreatorProfile(
+    user.id,
+    user.name,
+  );
+
+  const analyticsTotals = db
+    .prepare(
+      `SELECT
+        COUNT(*) AS posts,
+        COALESCE(SUM(impressions), 0) AS impressions,
+        COALESCE(SUM(engagements), 0) AS engagements
+       FROM analytics_posts
+       WHERE creator_id = ?`,
+    )
+    .get(user.id) as {
+      posts: number;
+      impressions: number;
+      engagements: number;
+    };
 
   const applications = db
     .prepare("SELECT COUNT(*) AS count FROM applications WHERE creator_id = ?")
@@ -111,9 +129,15 @@ export function dashboard(request: IncomingMessage, response: ServerResponse) {
       profile,
       metrics: {
         followers: Number(profile.followers ?? 0),
-        posts: Number(profile.post_count ?? 0),
-        impressions: Number(profile.impressions ?? 0),
-        engagements: Number(profile.engagement_count ?? 0),
+        posts: Number(
+          analyticsTotals.posts ?? 0,
+        ),
+        impressions: Number(
+          analyticsTotals.impressions ?? 0,
+        ),
+        engagements: Number(
+          analyticsTotals.engagements ?? 0,
+        ),
         applications: applications.count,
         collaborations: collaborations.count,
       },
