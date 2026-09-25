@@ -252,8 +252,6 @@ export default function Settings() {
       setName(data.name ?? "");
       setLinkedinUrl(data.linkedin_url ?? "");
       setXProfileUrl(data.x_profile_url ?? "");
-      setInitialLinkedin(data.linkedin_url ?? "");
-      setInitialX(data.x_profile_url ?? "");
 
       setSocialStatus((current) => ({
         ...current,

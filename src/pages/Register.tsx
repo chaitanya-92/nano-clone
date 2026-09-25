@@ -485,13 +485,6 @@ export default function Register() {
   const [customIndustries, setCustomIndustries] = useState<string[]>([]);
   const [customIndustry, setCustomIndustry] = useState("");
   const [showIndustryInput, setShowIndustryInput] = useState(false);
-  const [readTerms, setReadTerms] = useState<
-    Record<ProfessionalTermKey, boolean>
-  >({
-    taxResponsibilityConfirmed: false,
-    selfBillingMandateAccepted: false,
-    certificationAccepted: false,
-  });
   const [activeTerm, setActiveTerm] = useState<ProfessionalTerm | null>(null);
   const [analysis, setAnalysis] = useState<any>(null);
   const [emailStatus, setEmailStatus] = useState<
