@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { ArrowRight, Building2, CheckCircle2, Eye, EyeOff, Globe2, Linkedin, UserRound } from "lucide-react";
@@ -21,7 +21,250 @@ const initialValues={name:"",email:"",password:"",confirmPassword:"",role:"" as 
 
 function Input({name,label,placeholder,type="text",formik}:{name:string;label:string;placeholder?:string;type?:string;formik:any}){return <label className="block"><span className="mb-2 block text-xs font-semibold tracking-wide text-[#626a78]">{label}</span><input name={name} type={type} value={formik.values[name]} onChange={(event)=>{formik.handleChange(event);formik.setFieldTouched(name,true,false)}} onBlur={formik.handleBlur} placeholder={placeholder} className="auth-input"/><FieldError error={formik.errors[name]} touched={formik.touched[name]}/></label>}
 
-function EmailField({formik,status,onStatus,verified,onVerified}:{formik:any;status:"idle"|"checking"|"available"|"taken";onStatus:(status:"idle"|"checking"|"available"|"taken")=>void;verified:boolean;onVerified:(value:boolean)=>void}){const [otp,setOtp]=useState("");const [otpSent,setOtpSent]=useState(false);const [loading,setLoading]=useState(false);const [message,setMessage]=useState("");const email=formik.values.email;useEffect(()=>{setOtp("");setOtpSent(false);setMessage("");if(!email){onStatus("idle");formik.setFieldError("email",undefined);return}const timer=window.setTimeout(async()=>{try{if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)){onStatus("idle");formik.setFieldError("email","Enter a valid email address.");return}onStatus("checking");const result=await checkEmail(email);onStatus(result.available?"available":"taken");formik.setFieldError("email",result.available?undefined:"An account already exists for this email.")}catch{onStatus("idle")}},450);return()=>window.clearTimeout(timer)},[email]);const sendCode=async()=>{if(status!=="available"||!email)return;setLoading(true);setMessage("");try{await requestEmailOtp(email);setOtpSent(true);setMessage("Verification code sent. Check your inbox.")}catch(error){setMessage(error instanceof Error?error.message:"Unable to send verification code.")}finally{setLoading(false)}};const verifyCode=async()=>{if(!/^\\d{6}$/.test(otp)||!email)return;setLoading(true);setMessage("");try{await verifyEmailOtp(email,otp);onVerified(true);setMessage("Email verified.")}catch(error){setMessage(error instanceof Error?error.message:"Incorrect verification code.")}finally{setLoading(false)}};return <div className="block"><span className="mb-2 block text-xs font-semibold tracking-wide text-[#626a78]">Email</span><div className="flex gap-2"><input name="email" type="email" value={email} onChange={(event)=>{formik.handleChange(event);formik.setFieldTouched("email",true,false);onVerified(false);}} onBlur={formik.handleBlur} placeholder="you@company.com" autoComplete="email" className="auth-input"/>{verified&&<div className="flex shrink-0 items-center gap-1.5 rounded-xl border border-[#dce8df] bg-[#f6faf7] px-3 text-xs font-semibold text-[#3f6148]"><CheckCircle2 className="h-4 w-4"/>Verified</div>}</div>{status==="checking"&&<p className="mt-1.5 text-xs text-[#8a92a0]">Checking email…</p>}{status==="available"&&!verified&&<button type="button" onClick={sendCode} disabled={loading} className="mt-2 cursor-pointer rounded-lg border border-[#dfe3e8] bg-white px-3 py-2 text-xs font-semibold text-[#3b4350] transition hover:bg-[#f7f8fa] disabled:cursor-not-allowed disabled:opacity-50">{loading?"Sending…":otpSent?"Resend code":"Send verification code"}</button>}{otpSent&&!verified&&<div className="mt-3 rounded-xl border border-[#e4e8ee] bg-[#fafbfc] p-3"><p className="text-xs text-[#687386]">Enter the 6-digit code sent to <span className="font-semibold text-[#343b48]">{email}</span>.</p><div className="mt-2 flex gap-2"><input value={otp} onChange={event=>setOtp(event.target.value.replace(/\\D/g,"").slice(0,6))} inputMode="numeric" autoComplete="one-time-code" maxLength={6} placeholder="000000" className="auth-input flex-1 tracking-[.3em]"/><button type="button" onClick={verifyCode} disabled={loading||otp.length!==6} className="cursor-pointer rounded-xl bg-[#171d2b] px-4 text-xs font-semibold text-white transition hover:bg-[#111827] disabled:cursor-not-allowed disabled:opacity-50">{loading?"Verifying…":"Verify"}</button></div></div>}{message&&<p className={`mt-2 text-xs ${verified?"text-[#3f6148]":"text-[#687386]"}`}>{message}</p>}<FieldError error={formik.errors.email} touched={formik.touched.email}/></div>}
+function EmailField({
+  formik,
+  status,
+  onStatus,
+  verified,
+  onVerified,
+}: {
+  formik: any;
+  status: "idle" | "checking" | "available" | "taken";
+  onStatus: (status: "idle" | "checking" | "available" | "taken") => void;
+  verified: boolean;
+  onVerified: (value: boolean) => void;
+}) {
+  const [otp, setOtp] = useState("");
+  const [otpRequested, setOtpRequested] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const email = formik.values.email;
+
+  const validateEmail = (value: string) => {
+    return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(value);
+  };
+
+  const handleEmailChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    formik.handleChange(event);
+    formik.setFieldTouched("email", false, false);
+    formik.setFieldError("email", undefined);
+    onStatus("idle");
+    onVerified(false);
+    setOtp("");
+    setOtpRequested(false);
+    setMessage("");
+  };
+
+  const handleEmailBlur = async () => {
+    formik.setFieldTouched("email", true, true);
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!normalizedEmail) {
+      formik.setFieldError("email", "Email is required.");
+      onStatus("idle");
+      return;
+    }
+
+    if (!validateEmail(normalizedEmail)) {
+      formik.setFieldError("email", "Enter a valid email address.");
+      onStatus("idle");
+      return;
+    }
+
+    onStatus("checking");
+
+    try {
+      const result = await checkEmail(normalizedEmail);
+
+      if (!result.available) {
+        formik.setFieldError(
+          "email",
+          "An account already exists for this email.",
+        );
+        onStatus("taken");
+        return;
+      }
+
+      formik.setFieldError("email", undefined);
+      onStatus("available");
+    } catch {
+      onStatus("idle");
+    }
+  };
+
+  const handleRequestOtp = async () => {
+    if (status !== "available" || !validateEmail(email)) {
+      return;
+    }
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      await requestEmailOtp(email);
+      setOtpRequested(true);
+      setMessage("We sent a 6-digit verification code to your email.");
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Unable to send verification code.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!/^\\d{6}$/.test(otp) || !email) {
+      return;
+    }
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      await verifyEmailOtp(email, otp);
+      onVerified(true);
+      setOtpRequested(false);
+      setMessage("");
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Incorrect verification code.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="block">
+      <span className="mb-2 block text-xs font-semibold tracking-wide text-[#626a78]">
+        Email
+      </span>
+
+      <div className="flex items-start gap-2">
+        <div className="min-w-0 flex-1">
+          <input
+            name="email"
+            type="email"
+            value={email}
+            onChange={handleEmailChange}
+            onBlur={handleEmailBlur}
+            placeholder="you@company.com"
+            autoComplete="email"
+            className="auth-input"
+          />
+        </div>
+
+        {verified ? (
+          <div className="flex h-12 shrink-0 items-center gap-2 rounded-xl border border-[#d7e6dc] bg-[#f5faf7] px-3 text-xs font-semibold text-[#3f6148]">
+            <CheckCircle2 className="h-4 w-4" />
+            Verified
+          </div>
+        ) : status === "available" ? (
+          <button
+            type="button"
+            onClick={handleRequestOtp}
+            disabled={loading}
+            className="h-12 shrink-0 cursor-pointer rounded-xl border border-[#dfe3e8] bg-white px-4 text-xs font-semibold text-[#303744] transition hover:bg-[#f7f8fa] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {loading
+              ? "Sending..."
+              : otpRequested
+                ? "Resend code"
+                : "Verify email"}
+          </button>
+        ) : null}
+      </div>
+
+      {status === "checking" && (
+        <p className="mt-1.5 text-xs text-[#8a92a0]">
+          Checking email...
+        </p>
+      )}
+
+      {otpRequested && !verified && (
+        <div className="mt-3 rounded-2xl border border-[#e4e8ee] bg-[#fafbfc] p-4">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold text-[#252a34]">
+                Verify your email
+              </p>
+              <p className="mt-1 text-xs leading-5 text-[#737c8d]">
+                Enter the 6-digit code we sent to {email}.
+              </p>
+            </div>
+
+            <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[.12em] text-[#8a92a0]">
+              10 min
+            </span>
+          </div>
+
+          <div className="mt-4 flex gap-2">
+            <input
+              value={otp}
+              onChange={(event) => {
+                setOtp(
+                  event.target.value
+                    .replace(/\\D/g, "")
+                    .slice(0, 6),
+                );
+              }}
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              maxLength={6}
+              placeholder="000000"
+              aria-label="Email verification code"
+              className="auth-input flex-1 text-center tracking-[.45em]"
+            />
+
+            <button
+              type="button"
+              onClick={handleVerifyOtp}
+              disabled={loading || otp.length !== 6}
+              className="h-12 shrink-0 cursor-pointer rounded-xl bg-[#171d2b] px-5 text-xs font-semibold text-white transition hover:bg-[#111827] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {loading ? "Verifying..." : "Confirm"}
+            </button>
+          </div>
+
+          <div className="mt-3 flex items-center justify-between gap-3">
+            <p className="text-xs text-[#687386]">
+              Didn't receive the code?
+            </p>
+
+            <button
+              type="button"
+              onClick={handleRequestOtp}
+              disabled={loading}
+              className="cursor-pointer text-xs font-semibold text-[#3b4350] hover:text-[#171d2b] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Resend code
+            </button>
+          </div>
+        </div>
+      )}
+
+      {message && !verified && (
+        <p className="mt-2 text-xs text-[#687386]">
+          {message}
+        </p>
+      )}
+
+      <FieldError
+        error={formik.errors.email}
+        touched={formik.touched.email}
+      />
+    </div>
+  );
+}
+
 function RoleChoice({onSelect}:{onSelect:(role:"creator"|"brand")=>void}){return <div className="min-h-screen bg-[#f5f7fb]"><div className="mx-auto flex min-h-screen max-w-6xl flex-col justify-center px-6 py-12"><div className="text-center"><div className="text-2xl font-bold tracking-[-.05em]">naano<span className="text-[#2864f0]">.</span></div><p className="mt-12 text-[11px] font-bold uppercase tracking-[.18em] text-[#2864f0]">Get started</p><h1 className="mt-3 text-4xl font-semibold tracking-[-.055em] text-[#171d2b] md:text-5xl">How will you use Naano?</h1><p className="mx-auto mt-4 max-w-lg text-[15px] leading-7 text-[#737c8d]">Choose your path and we’ll ask only the questions relevant to your workspace.</p></div><div className="mx-auto mt-12 grid w-full max-w-3xl gap-5 md:grid-cols-2"><button type="button" onClick={()=>onSelect("creator")} className="group cursor-pointer rounded-[28px] border border-[#e1e6ee] bg-white p-8 text-left shadow-[0_12px_40px_rgba(35,52,80,.06)] transition duration-200 hover:-translate-y-1 hover:border-[#cbd1da] hover:shadow-[0_22px_60px_rgba(35,52,80,.12)]"><div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#eef4ff] text-[#2864f0]"><UserRound className="h-6 w-6"/></div><div className="mt-9 flex items-end justify-between gap-4"><div><h2 className="text-xl font-semibold tracking-[-.03em]">I’m a creator</h2><p className="mt-2 max-w-xs text-sm leading-6 text-[#737c8d]">Build your creator card, connect your social presence and find paid opportunities.</p></div><ArrowRight className="h-5 w-5 shrink-0 text-[#9aa2b0] transition group-hover:translate-x-1 group-hover:text-[#626a78]"/></div></button><button type="button" onClick={()=>onSelect("brand")} className="group cursor-pointer rounded-[28px] border border-[#e1e6ee] bg-white p-8 text-left shadow-[0_12px_40px_rgba(35,52,80,.06)] transition duration-200 hover:-translate-y-1 hover:border-[#cbd1da] hover:shadow-[0_22px_60px_rgba(35,52,80,.12)]"><div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#eef4ff] text-[#2864f0]"><Building2 className="h-6 w-6"/></div><div className="mt-9 flex items-end justify-between gap-4"><div><h2 className="text-xl font-semibold tracking-[-.03em]">I’m a brand</h2><p className="mt-2 max-w-xs text-sm leading-6 text-[#737c8d]">Create your company profile, define your ICP and launch creator campaigns.</p></div><ArrowRight className="h-5 w-5 shrink-0 text-[#9aa2b0] transition group-hover:translate-x-1 group-hover:text-[#626a78]"/></div></button></div><p className="mt-8 text-center text-sm text-[#8a92a0]">Already have an account? <Link to="/login" className="font-semibold text-[#2864f0]">Sign in</Link></p></div></div>}
 
 export default function Register(){
