@@ -1,39 +1,3 @@
-function fileToDataUrl(
-  file: File,
-): Promise<string> {
-  return new Promise(
-    (resolve, reject) => {
-      const reader =
-        new FileReader();
-
-      reader.onload = () => {
-        if (
-          typeof reader.result !==
-          "string"
-        ) {
-          reject(
-            new Error(
-              "Unable to read image.",
-            ),
-          );
-          return;
-        }
-
-        resolve(reader.result);
-      };
-
-      reader.onerror = () =>
-        reject(
-          new Error(
-            "Unable to read image.",
-          ),
-        );
-
-      reader.readAsDataURL(file);
-    },
-  );
-}
-
 import {
   Copy,
   ExternalLink,
@@ -64,6 +28,14 @@ import {
   type CreatorProfile,
 } from "@/lib/dashboard";
 
+function fileToDataUrl(
+  file: File,
+): Promise<string> {
+  return new Promise(
+    (resolve, reject) => {
+      const reader =
+        new FileReader();
+
 export default function MyCard() {
   const [profile, setProfile] = useState<CreatorProfile | null>(null);
   const [open, setOpen] = useState(false);
@@ -72,7 +44,6 @@ export default function MyCard() {
     category: "",
     bio: "",
   });
-  const [copied, setCopied] = useState(false);
   const [photoOpen, setPhotoOpen] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState("");
@@ -215,8 +186,6 @@ export default function MyCard() {
       await navigator.clipboard.writeText(
         publicUrl,
       );
-
-      setCopied(true);
 
       toast.add({
         title: "Card link copied",
