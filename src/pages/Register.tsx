@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Formik, Form } from "formik";
+import * as Yup from "yup";
 import { Eye, EyeOff, Globe2, Linkedin, Building2, UserRound, BadgeCheck } from "lucide-react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { OnboardingShell } from "@/auth/components/OnboardingShell";
 import { FieldError } from "@/auth/components/FieldError";
-import { accountSchema, creatorDetailsSchema, creatorPositioningSchema, creatorPricingSchema, professionalSchema, brandCompanySchema, brandProfileSchema } from "@/auth/schemas";
+import { accountSchema, creatorSocialSchema, creatorDetailsSchema, creatorPositioningSchema, creatorPricingSchema, professionalSchema, brandCompanySchema, brandProfileSchema } from "@/auth/schemas";
 import { saveBrandOnboarding, saveCreatorCard, saveCreatorDetails, saveCreatorProfessional, saveCreatorProfile, saveCreatorSocial } from "@/lib/onboarding";
 import { register } from "@/lib/auth";
 import { signIn } from "@/features/authSlice";
@@ -30,7 +31,7 @@ export default function Register(){
  if(!isLoading&&isAuthenticated)return <Navigate to="/dashboard" replace/>;
  return <Formik initialValues={initialValues} onSubmit={()=>navigate("/dashboard",{replace:true})} validateOnBlur validateOnChange={false}>{formik=>{
  const role=formik.values.role;const steps=role==="brand"?stepsBrand:stepsCreator;
- const validateStep=async()=>{setError("");let schema:any;if(step===0)schema=accountSchema;else if(role==="creator"&&step===1)schema=creatorDetailsSchema.concat(creatorPositioningSchema.pick(["linkedinUrl"]));else if(role==="creator"&&step===2)schema=creatorPositioningSchema;else if(role==="creator"&&step===3)schema=creatorPricingSchema;else if(role==="creator"&&step===4)schema=professionalSchema;else if(role==="brand"&&step===1)schema=brandCompanySchema;else if(role==="brand"&&step===2)schema=brandProfileSchema;else schema=brandProfileSchema;try{await schema.validate(formik.values,{abortEarly:false});return true}catch(e:any){const next:any={};(e.inner??[]).forEach((item:any)=>{if(item.path)next[item.path]=item.message});formik.setErrors(next);Object.keys(next).forEach(key=>formik.setFieldTouched(key,true,false));return false}};
+ const validateStep=async()=>{setError("");let schema:any;if(step===0)schema=accountSchema;else if(role==="creator"&&step===1)schema=creatorSocialSchema;else if(role==="creator"&&step===2)schema=creatorPositioningSchema;else if(role==="creator"&&step===3)schema=creatorPricingSchema;else if(role==="creator"&&step===4)schema=professionalSchema;else if(role==="brand"&&step===1)schema=brandCompanySchema;else if(role==="brand"&&step===2)schema=Yup.object({companyName:Yup.string().trim().min(2).required("Company name is required."),description:Yup.string().trim().min(20).required("Add a company description."),valueProposition:Yup.string().trim().min(40).required("Add your value proposition."),country:Yup.string().required("Select your country.")});else schema=brandProfileSchema;try{await schema.validate(formik.values,{abortEarly:false});return true}catch(e:any){const next:any={};(e.inner??[]).forEach((item:any)=>{if(item.path)next[item.path]=item.message});formik.setErrors(next);Object.keys(next).forEach(key=>formik.setFieldTouched(key,true,false));return false}};
  const next=async()=>{if(!role&&step===0){setError("Choose Creator or Brand to continue.");return}if(!(await validateStep()))return;setSaving(true);try{
  if(step===0){const result=await register(formik.values.name,formik.values.email,formik.values.password,role as "creator"|"brand");dispatch(signIn(result.user));}
  else if(role==="creator"&&step===1)await saveCreatorSocial({linkedinUrl:formik.values.linkedinUrl,xProfileUrl:formik.values.xProfileUrl});
