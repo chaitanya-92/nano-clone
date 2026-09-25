@@ -90,6 +90,72 @@ export function initializeDatabase() {
       updated_at TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS campaigns (
+      id TEXT PRIMARY KEY,
+      brand_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      title TEXT NOT NULL,
+      description TEXT NOT NULL,
+      brief TEXT NOT NULL DEFAULT '',
+      deliverables TEXT NOT NULL DEFAULT '[]',
+      requirements TEXT NOT NULL DEFAULT '[]',
+      budget_cents INTEGER NOT NULL DEFAULT 0,
+      currency TEXT NOT NULL DEFAULT 'EUR',
+      application_deadline TEXT,
+      start_date TEXT,
+      end_date TEXT,
+      status TEXT NOT NULL DEFAULT 'draft',
+      min_followers INTEGER NOT NULL DEFAULT 0,
+      max_applications INTEGER,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS applications (
+      id TEXT PRIMARY KEY,
+      campaign_id TEXT NOT NULL REFERENCES campaigns(id) ON DELETE CASCADE,
+      creator_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      message TEXT NOT NULL DEFAULT '',
+      proposed_price_cents INTEGER,
+      status TEXT NOT NULL DEFAULT 'pending',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      UNIQUE(campaign_id, creator_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS collaborations (
+      id TEXT PRIMARY KEY,
+      campaign_id TEXT NOT NULL REFERENCES campaigns(id) ON DELETE CASCADE,
+      creator_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      brand_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      application_id TEXT REFERENCES applications(id) ON DELETE SET NULL,
+      status TEXT NOT NULL DEFAULT 'application_submitted',
+      brief TEXT NOT NULL DEFAULT '',
+      content_url TEXT,
+      published_url TEXT,
+      due_at TEXT,
+      approved_at TEXT,
+      completed_at TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS analytics_posts (
+      id TEXT PRIMARY KEY,
+      creator_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      platform TEXT NOT NULL DEFAULT 'linkedin',
+      external_id TEXT,
+      url TEXT,
+      text TEXT NOT NULL DEFAULT '',
+      published_at TEXT NOT NULL,
+      impressions INTEGER NOT NULL DEFAULT 0,
+      reach INTEGER NOT NULL DEFAULT 0,
+      likes INTEGER NOT NULL DEFAULT 0,
+      comments INTEGER NOT NULL DEFAULT 0,
+      reposts INTEGER NOT NULL DEFAULT 0,
+      engagements INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL
+    );
+
     CREATE INDEX IF NOT EXISTS sessions_user_id_idx ON sessions(user_id);
     CREATE INDEX IF NOT EXISTS sessions_expires_at_idx ON sessions(expires_at);
   `);
