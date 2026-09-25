@@ -2,7 +2,7 @@ import type { User, UserRole } from "@/features/authSlice";
 
 type AuthResponse = { user: User };
 
-const API_URL = "https://nano-clone.onrender.com";
+const API_URL = import.meta.env.VITE_API_URL ?? "";
 
 async function request<T>(
   path: string,
