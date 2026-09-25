@@ -44,7 +44,26 @@ export function setCookie(
     attributes.push(`Max-Age=${options.maxAge}`);
   }
 
-  response.setHeader("Set-Cookie", attributes.join("; "));
+  const cookie = attributes.join("; ");
+  const existing = response.getHeader("Set-Cookie");
+
+  if (!existing) {
+    response.setHeader("Set-Cookie", [cookie]);
+    return;
+  }
+
+  if (Array.isArray(existing)) {
+    response.setHeader("Set-Cookie", [
+      ...existing.map(String),
+      cookie,
+    ]);
+    return;
+  }
+
+  response.setHeader("Set-Cookie", [
+    String(existing),
+    cookie,
+  ]);
 }
 
 export function createSession(

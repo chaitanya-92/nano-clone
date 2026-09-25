@@ -254,12 +254,49 @@ export async function googleCallback(
       }),
   );
 
+  if (params.error) {
+    console.error(
+      "Google OAuth provider error:",
+      params.error,
+      params.error_description,
+    );
+  
+    return redirect(
+      response,
+      getFrontendLoginErrorUrl(
+        "google_failed",
+      ),
+    );
+  }
+  
+  if (!params.code) {
+    console.error(
+      "Google OAuth callback missing authorization code.",
+    );
+  
+    return redirect(
+      response,
+      getFrontendLoginErrorUrl(
+        "google_failed",
+      ),
+    );
+  }
+  
   if (
-    params.error ||
-    !params.code ||
     params.state !==
-      cookies.naano_oauth_state
+    cookies.naano_oauth_state
   ) {
+    console.error(
+      "Google OAuth state mismatch.",
+      {
+        received: params.state,
+        expected: cookies.naano_oauth_state,
+        hasCookie: Boolean(
+          cookies.naano_oauth_state,
+        ),
+      },
+    );
+  
     return redirect(
       response,
       getFrontendLoginErrorUrl(
