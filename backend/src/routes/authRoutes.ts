@@ -27,10 +27,7 @@ export async function authRoutes(
     return logout(request, response);
   }
 
-  if (
-    url.pathname === "/api/auth/account" &&
-    request.method === "DELETE"
-  ) {
+  if (url.pathname === "/api/auth/account" && request.method === "DELETE") {
     return deleteAccount(request, response);
   }
 

@@ -412,25 +412,17 @@ export async function deleteAccount(
   }
 
   try {
-    const transaction = db.transaction(
-      (userId: string) => {
-        db.prepare(
-          "DELETE FROM withdrawals WHERE user_id = ?",
-        ).run(userId);
+    const transaction = db.transaction((userId: string) => {
+      db.prepare("DELETE FROM withdrawals WHERE user_id = ?").run(userId);
 
-        db.prepare(
-          "DELETE FROM payout_methods WHERE user_id = ?",
-        ).run(userId);
+      db.prepare("DELETE FROM payout_methods WHERE user_id = ?").run(userId);
 
-        db.prepare(
-          "DELETE FROM email_verifications WHERE email = ?",
-        ).run(user.email);
+      db.prepare("DELETE FROM email_verifications WHERE email = ?").run(
+        user.email,
+      );
 
-        db.prepare(
-          "DELETE FROM users WHERE id = ?",
-        ).run(userId);
-      },
-    );
+      db.prepare("DELETE FROM users WHERE id = ?").run(userId);
+    });
 
     transaction(user.id);
 
@@ -442,14 +434,10 @@ export async function deleteAccount(
       ok: true,
     });
   } catch (value) {
-    console.error(
-      "Account deletion failed:",
-      value,
-    );
+    console.error("Account deletion failed:", value);
 
     return json(response, 500, {
-      error:
-        "Unable to delete your account. Please try again.",
+      error: "Unable to delete your account. Please try again.",
     });
   }
 }

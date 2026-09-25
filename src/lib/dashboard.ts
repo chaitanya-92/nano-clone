@@ -360,10 +360,7 @@ export function getCurrentUser() {
 }
 
 export function deleteAccount() {
-  return request<{ ok: true }>(
-    "/api/auth/account",
-    {
-      method: "DELETE",
-    },
-  );
+  return request<{ ok: true }>("/api/auth/account", {
+    method: "DELETE",
+  });
 }
