@@ -5,10 +5,9 @@ import { getPublicCreatorCard } from "@/lib/dashboard";
 
 export default function PublicCreatorCard() {
   const { slug = "" } = useParams();
-  const [card, setCard] =
-    useState<Awaited<
-      ReturnType<typeof getPublicCreatorCard>
-    >["data"] | null>(null);
+  const [card, setCard] = useState<
+    Awaited<ReturnType<typeof getPublicCreatorCard>>["data"] | null
+  >(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -23,9 +22,7 @@ export default function PublicCreatorCard() {
       .then(({ data }) => setCard(data))
       .catch((value) =>
         setError(
-          value instanceof Error
-            ? value.message
-            : "Creator card not found.",
+          value instanceof Error ? value.message : "Creator card not found.",
         ),
       )
       .finally(() => setLoading(false));
@@ -34,9 +31,7 @@ export default function PublicCreatorCard() {
   if (loading) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#f6f8fc]">
-        <p className="text-sm text-[#7d899f]">
-          Loading creator card…
-        </p>
+        <p className="text-sm text-[#7d899f]">Loading creator card…</p>
       </main>
     );
   }
@@ -49,8 +44,7 @@ export default function PublicCreatorCard() {
             Creator card not found
           </h1>
           <p className="mt-2 text-sm text-[#7d899f]">
-            {error ||
-              "This public card is unavailable."}
+            {error || "This public card is unavailable."}
           </p>
           <Link
             to="/"
@@ -67,9 +61,7 @@ export default function PublicCreatorCard() {
   let industries: string[] = [];
 
   try {
-    industries = JSON.parse(
-      card.industries || "[]",
-    );
+    industries = JSON.parse(card.industries || "[]");
   } catch {
     industries = [];
   }
@@ -110,15 +102,11 @@ export default function PublicCreatorCard() {
             </h1>
 
             <p className="mt-2 text-[16px] text-[#7b879d]">
-              {card.category ||
-                card.headline ||
-                "Creator"}
+              {card.category || card.headline || "Creator"}
             </p>
 
             <p className="mx-auto mt-6 max-w-[560px] text-[15px] leading-7 text-[#617089]">
-              {card.bio ||
-                card.headline ||
-                "Creator on Naano."}
+              {card.bio || card.headline || "Creator on Naano."}
             </p>
 
             {industries.length > 0 && (
@@ -139,27 +127,21 @@ export default function PublicCreatorCard() {
                 <p className="text-2xl font-semibold text-[#182239]">
                   {card.followers.toLocaleString()}
                 </p>
-                <p className="mt-1 text-xs text-[#8794aa]">
-                  Followers
-                </p>
+                <p className="mt-1 text-xs text-[#8794aa]">Followers</p>
               </div>
 
               <div className="border-x border-[#e8ecf2]">
                 <p className="text-2xl font-semibold text-[#182239]">
                   {card.impressions.toLocaleString()}
                 </p>
-                <p className="mt-1 text-xs text-[#8794aa]">
-                  Impressions
-                </p>
+                <p className="mt-1 text-xs text-[#8794aa]">Impressions</p>
               </div>
 
               <div>
                 <p className="text-2xl font-semibold text-[#182239]">
                   {card.post_count.toLocaleString()}
                 </p>
-                <p className="mt-1 text-xs text-[#8794aa]">
-                  Posts
-                </p>
+                <p className="mt-1 text-xs text-[#8794aa]">Posts</p>
               </div>
             </div>
 

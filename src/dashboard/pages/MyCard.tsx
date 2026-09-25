@@ -1,10 +1,4 @@
-import {
-  Copy,
-  ExternalLink,
-  Pencil,
-  Save,
-  Share2,
-} from "lucide-react";
+import { Copy, ExternalLink, Pencil, Save, Share2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -22,8 +16,7 @@ import {
 } from "@/lib/dashboard";
 
 export default function MyCard() {
-  const [profile, setProfile] =
-    useState<CreatorProfile | null>(null);
+  const [profile, setProfile] = useState<CreatorProfile | null>(null);
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState({
     headline: "",
@@ -53,25 +46,19 @@ export default function MyCard() {
   }, []);
 
   const publicUrl = useMemo(
-    () =>
-      profile?.slug
-        ? getPublicCardUrl(profile.slug)
-        : "",
+    () => (profile?.slug ? getPublicCardUrl(profile.slug) : ""),
     [profile?.slug],
   );
 
   const save = async () => {
     try {
-      const { data } =
-        await updateCreatorProfile(draft);
+      const { data } = await updateCreatorProfile(draft);
 
       setProfile(data);
       setOpen(false);
     } catch (value) {
       setError(
-        value instanceof Error
-          ? value.message
-          : "Unable to save your card.",
+        value instanceof Error ? value.message : "Unable to save your card.",
       );
     }
   };
@@ -81,16 +68,11 @@ export default function MyCard() {
       return;
     }
 
-    await navigator.clipboard.writeText(
-      publicUrl,
-    );
+    await navigator.clipboard.writeText(publicUrl);
 
     setCopied(true);
 
-    window.setTimeout(
-      () => setCopied(false),
-      1600,
-    );
+    window.setTimeout(() => setCopied(false), 1600);
   };
 
   const share = async () => {
@@ -101,9 +83,7 @@ export default function MyCard() {
     if (navigator.share) {
       await navigator
         .share({
-          title:
-            (profile?.name ?? "Creator") +
-            " on Naano",
+          title: (profile?.name ?? "Creator") + " on Naano",
           url: publicUrl,
         })
         .catch(() => undefined);
@@ -133,9 +113,7 @@ export default function MyCard() {
   let industries: string[] = [];
 
   try {
-    industries = JSON.parse(
-      profile.industries || "[]",
-    );
+    industries = JSON.parse(profile.industries || "[]");
   } catch {
     industries = [];
   }
@@ -153,8 +131,7 @@ export default function MyCard() {
           </h1>
 
           <p className="mt-2 max-w-[680px] text-[16px] leading-7 text-[#78869e]">
-            Review exactly what brands can discover
-            from your Naano card.
+            Review exactly what brands can discover from your Naano card.
           </p>
         </div>
 
@@ -171,11 +148,7 @@ export default function MyCard() {
 
           <a
             href={publicUrl || "#"}
-            target={
-              publicUrl
-                ? "_blank"
-                : undefined
-            }
+            target={publicUrl ? "_blank" : undefined}
             rel="noreferrer"
             onClick={(event) => {
               if (!publicUrl) {
@@ -222,15 +195,11 @@ export default function MyCard() {
             </h2>
 
             <p className="mt-2 text-[16px] text-[#7b879d]">
-              {profile.category ||
-                profile.headline ||
-                "Creator"}
+              {profile.category || profile.headline || "Creator"}
             </p>
 
             <p className="mx-auto mt-6 max-w-[640px] text-[15px] leading-7 text-[#64728a]">
-              {profile.bio ||
-                profile.headline ||
-                "Complete your card profile."}
+              {profile.bio || profile.headline || "Complete your card profile."}
             </p>
 
             {industries.length > 0 && (
@@ -251,27 +220,21 @@ export default function MyCard() {
                 <p className="text-2xl font-semibold text-[#182239]">
                   {profile.followers.toLocaleString()}
                 </p>
-                <p className="mt-1 text-xs text-[#8794aa]">
-                  Followers
-                </p>
+                <p className="mt-1 text-xs text-[#8794aa]">Followers</p>
               </div>
 
               <div className="border-x border-[#e8ecf2]">
                 <p className="text-2xl font-semibold text-[#182239]">
                   {profile.impressions.toLocaleString()}
                 </p>
-                <p className="mt-1 text-xs text-[#8794aa]">
-                  Impressions
-                </p>
+                <p className="mt-1 text-xs text-[#8794aa]">Impressions</p>
               </div>
 
               <div>
                 <p className="text-2xl font-semibold text-[#182239]">
                   {profile.post_count.toLocaleString()}
                 </p>
-                <p className="mt-1 text-xs text-[#8794aa]">
-                  Posts
-                </p>
+                <p className="mt-1 text-xs text-[#8794aa]">Posts</p>
               </div>
             </div>
           </div>
@@ -283,24 +246,19 @@ export default function MyCard() {
           </p>
 
           <p className="mt-3 break-all rounded-xl border border-[#e4e8ee] bg-[#f8fafc] px-4 py-3 text-sm text-[#52617b]">
-            {publicUrl ||
-              "Publish your card to create a public link."}
+            {publicUrl || "Publish your card to create a public link."}
           </p>
 
           <div className="mt-4 grid gap-2">
             <Button
               type="button"
               variant="outline"
-              onClick={() =>
-                void copyLink()
-              }
+              onClick={() => void copyLink()}
               disabled={!publicUrl}
               className="cursor-pointer justify-start"
             >
               <Copy className="mr-2 h-4 w-4" />
-              {copied
-                ? "Copied"
-                : "Copy link"}
+              {copied ? "Copied" : "Copy link"}
             </Button>
 
             <Button
@@ -326,9 +284,7 @@ export default function MyCard() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-[620px]">
           <DialogHeader>
-            <DialogTitle>
-              Edit creator card
-            </DialogTitle>
+            <DialogTitle>Edit creator card</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
@@ -336,25 +292,17 @@ export default function MyCard() {
               ["headline", "Headline"],
               ["category", "Category"],
             ].map(([key, label]) => (
-              <label
-                key={key}
-                className="block"
-              >
+              <label key={key} className="block">
                 <span className="mb-2 block text-xs font-semibold text-[#626a78]">
                   {label}
                 </span>
 
                 <input
-                  value={
-                    draft[
-                      key as keyof typeof draft
-                    ]
-                  }
+                  value={draft[key as keyof typeof draft]}
                   onChange={(event) =>
                     setDraft({
                       ...draft,
-                      [key]:
-                        event.target.value,
+                      [key]: event.target.value,
                     })
                   }
                   className="auth-input"
