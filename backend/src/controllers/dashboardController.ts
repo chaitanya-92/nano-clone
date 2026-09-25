@@ -3,14 +3,9 @@ import { requireAuth } from "../middleware/authMiddleware";
 import { db } from "../db/client";
 import { json, now } from "../utils/api";
 
-function ensureCreatorProfile(
-  userId: string,
-  name: string,
-) {
+function ensureCreatorProfile(userId: string, name: string) {
   let profile = db
-    .prepare(
-      "SELECT * FROM creator_profiles WHERE user_id = ?",
-    )
+    .prepare("SELECT * FROM creator_profiles WHERE user_id = ?")
     .get(userId) as Record<string, unknown> | undefined;
 
   if (!profile) {
@@ -18,31 +13,18 @@ function ensureCreatorProfile(
 
     db.prepare(
       "INSERT INTO creator_profiles (user_id, name, created_at, updated_at) VALUES (?, ?, ?, ?)",
-    ).run(
-      userId,
-      name,
-      timestamp,
-      timestamp,
-    );
+    ).run(userId, name, timestamp, timestamp);
 
     profile = db
-      .prepare(
-        "SELECT * FROM creator_profiles WHERE user_id = ?",
-      )
+      .prepare("SELECT * FROM creator_profiles WHERE user_id = ?")
       .get(userId) as Record<string, unknown>;
   }
 
   return profile;
 }
 
-export function dashboard(
-  request: IncomingMessage,
-  response: ServerResponse,
-) {
-  const user = requireAuth(
-    request,
-    response,
-  );
+export function dashboard(request: IncomingMessage, response: ServerResponse) {
+  const user = requireAuth(request, response);
 
   if (!user) {
     return;
@@ -50,9 +32,7 @@ export function dashboard(
 
   if (user.role === "brand") {
     const stats = db
-      .prepare(
-        "SELECT COUNT(*) AS campaigns FROM campaigns WHERE brand_id = ?",
-      )
+      .prepare("SELECT COUNT(*) AS campaigns FROM campaigns WHERE brand_id = ?")
       .get(user.id) as {
       campaigns: number;
     };
@@ -81,35 +61,23 @@ export function dashboard(
       count: number;
     };
 
-    return json(
-      response,
-      200,
-      {
-        data: {
-          role: "brand",
-          metrics: {
-            campaigns: stats.campaigns,
-            creators_activated:
-              activated.count,
-            posts_published:
-              posts.count,
-            impressions:
-              impressions.count,
-          },
+    return json(response, 200, {
+      data: {
+        role: "brand",
+        metrics: {
+          campaigns: stats.campaigns,
+          creators_activated: activated.count,
+          posts_published: posts.count,
+          impressions: impressions.count,
         },
       },
-    );
+    });
   }
 
-  const profile = ensureCreatorProfile(
-    user.id,
-    user.name,
-  );
+  const profile = ensureCreatorProfile(user.id, user.name);
 
   const applications = db
-    .prepare(
-      "SELECT COUNT(*) AS count FROM applications WHERE creator_id = ?",
-    )
+    .prepare("SELECT COUNT(*) AS count FROM applications WHERE creator_id = ?")
     .get(user.id) as {
     count: number;
   };
@@ -137,32 +105,20 @@ export function dashboard(
     )
     .all(user.id);
 
-  return json(
-    response,
-    200,
-    {
-      data: {
-        role: "creator",
-        profile,
-        metrics: {
-          followers:
-            Number(profile.followers ?? 0),
-          posts:
-            Number(profile.post_count ?? 0),
-          impressions:
-            Number(profile.impressions ?? 0),
-          engagements:
-            Number(
-              profile.engagement_count ?? 0,
-            ),
-          applications:
-            applications.count,
-          collaborations:
-            collaborations.count,
-        },
-        earnings,
-        notifications,
+  return json(response, 200, {
+    data: {
+      role: "creator",
+      profile,
+      metrics: {
+        followers: Number(profile.followers ?? 0),
+        posts: Number(profile.post_count ?? 0),
+        impressions: Number(profile.impressions ?? 0),
+        engagements: Number(profile.engagement_count ?? 0),
+        applications: applications.count,
+        collaborations: collaborations.count,
       },
+      earnings,
+      notifications,
     },
-  );
+  });
 }

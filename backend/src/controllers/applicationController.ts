@@ -145,10 +145,7 @@ export async function updateApplication(
     now(),
     id,
   );
-  if (
-    status === "accepted" &&
-    user.role === "brand"
-  ) {
+  if (status === "accepted" && user.role === "brand") {
     const existing = db
       .prepare("SELECT id FROM collaborations WHERE application_id=?")
       .get(id);
