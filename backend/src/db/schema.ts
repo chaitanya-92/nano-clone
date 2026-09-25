@@ -55,6 +55,39 @@ export function initializeDatabase() {
       updated_at TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS social_accounts (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      provider TEXT NOT NULL CHECK(provider IN ('linkedin','x')),
+      provider_user_id TEXT,
+      username TEXT,
+      profile_url TEXT,
+      profile_image_url TEXT,
+      status TEXT NOT NULL DEFAULT 'pending',
+      verified_at TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      UNIQUE(user_id, provider)
+    );
+
+    CREATE TABLE IF NOT EXISTS website_analyses (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      website TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pending',
+      company_name TEXT NOT NULL DEFAULT '',
+      description TEXT NOT NULL DEFAULT '',
+      value_proposition TEXT NOT NULL DEFAULT '',
+      industries TEXT NOT NULL DEFAULT '[]',
+      audience_signals TEXT NOT NULL DEFAULT '[]',
+      social_links TEXT NOT NULL DEFAULT '[]',
+      raw_title TEXT NOT NULL DEFAULT '',
+      raw_description TEXT NOT NULL DEFAULT '',
+      error_message TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
     CREATE TABLE IF NOT EXISTS creator_targets (
       id TEXT PRIMARY KEY,
       creator_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -247,6 +280,8 @@ export function initializeDatabase() {
     );
 
     CREATE INDEX IF NOT EXISTS sessions_user_id_idx ON sessions(user_id);
+    CREATE INDEX IF NOT EXISTS social_accounts_user_id_idx ON social_accounts(user_id);
+    CREATE INDEX IF NOT EXISTS website_analyses_user_id_idx ON website_analyses(user_id);
     CREATE INDEX IF NOT EXISTS sessions_expires_at_idx ON sessions(expires_at);
   `);
 }
