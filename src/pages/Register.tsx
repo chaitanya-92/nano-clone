@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import { Eye, EyeOff, Globe2, Linkedin, Building2, UserRound, BadgeCheck } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Globe2, Linkedin, Building2, UserRound, BadgeCheck } from "lucide-react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { OnboardingShell } from "@/auth/components/OnboardingShell";
 import { FieldError } from "@/auth/components/FieldError";
