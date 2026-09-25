@@ -142,18 +142,20 @@ export async function connectSocial(
     );
   }
 
-  let fetchedProfile;
+  let fetchedProfile = null;
 
   try {
-    fetchedProfile = await fetchPublicSocialProfile(provider, profileUrl);
+    fetchedProfile =
+      await fetchPublicSocialProfile(
+        provider,
+        profileUrl,
+      );
   } catch (profileError) {
-    return error(
-      response,
-      422,
-      "PROFILE_FETCH_FAILED",
+    console.warn(
+      "Social profile refresh unavailable:",
       profileError instanceof Error
         ? profileError.message
-        : "The public social profile could not be fetched.",
+        : profileError,
     );
   }
 
@@ -166,9 +168,9 @@ export async function connectSocial(
     id,
     user.id,
     provider,
-    fetchedProfile.username,
+    fetchedProfile?.username ?? null,
     profileUrl,
-    fetchedProfile.profileImageUrl,
+    fetchedProfile?.profileImageUrl ?? null,
     "connected",
     t,
     t,
@@ -180,10 +182,10 @@ export async function connectSocial(
       "UPDATE creator_profiles SET linkedin_url=?,name=COALESCE(NULLIF(?,''),name),headline=COALESCE(NULLIF(?,''),headline),profile_photo_url=COALESCE(NULLIF(?,''),profile_photo_url),followers=COALESCE(?,followers),updated_at=? WHERE user_id=?",
     ).run(
       profileUrl,
-      fetchedProfile.name,
-      fetchedProfile.headline,
-      fetchedProfile.profileImageUrl,
-      fetchedProfile.followers,
+      fetchedProfile?.name ?? null,
+      fetchedProfile?.headline ?? null,
+      fetchedProfile?.profileImageUrl ?? null,
+      fetchedProfile?.followers ?? null,
       t,
       user.id,
     );
@@ -194,10 +196,10 @@ export async function connectSocial(
       "UPDATE creator_profiles SET x_profile_url=?,name=COALESCE(NULLIF(?,''),name),bio=COALESCE(NULLIF(?,''),bio),profile_photo_url=COALESCE(NULLIF(?,''),profile_photo_url),followers=COALESCE(?,followers),updated_at=? WHERE user_id=?",
     ).run(
       profileUrl,
-      fetchedProfile.name,
-      fetchedProfile.bio,
-      fetchedProfile.profileImageUrl,
-      fetchedProfile.followers,
+      fetchedProfile?.name ?? null,
+      fetchedProfile?.bio ?? null,
+      fetchedProfile?.profileImageUrl ?? null,
+      fetchedProfile?.followers ?? null,
       t,
       user.id,
     );
@@ -208,6 +210,8 @@ export async function connectSocial(
       provider,
       profileUrl,
       fetchedProfile,
+      refreshAvailable:
+        Boolean(fetchedProfile),
     },
   });
 }
