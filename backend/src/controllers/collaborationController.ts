@@ -66,7 +66,8 @@ export function listCollaborations(
             LIMIT 1
           ),
           0
-        ) AS net_amount_cents
+        ) AS net_amount_cents,
+        ca.currency AS currency
       FROM collaborations c
       JOIN campaigns ca ON ca.id = c.campaign_id
       JOIN users u ON u.id = c.creator_id

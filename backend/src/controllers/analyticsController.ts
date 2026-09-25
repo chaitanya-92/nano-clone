@@ -55,26 +55,47 @@ export function analytics(
 
   const profile = (db
     .prepare(
-      "SELECT followers, impressions, engagement_count, post_count FROM creator_profiles WHERE user_id = ?",
+      "SELECT followers FROM creator_profiles WHERE user_id = ?",
     )
     .get(user.id) as
     | {
         followers: number;
-        impressions: number;
-        engagement_count: number;
-        post_count: number;
       }
     | undefined) ?? {
     followers: 0,
-    impressions: 0,
-    engagement_count: 0,
-    post_count: 0,
   };
+
+  const profileTotals = db
+    .prepare(
+      `SELECT
+        COALESCE(SUM(impressions), 0) AS impressions,
+        COALESCE(SUM(engagements), 0) AS engagement_count,
+        COUNT(*) AS post_count
+       FROM analytics_posts
+       WHERE creator_id = ?
+       ${where}`,
+    )
+    .get(...args) as {
+      impressions: number;
+      engagement_count: number;
+      post_count: number;
+    };
 
   return json(response, 200, {
     data: {
       range,
-      profile,
+      profile: {
+        followers: Number(profile.followers ?? 0),
+        impressions: Number(
+          profileTotals.impressions ?? 0,
+        ),
+        engagement_count: Number(
+          profileTotals.engagement_count ?? 0,
+        ),
+        post_count: Number(
+          profileTotals.post_count ?? 0,
+        ),
+      },
       summary,
       posts,
     },
