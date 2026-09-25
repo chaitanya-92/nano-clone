@@ -57,7 +57,7 @@ export default function Analytics() {
       posts: data?.summary.posts ?? 0,
       reach: data?.summary.reach ?? 0,
       engagements: data?.summary.engagements ?? 0,
-      followers: data?.profile.followers ?? 0,
+      followers: data?.profile?.followers ?? 0,
     }),
     [data],
   );
