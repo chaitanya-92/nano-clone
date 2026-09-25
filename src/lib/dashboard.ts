@@ -1,21 +1,34 @@
 import type { User } from "@/features/authSlice";
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8787";
+const API_URL =
+  import.meta.env.VITE_API_URL ?? "http://localhost:8787";
 
-async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const response = await fetch(API_URL + path, {
-    ...options,
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
+async function request<T>(
+  path: string,
+  options: RequestInit = {},
+): Promise<T> {
+  const response = await fetch(
+    API_URL + path,
+    {
+      ...options,
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
     },
-  });
+  );
 
-  const body = await response.json().catch(() => ({}));
+  const body = await response
+    .json()
+    .catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(body?.error?.message ?? body?.error ?? "Request failed.");
+    throw new Error(
+      body?.error?.message ??
+        body?.error ??
+        "Request failed.",
+    );
   }
 
   return body;
@@ -87,6 +100,7 @@ export interface Collaboration {
   impressions: number;
   engagements: number;
   net_amount_cents: number;
+  currency: string;
 }
 
 export interface AnalyticsResponse {
@@ -194,22 +208,32 @@ export interface CommunityResponse {
 }
 
 export function getDashboard() {
-  return request<DashboardResponse>("/api/dashboard");
+  return request<DashboardResponse>(
+    "/api/dashboard",
+  );
 }
 
 export function getCreatorProfile() {
-  return request<{ data: CreatorProfile }>("/api/creator/profile");
+  return request<{
+    data: CreatorProfile;
+  }>("/api/creator/profile");
 }
 
-export function updateCreatorProfile(payload: Record<string, unknown>) {
-  return request<{ data: CreatorProfile }>("/api/creator/profile", {
+export function updateCreatorProfile(
+  payload: Record<string, unknown>,
+) {
+  return request<{
+    data: CreatorProfile;
+  }>("/api/creator/profile", {
     method: "PATCH",
     body: JSON.stringify(payload),
   });
 }
 
 export function getCampaigns() {
-  return request<{ data: Campaign[] }>("/api/campaigns");
+  return request<{
+    data: Campaign[];
+  }>("/api/campaigns");
 }
 
 export function getApplications() {
@@ -227,49 +251,80 @@ export function applyToCampaign(
 ) {
   return request<{
     data: Record<string, unknown>;
-  }>("/api/campaigns/" + campaignId + "/applications", {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
+  }>(
+    "/api/campaigns/" +
+      campaignId +
+      "/applications",
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+  );
 }
 
 export function getCollaborations() {
-  return request<{ data: Collaboration[] }>("/api/collaborations");
+  return request<{
+    data: Collaboration[];
+  }>("/api/collaborations");
 }
 
 export function updateCollaboration(
   id: string,
   payload: Record<string, unknown>,
 ) {
-  return request<{ data: Collaboration }>("/api/collaborations/" + id, {
-    method: "PATCH",
-    body: JSON.stringify(payload),
-  });
+  return request<{
+    data: Collaboration;
+  }>(
+    "/api/collaborations/" +
+      id,
+    {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    },
+  );
 }
 
-export function getAnalytics(range: "all" | "30d" | "90d") {
-  return request<AnalyticsResponse>("/api/analytics?range=" + range);
+export function getAnalytics(
+  range: "all" | "30d" | "90d",
+) {
+  return request<AnalyticsResponse>(
+    "/api/analytics?range=" +
+      range,
+  );
 }
 
 export function getEarnings() {
-  return request<EarningsResponse>("/api/earnings");
+  return request<EarningsResponse>(
+    "/api/earnings",
+  );
 }
 
 export function getPayoutMethods() {
-  return request<{ data: PayoutMethod[] }>("/api/earnings/payout-methods");
+  return request<{
+    data: PayoutMethod[];
+  }>("/api/earnings/payout-methods");
 }
 
-export function addPayoutMethod(payload: { type: string; label: string }) {
-  return request<{ data: PayoutMethod }>("/api/earnings/payout-methods", {
+export function addPayoutMethod(
+  payload: {
+    type: string;
+    label: string;
+  },
+) {
+  return request<{
+    data: PayoutMethod;
+  }>("/api/earnings/payout-methods", {
     method: "POST",
     body: JSON.stringify(payload),
   });
 }
 
-export function requestWithdrawal(payload: {
-  payoutMethodId: string;
-  amountCents: number;
-}) {
+export function requestWithdrawal(
+  payload: {
+    payoutMethodId: string;
+    amountCents: number;
+  },
+) {
   return request<{
     data: Record<string, unknown>;
   }>("/api/earnings/withdrawals", {
@@ -279,10 +334,14 @@ export function requestWithdrawal(payload: {
 }
 
 export function getAffiliate() {
-  return request<AffiliateResponse>("/api/affiliate");
+  return request<AffiliateResponse>(
+    "/api/affiliate",
+  );
 }
 
-export function createReferral(type: "creator" | "brand") {
+export function createReferral(
+  type: "creator" | "brand",
+) {
   return request<{
     data: {
       id: string;
@@ -297,18 +356,33 @@ export function createReferral(type: "creator" | "brand") {
 }
 
 export function getConversations() {
-  return request<{ data: Conversation[] }>("/api/conversations");
+  return request<{
+    data: Conversation[];
+  }>("/api/conversations");
 }
 
-export function getMessages(conversationId: string) {
-  return request<{ data: Message[] }>(
-    "/api/conversations/" + conversationId + "/messages",
+export function getMessages(
+  conversationId: string,
+) {
+  return request<{
+    data: Message[];
+  }>(
+    "/api/conversations/" +
+      conversationId +
+      "/messages",
   );
 }
 
-export function sendConversationMessage(conversationId: string, body: string) {
-  return request<{ data: Message }>(
-    "/api/conversations/" + conversationId + "/messages",
+export function sendConversationMessage(
+  conversationId: string,
+  body: string,
+) {
+  return request<{
+    data: Message;
+  }>(
+    "/api/conversations/" +
+      conversationId +
+      "/messages",
     {
       method: "POST",
       body: JSON.stringify({ body }),
@@ -316,9 +390,15 @@ export function sendConversationMessage(conversationId: string, body: string) {
   );
 }
 
-export function markConversationRead(conversationId: string) {
-  return request<{ ok: true }>(
-    "/api/conversations/" + conversationId + "/read",
+export function markConversationRead(
+  conversationId: string,
+) {
+  return request<{
+    ok: true;
+  }>(
+    "/api/conversations/" +
+      conversationId +
+      "/read",
     {
       method: "PATCH",
     },
@@ -326,10 +406,14 @@ export function markConversationRead(conversationId: string) {
 }
 
 export function getCommunity() {
-  return request<CommunityResponse>("/api/community");
+  return request<CommunityResponse>(
+    "/api/community",
+  );
 }
 
-export function getPublicCreatorCard(slug: string) {
+export function getPublicCreatorCard(
+  slug: string,
+) {
   return request<{
     data: {
       name: string;
@@ -344,27 +428,40 @@ export function getPublicCreatorCard(slug: string) {
       impressions: number;
       engagement_count: number;
       post_count: number;
-      profile_photo_url: string | null;
+      profile_photo_url:
+        string | null;
       price_cents: number;
       currency: string;
     };
-  }>("/api/creator/card/" + slug);
+  }>(
+    "/api/creator/card/" +
+      slug,
+  );
 }
 
-export function getPublicCardUrl(slug: string) {
-  return window.location.origin + "/creator/" + slug;
+export function getPublicCardUrl(
+  slug: string,
+) {
+  return (
+    window.location.origin +
+    "/creator/" +
+    slug
+  );
 }
 
 export function getCurrentUser() {
-  return request<{ user: User | null }>("/api/auth/me");
+  return request<{
+    user: User | null;
+  }>("/api/auth/me");
 }
 
 export function deleteAccount() {
-  return request<{ ok: true }>("/api/auth/account", {
+  return request<{
+    ok: true;
+  }>("/api/auth/account", {
     method: "DELETE",
   });
 }
-
 
 export function connectSocial(
   provider: "linkedin" | "x",
@@ -379,7 +476,8 @@ export function connectSocial(
         name: string | null;
         headline: string | null;
         bio: string | null;
-        profileImageUrl: string | null;
+        profileImageUrl:
+          string | null;
         followers: number | null;
       };
     };
