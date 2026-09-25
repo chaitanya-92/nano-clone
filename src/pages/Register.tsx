@@ -8,7 +8,6 @@ import {
   Eye,
   EyeOff,
   Globe2,
-  Linkedin,
   Plus,
   UserRound,
 } from "lucide-react";
@@ -943,7 +942,10 @@ export default function Register() {
                         }
                         className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-xl border border-[#0a66c2]/20 bg-[#f2f8fc] px-4 py-2.5 text-sm font-semibold text-[#0a66c2] disabled:cursor-not-allowed disabled:opacity-50"
                       >
-                        <Linkedin className="h-4 w-4" />
+                        <LinkedinIcon
+                          className="h-4 w-4"
+                          variant="brand"
+                        />
                         {socialStatus.linkedin === "Connected"
                           ? "Connected"
                           : "Connect LinkedIn"}
@@ -1495,10 +1497,11 @@ export default function Register() {
                               type="button"
                               onClick={() =>
                                 setActiveTerm({
+                                  key: term.key,
+                                  label: term.label,
                                   title: term.title,
                                   description: term.description,
                                   sections: term.sections,
-                                  key: term.key,
                                 })
                               }
                               className="cursor-pointer text-xs font-semibold text-[#3f4857] underline underline-offset-2 transition hover:text-[#171d2b]"
