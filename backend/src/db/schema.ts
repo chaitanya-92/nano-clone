@@ -9,8 +9,23 @@ export function initializeDatabase() {
       name TEXT NOT NULL,
       role TEXT NOT NULL CHECK(role IN ('creator', 'brand')),
       provider TEXT NOT NULL DEFAULT 'password',
+      email_verified INTEGER NOT NULL DEFAULT 0,
       created_at TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS email_verifications (
+      id TEXT PRIMARY KEY,
+      email TEXT NOT NULL,
+      code_hash TEXT NOT NULL,
+      verification_token_hash TEXT,
+      attempts INTEGER NOT NULL DEFAULT 0,
+      expires_at INTEGER NOT NULL,
+      verified_at INTEGER,
+      created_at TEXT NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS email_verifications_email_idx ON email_verifications(email);
+    CREATE INDEX IF NOT EXISTS email_verifications_expires_at_idx ON email_verifications(expires_at);
 
     CREATE TABLE IF NOT EXISTS sessions (
       id TEXT PRIMARY KEY,
@@ -284,4 +299,13 @@ export function initializeDatabase() {
     CREATE INDEX IF NOT EXISTS website_analyses_user_id_idx ON website_analyses(user_id);
     CREATE INDEX IF NOT EXISTS sessions_expires_at_idx ON sessions(expires_at);
   `);
+  migrateDatabase();
+}
+
+export function migrateDatabase() {
+  try {
+    db.exec("ALTER TABLE users ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 0");
+  } catch (error: any) {
+    if (!String(error?.message ?? "").includes("duplicate column name")) throw error;
+  }
 }
