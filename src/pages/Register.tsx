@@ -1468,7 +1468,7 @@ export default function Register() {
                         },
                       ],
                     },
-                  ].map((term: ProfessionalTerm) => (
+                  ] as ProfessionalTerm[]).map((term) => (
                     <div
                       key={term.key}
                       className="rounded-xl border border-[#e4e8ee] p-4"
