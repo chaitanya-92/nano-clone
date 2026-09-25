@@ -903,7 +903,7 @@ export default function Settings() {
                   onClick={() =>
                     setShowDelete(true)
                   }
-                  className="mt-5 h-10 cursor-pointer rounded-lg px-4"
+                  className="mt-5 h-10 cursor-pointer rounded-lg bg-[#d84343] px-4 text-white hover:bg-[#c93636] focus-visible:ring-[#d84343]/30"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete my account
@@ -993,7 +993,7 @@ export default function Settings() {
                 deleteConfirmation !==
                   "DELETE"
               }
-              className="h-10 cursor-pointer rounded-lg px-4"
+              className="h-10 cursor-pointer rounded-lg bg-[#d84343] px-4 text-white hover:bg-[#c93636] focus-visible:ring-[#d84343]/30"
             >
               {busy && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
