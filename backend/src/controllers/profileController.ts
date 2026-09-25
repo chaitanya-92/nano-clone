@@ -24,18 +24,83 @@ export function getPublicCard(
     return error(response, 404, "CARD_NOT_FOUND", "Creator card not found.");
   return json(response, 200, { data: profile });
 }
-export function getProfile(request: IncomingMessage, response: ServerResponse) {
+export function getProfile(
+  request: IncomingMessage,
+  response: ServerResponse,
+) {
   const user = requireAuth(request, response);
-  if (!user) return;
-  if (user.role === "creator")
+
+  if (!user) {
+    return;
+  }
+
+  const isCreatorRoute =
+    request.url?.startsWith(
+      "/api/creator/profile",
+    ) ?? false;
+
+  if (
+    isCreatorRoute &&
+    user.role !== "creator"
+  ) {
+    return error(
+      response,
+      403,
+      "CREATOR_ACCOUNT_REQUIRED",
+      "Creator account required.",
+    );
+  }
+
+  if (
+    !isCreatorRoute &&
+    user.role !== "brand"
+  ) {
+    return error(
+      response,
+      403,
+      "BRAND_ACCOUNT_REQUIRED",
+      "Brand account required.",
+    );
+  }
+
+  if (user.role === "creator") {
+    let profile = db
+      .prepare(
+        "SELECT * FROM creator_profiles WHERE user_id = ?",
+      )
+      .get(user.id) as
+      | Record<string, unknown>
+      | undefined;
+
+    if (!profile) {
+      const timestamp = now();
+
+      db.prepare(
+        "INSERT INTO creator_profiles (user_id, name, created_at, updated_at) VALUES (?, ?, ?, ?)",
+      ).run(
+        user.id,
+        user.name,
+        timestamp,
+        timestamp,
+      );
+
+      profile = db
+        .prepare(
+          "SELECT * FROM creator_profiles WHERE user_id = ?",
+        )
+        .get(user.id) as Record<string, unknown>;
+    }
+
     return json(response, 200, {
-      data: db
-        .prepare("SELECT * FROM creator_profiles WHERE user_id=?")
-        .get(user.id),
+      data: profile,
     });
+  }
+
   return json(response, 200, {
     data: db
-      .prepare("SELECT * FROM brand_profiles WHERE user_id=?")
+      .prepare(
+        "SELECT * FROM brand_profiles WHERE user_id = ?",
+      )
       .get(user.id),
   });
 }
@@ -47,9 +112,42 @@ export async function patchProfile(
   if (!user) return;
   const body = await readJson(request);
   if (user.role === "creator") {
-    const p = db
-      .prepare("SELECT * FROM creator_profiles WHERE user_id=?")
-      .get(user.id) as any;
+    if (user.role !== "creator") {
+      return error(
+        response,
+        403,
+        "CREATOR_ACCOUNT_REQUIRED",
+        "Creator account required.",
+      );
+    }
+
+    let p = db
+      .prepare(
+        "SELECT * FROM creator_profiles WHERE user_id = ?",
+      )
+      .get(user.id) as
+      | Record<string, unknown>
+      | undefined;
+
+    if (!p) {
+      const timestamp = now();
+
+      db.prepare(
+        "INSERT INTO creator_profiles (user_id, name, created_at, updated_at) VALUES (?, ?, ?, ?)",
+      ).run(
+        user.id,
+        user.name,
+        timestamp,
+        timestamp,
+      );
+
+      p = db
+        .prepare(
+          "SELECT * FROM creator_profiles WHERE user_id = ?",
+        )
+        .get(user.id) as Record<string, unknown>;
+    }
+
     db.prepare(
       "UPDATE creator_profiles SET name=?,headline=?,category=?,bio=?,linkedin_url=?,x_profile_url=?,price_cents=?,updated_at=? WHERE user_id=?",
     ).run(

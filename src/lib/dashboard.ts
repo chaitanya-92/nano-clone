@@ -364,3 +364,17 @@ export function deleteAccount() {
     method: "DELETE",
   });
 }
+
+export function getSocialAccounts() {
+  return request<{
+    data: Array<{
+      id: string;
+      provider: "linkedin" | "x";
+      username: string | null;
+      profile_url: string | null;
+      profile_image_url: string | null;
+      status: string;
+      verified_at: string | null;
+    }>;
+  }>("/api/social-accounts");
+}
