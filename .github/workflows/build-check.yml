@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - building/auth-onboarding
+      - fix/**
   pull_request:
     branches:
       - building/auth-onboarding
+      - fix/**
 
 jobs:
   build:
@@ -27,3 +29,6 @@ jobs:
 
       - name: Build application
         run: npm run build
+
+      - name: Lint application
+        run: npm run lint
