@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ChangeEvent } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { ArrowRight, Building2, CheckCircle2, Eye, EyeOff, Globe2, Linkedin, UserRound } from "lucide-react";
@@ -45,7 +45,7 @@ function EmailField({
   };
 
   const handleEmailChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: ChangeEvent<HTMLInputElement>,
   ) => {
     formik.handleChange(event);
     formik.setFieldTouched("email", false, false);
