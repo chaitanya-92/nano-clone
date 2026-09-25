@@ -1480,11 +1480,13 @@ export default function Register() {
                         <Checkbox
                           checked={Boolean(formik.values[term.key])}
                           onCheckedChange={(checked) =>
-                            formik.setFieldValue(term.key, Boolean(checked))
+                            formik.setFieldValue(
+                              term.key,
+                              Boolean(checked),
+                            )
                           }
-                          disabled={!readTerms[term.key]}
                           aria-label={term.label}
-                          className="mt-0.5"
+                          className="mt-0.5 cursor-pointer"
                         />
 
                         <div className="min-w-0 flex-1">
@@ -1509,11 +1511,9 @@ export default function Register() {
                               Read more
                             </button>
 
-                            {!readTerms[term.key] && (
-                              <span className="text-[11px] text-[#9aa1ad]">
-                                Read to the end to unlock
-                              </span>
-                            )}
+                            <span className="text-[11px] text-[#9aa1ad]">
+                              Optional: read the full details
+                            </span>
                           </div>
 
                           <FieldError
@@ -1535,14 +1535,7 @@ export default function Register() {
                         setActiveTerm(null);
                       }
                     }}
-                    onReadComplete={() => {
-                      if (activeTerm) {
-                        setReadTerms((terms) => ({
-                          ...terms,
-                          [activeTerm.key]: true,
-                        }));
-                      }
-                    }}
+
                   />
                 </div>
               )}{" "}
