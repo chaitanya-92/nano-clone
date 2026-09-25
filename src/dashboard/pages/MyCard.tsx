@@ -200,39 +200,48 @@ export default function MyCard() {
         1600,
       );
     } catch {
-      const textarea =
-        document.createElement(
-          "textarea",
+      try {
+        const textarea =
+          document.createElement(
+            "textarea",
+          );
+
+        textarea.value = publicUrl;
+        textarea.style.position =
+          "fixed";
+        textarea.style.opacity = "0";
+
+        document.body.appendChild(
+          textarea,
         );
 
-      textarea.value = publicUrl;
-      textarea.style.position =
-        "fixed";
-      textarea.style.opacity = "0";
-      document.body.appendChild(
-        textarea,
-      );
-      textarea.select();
-      document.execCommand("copy");
-      textarea.remove();
+        textarea.select();
+        document.execCommand(
+          "copy",
+        );
+        textarea.remove();
 
-      toast.add({
-        title: "Card link copied",
-        description:
-          "The public creator card link is ready to share.",
-        type: "success",
-        timeout: 2200,
-      });
+        toast.add({
+          title: "Card link copied",
+          description:
+            "The public creator card link is ready to share.",
+          type: "success",
+          timeout: 2200,
+        });
 
-      return;
-    } catch {
-      toast.add({
-        title: "Copy failed",
-        description:
-          "Your browser did not allow clipboard access.",
-        type: "error",
-        timeout: 2600,
-      });
+        window.setTimeout(
+          () => setCopied(false),
+          1600,
+        );
+      } catch {
+        toast.add({
+          title: "Copy failed",
+          description:
+            "Your browser did not allow clipboard access.",
+          type: "error",
+          timeout: 2600,
+        });
+      }
     }
   };
 
