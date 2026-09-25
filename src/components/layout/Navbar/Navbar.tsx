@@ -30,9 +30,7 @@ export function Navbar() {
         className={cn(
           "naano-shell flex items-center justify-between",
           "transition-[height] duration-300",
-          isScrolled
-            ? "h-16"
-            : "h-[var(--nav-height)]",
+          isScrolled ? "h-16" : "h-[var(--nav-height)]",
         )}
       >
         <Logo />

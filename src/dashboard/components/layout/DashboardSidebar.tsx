@@ -26,9 +26,21 @@ import {
 const navigation = [
   { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
   { label: "My card", href: "/dashboard/my-card", icon: WalletCards },
-  { label: "Opportunities", href: "/dashboard/opportunities", icon: BriefcaseBusiness },
-  { label: "Collaborations", href: "/dashboard/collaborations", icon: Handshake },
-  { label: "Analytics", href: "/dashboard/analytics", icon: ChartNoAxesCombined },
+  {
+    label: "Opportunities",
+    href: "/dashboard/opportunities",
+    icon: BriefcaseBusiness,
+  },
+  {
+    label: "Collaborations",
+    href: "/dashboard/collaborations",
+    icon: Handshake,
+  },
+  {
+    label: "Analytics",
+    href: "/dashboard/analytics",
+    icon: ChartNoAxesCombined,
+  },
   { label: "Community", href: "/dashboard/community", icon: Users },
   { label: "Earnings", href: "/dashboard/earnings", icon: CircleDollarSign },
   { label: "Affiliate program", href: "/dashboard/affiliate", icon: Percent },
@@ -63,9 +75,17 @@ export function DashboardSidebar() {
   }, []);
 
   return (
-    <Sidebar collapsible="icon" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} className="border-[#e8ebf0]">
+    <Sidebar
+      collapsible="icon"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      className="border-[#e8ebf0]"
+    >
       <SidebarHeader className="h-[72px] border-b border-[#e8ebf0] p-0">
-        <Link to="/dashboard" className="flex h-full items-center px-6 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
+        <Link
+          to="/dashboard"
+          className="flex h-full items-center px-6 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
+        >
           <span className="text-[25px] font-bold tracking-[-1.5px] text-[#111318] group-data-[collapsible=icon]:hidden">
             naano
           </span>

@@ -1,16 +1,12 @@
 import { useState } from "react";
-import {
-  ArrowUpRight,
-  Check,
-  ExternalLink,
-  Link2,
-  Share2,
-} from "lucide-react";
+import { ArrowUpRight, Check, ExternalLink, Link2, Share2 } from "lucide-react";
 import { LinkedinIcon } from "@/components/ui/icons/linkedin-icon";
 import { communityData } from "../data/dashboardData";
 
 export default function Community() {
-  const [leaderboardMetric, setLeaderboardMetric] = useState<"impressions" | "posts">("impressions");
+  const [leaderboardMetric, setLeaderboardMetric] = useState<
+    "impressions" | "posts"
+  >("impressions");
 
   return (
     <div className="min-h-[calc(100vh-72px)] w-full bg-[#edf5ff]">
@@ -42,7 +38,10 @@ export default function Community() {
             <LinkedInCard />
           </section>
 
-          <Leaderboard metric={leaderboardMetric} setMetric={setLeaderboardMetric} />
+          <Leaderboard
+            metric={leaderboardMetric}
+            setMetric={setLeaderboardMetric}
+          />
         </div>
       </div>
     </div>
@@ -58,7 +57,10 @@ function SlackCard() {
 
           <div className="mt-5 flex -space-x-2">
             {["E", "T", "J", "M", "K", "R", "S", "D"].map((letter, index) => (
-              <div key={`${letter}-${index}`} className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#dce7f5] text-[10px] font-semibold text-[#52617b]">
+              <div
+                key={`${letter}-${index}`}
+                className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#dce7f5] text-[10px] font-semibold text-[#52617b]"
+              >
                 {letter}
               </div>
             ))}
@@ -96,7 +98,10 @@ function SlackCard() {
         ))}
       </div>
 
-      <button type="button" className="mt-10 flex h-[52px] w-full items-center justify-between rounded-[15px] bg-white px-5 text-[14px] font-semibold text-[#245be8] shadow-[0_8px_24px_rgba(41,79,136,0.13)] transition-transform hover:-translate-y-0.5">
+      <button
+        type="button"
+        className="mt-10 flex h-[52px] w-full items-center justify-between rounded-[15px] bg-white px-5 text-[14px] font-semibold text-[#245be8] shadow-[0_8px_24px_rgba(41,79,136,0.13)] transition-transform hover:-translate-y-0.5"
+      >
         <div className="flex items-center gap-3">
           <SlackLogo small />
           <span>{communityData.slack.action}</span>
@@ -173,7 +178,10 @@ function LinkedInCard() {
         <CreatorCardPreview />
       </div>
 
-      <button type="button" className="mt-5 flex h-[51px] w-full items-center justify-between rounded-[14px] bg-[#2864f0] px-5 text-[14px] font-semibold text-white transition-colors hover:bg-[#1e57dc]">
+      <button
+        type="button"
+        className="mt-5 flex h-[51px] w-full items-center justify-between rounded-[14px] bg-[#2864f0] px-5 text-[14px] font-semibold text-white transition-colors hover:bg-[#1e57dc]"
+      >
         <div className="flex items-center gap-3">
           <Share2 className="h-4 w-4" strokeWidth={1.8} />
           {communityData.linkedin.action}
@@ -239,7 +247,9 @@ function CreatorCardPreview() {
           <div className="text-[21px] font-semibold text-[#202637]">
             {creator.impressions}
           </div>
-          <div className="mt-1 text-[10px] text-[#8994a7]">Est. impressions</div>
+          <div className="mt-1 text-[10px] text-[#8994a7]">
+            Est. impressions
+          </div>
         </div>
 
         <div className="py-4 text-center">
@@ -306,7 +316,9 @@ function Leaderboard({
 
       <div>
         {creators.map((creator) => {
-          const numericImpressions = Number(creator.impressions.replace(/K/i, ""));
+          const numericImpressions = Number(
+            creator.impressions.replace(/K/i, ""),
+          );
 
           const numericValue =
             metric === "impressions" ? numericImpressions : creator.posts;
@@ -314,12 +326,13 @@ function Leaderboard({
           const width = Math.max((numericValue / maxValue) * 100, 5);
 
           const value =
-            metric === "impressions"
-              ? creator.impressions
-              : `${creator.posts}`;
+            metric === "impressions" ? creator.impressions : `${creator.posts}`;
 
           return (
-            <div key={creator.rank} className="grid min-h-[68px] grid-cols-[60px_minmax(260px,1fr)_minmax(300px,1.4fr)_90px] items-center gap-4 border-b border-[#edf0f4] px-6 last:border-b-0 hover:bg-[#fafcff]">
+            <div
+              key={creator.rank}
+              className="grid min-h-[68px] grid-cols-[60px_minmax(260px,1fr)_minmax(300px,1.4fr)_90px] items-center gap-4 border-b border-[#edf0f4] px-6 last:border-b-0 hover:bg-[#fafcff]"
+            >
               <div className="flex justify-center">
                 <Rank rank={creator.rank} />
               </div>
@@ -346,7 +359,10 @@ function Leaderboard({
 
               <div className="flex items-center gap-4">
                 <div className="h-[5px] flex-1 overflow-hidden rounded-full bg-[#e9edf3]">
-                  <div className="h-full rounded-full bg-[#2864f0] transition-all duration-300" style={{ width: `${width}%` }} />
+                  <div
+                    className="h-full rounded-full bg-[#2864f0] transition-all duration-300"
+                    style={{ width: `${width}%` }}
+                  />
                 </div>
 
                 <span className="min-w-[125px] text-right text-[9px] text-[#909bad]">
@@ -392,11 +408,7 @@ function Rank({ rank }: { rank: number }) {
     );
   }
 
-  return (
-    <span className="text-[13px] font-medium text-[#77849b]">
-      {rank}
-    </span>
-  );
+  return <span className="text-[13px] font-medium text-[#77849b]">{rank}</span>;
 }
 
 function SlackLogo({ small = false }: { small?: boolean }) {

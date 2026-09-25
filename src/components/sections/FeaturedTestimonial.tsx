@@ -49,8 +49,7 @@ export function FeaturedTestimonial() {
                 index={index}
                 total={quoteWords.length + 2}
                 progress={quoteProgress}
-              />
-              {" "}
+              />{" "}
             </span>
           ))}
 
@@ -81,13 +80,9 @@ export function FeaturedTestimonial() {
             {person.name}
           </p>
 
-          <p className="mt-1 text-[15px] text-[#737982]">
-            {person.role}
-          </p>
+          <p className="mt-1 text-[15px] text-[#737982]">{person.role}</p>
 
-          <p className="mt-1 text-[15px] text-[#aeb2b8]">
-            {person.category}
-          </p>
+          <p className="mt-1 text-[15px] text-[#aeb2b8]">{person.category}</p>
         </div>
       </div>
     </section>

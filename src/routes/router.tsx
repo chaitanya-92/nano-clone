@@ -6,7 +6,6 @@ import { useScrollRestoration } from "@/hooks/useScrollRestoration";
 import { dashboardRoutes } from "@/dashboard/dashboardRoutes";
 import NotFound from "@/pages/NotFound";
 
-
 function RootLayout() {
   useScrollRestoration();
 

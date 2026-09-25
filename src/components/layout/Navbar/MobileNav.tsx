@@ -11,11 +11,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 
-import {
-  navItems,
-  resourceLinks,
-  navigationActions,
-} from "@/data/data";
+import { navItems, resourceLinks, navigationActions } from "@/data/data";
 
 export function MobileNav() {
   const navigate = (href: string) => {
@@ -43,10 +39,7 @@ export function MobileNav() {
             />
           }
         >
-          <Menu
-            className="h-5 w-5"
-            strokeWidth={1.8}
-          />
+          <Menu className="h-5 w-5" strokeWidth={1.8} />
         </SheetTrigger>
 
         <SheetContent
@@ -118,9 +111,7 @@ export function MobileNav() {
             {/* Actions */}
             <div className="mt-8 flex flex-col gap-3">
               <SheetClose
-                onClick={() =>
-                  navigate(navigationActions.signIn.href)
-                }
+                onClick={() => navigate(navigationActions.signIn.href)}
                 className="
                   inline-flex
                   h-11
@@ -145,9 +136,7 @@ export function MobileNav() {
               </SheetClose>
 
               <SheetClose
-                onClick={() =>
-                  navigate(navigationActions.signUp.href)
-                }
+                onClick={() => navigate(navigationActions.signUp.href)}
                 className="
                   inline-flex
                   h-11

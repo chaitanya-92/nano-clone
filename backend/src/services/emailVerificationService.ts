@@ -45,14 +45,23 @@ async function sendVerificationEmail(email: string, code: string) {
 
 export async function requestEmailVerification(email: string) {
   const normalizedEmail = email.trim().toLowerCase();
-  const existing = db.prepare("SELECT id FROM users WHERE email = ?").get(normalizedEmail);
+  const existing = db
+    .prepare("SELECT id FROM users WHERE email = ?")
+    .get(normalizedEmail);
 
   if (existing) {
     throw new Error("An account already exists for this email.");
   }
 
-  const recent = db.prepare("SELECT created_at FROM email_verifications WHERE email = ? ORDER BY created_at DESC LIMIT 1").get(normalizedEmail) as { created_at?: string } | undefined;
-  if (recent?.created_at && Date.now() - new Date(recent.created_at).getTime() < RESEND_COOLDOWN_MS) {
+  const recent = db
+    .prepare(
+      "SELECT created_at FROM email_verifications WHERE email = ? ORDER BY created_at DESC LIMIT 1",
+    )
+    .get(normalizedEmail) as { created_at?: string } | undefined;
+  if (
+    recent?.created_at &&
+    Date.now() - new Date(recent.created_at).getTime() < RESEND_COOLDOWN_MS
+  ) {
     throw new Error("Please wait before requesting another code.");
   }
 
@@ -61,17 +70,29 @@ export async function requestEmailVerification(email: string) {
   const expiresAt = Date.now() + OTP_TTL_MS;
   const createdAt = new Date().toISOString();
 
-  db.prepare("DELETE FROM email_verifications WHERE email = ? AND verified_at IS NULL").run(normalizedEmail);
-  db.prepare(`
+  db.prepare(
+    "DELETE FROM email_verifications WHERE email = ? AND verified_at IS NULL",
+  ).run(normalizedEmail);
+  db.prepare(
+    `
     INSERT INTO email_verifications
     (id, email, code_hash, attempts, expires_at, created_at)
     VALUES (?, ?, ?, 0, ?, ?)
-  `).run(verificationId, normalizedEmail, otpHash(normalizedEmail, code), expiresAt, createdAt);
+  `,
+  ).run(
+    verificationId,
+    normalizedEmail,
+    otpHash(normalizedEmail, code),
+    expiresAt,
+    createdAt,
+  );
 
   try {
     await sendVerificationEmail(normalizedEmail, code);
   } catch (error) {
-    db.prepare("DELETE FROM email_verifications WHERE id = ?").run(verificationId);
+    db.prepare("DELETE FROM email_verifications WHERE id = ?").run(
+      verificationId,
+    );
     throw error;
   }
 
@@ -80,7 +101,11 @@ export async function requestEmailVerification(email: string) {
 
 export function verifyEmailCode(email: string, code: string) {
   const normalizedEmail = email.trim().toLowerCase();
-  const verification = db.prepare("SELECT * FROM email_verifications WHERE email = ? ORDER BY created_at DESC LIMIT 1").get(normalizedEmail) as any;
+  const verification = db
+    .prepare(
+      "SELECT * FROM email_verifications WHERE email = ? ORDER BY created_at DESC LIMIT 1",
+    )
+    .get(normalizedEmail) as any;
 
   if (!verification || verification.verified_at) {
     throw new Error("Request a new verification code.");
@@ -96,12 +121,16 @@ export function verifyEmailCode(email: string, code: string) {
 
   const expectedHash = otpHash(normalizedEmail, code.trim());
   if (expectedHash !== verification.code_hash) {
-    db.prepare("UPDATE email_verifications SET attempts = attempts + 1 WHERE id = ?").run(verification.id);
+    db.prepare(
+      "UPDATE email_verifications SET attempts = attempts + 1 WHERE id = ?",
+    ).run(verification.id);
     throw new Error("Incorrect verification code.");
   }
 
   const verificationToken = randomBytes(32).toString("base64url");
-  db.prepare("UPDATE email_verifications SET verified_at = ?, verification_token_hash = ? WHERE id = ?").run(Date.now(), hashValue(verificationToken), verification.id);
+  db.prepare(
+    "UPDATE email_verifications SET verified_at = ?, verification_token_hash = ? WHERE id = ?",
+  ).run(Date.now(), hashValue(verificationToken), verification.id);
 
   return verificationToken;
 }

@@ -1,10 +1,7 @@
 import type { ReactNode } from "react";
 import { ArrowLeft, ArrowRight, Sparkles, X } from "lucide-react";
 import { motion } from "framer-motion";
-import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Stepper } from "./Stepper";
 
 interface Props {
@@ -205,9 +202,7 @@ export function OnboardingShell({
 
   if (!modal) {
     return (
-      <div className="min-h-screen bg-[#f5f7fb] text-[#151923]">
-        {content}
-      </div>
+      <div className="min-h-screen bg-[#f5f7fb] text-[#151923]">{content}</div>
     );
   }
 
