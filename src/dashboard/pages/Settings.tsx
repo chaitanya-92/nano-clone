@@ -506,7 +506,7 @@ export default function Settings() {
 
                   <div className="mt-5 space-y-5">
                     {socialRows.map(
-                      ({ provider, label, icon: Icon, state, setState }) => (
+                      ({ provider, label, state, setState }) => (
                         <div key={provider} className="space-y-2">
                           <label
                             htmlFor={provider + "-url"}
