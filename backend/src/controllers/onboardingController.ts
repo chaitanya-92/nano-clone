@@ -1,5 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { requireAuth } from "../middleware/authMiddleware";
+import { randomBytes } from "node:crypto";
 import { db } from "../db/client";
 import { error, json, readJson, stringValue, integerValue, arrayValue, now } from "../utils/api";
 
@@ -51,7 +52,10 @@ export async function saveCard(request: IncomingMessage, response: ServerRespons
   const body = await readJson(request);
   const priceCents = integerValue(body.priceCents, -1);
   if (priceCents < 0) return error(response, 422, "INVALID_PRICE", "Price per post must be zero or greater.");
-  db.prepare("UPDATE creator_profiles SET price_cents = ?, card_status = 'published', onboarding_step = MAX(onboarding_step, 4), onboarding_status = 'completed', updated_at = ? WHERE user_id = ?").run(priceCents, now(), user.id);
+  const current = profile(user.id) as any;
+  const base = String(current?.name || user.name).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const slug = current?.slug || base + "-" + randomBytes(3).toString("hex");
+  db.prepare("UPDATE creator_profiles SET price_cents = ?, slug = ?, card_status = 'published', onboarding_step = MAX(onboarding_step, 4), onboarding_status = 'completed', updated_at = ? WHERE user_id = ?").run(priceCents, slug, now(), user.id);
   return json(response, 200, { data: profile(user.id) });
 }
 
