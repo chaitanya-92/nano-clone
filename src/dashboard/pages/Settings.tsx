@@ -53,57 +53,35 @@ const tabs = [
 export default function Settings() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const user = useAppSelector(
-    (state) => state.auth.user,
-  );
-  const [tab, setTab] =
-    useState<(typeof tabs)[number]["id"]>(
-      "profile",
-    );
-  const [profile, setProfile] =
-    useState<CreatorProfile | null>(null);
-  const [methods, setMethods] =
-    useState<PayoutMethod[]>([]);
+  const user = useAppSelector((state) => state.auth.user);
+  const [tab, setTab] = useState<(typeof tabs)[number]["id"]>("profile");
+  const [profile, setProfile] = useState<CreatorProfile | null>(null);
+  const [methods, setMethods] = useState<PayoutMethod[]>([]);
   const [name, setName] = useState("");
-  const [linkedinUrl, setLinkedinUrl] =
-    useState("");
-  const [xProfileUrl, setXProfileUrl] =
-    useState("");
-  const [methodLabel, setMethodLabel] =
-    useState("");
-  const [showMethod, setShowMethod] =
-    useState(false);
-  const [showDelete, setShowDelete] =
-    useState(false);
-  const [deleteConfirmation, setDeleteConfirmation] =
-    useState("");
+  const [linkedinUrl, setLinkedinUrl] = useState("");
+  const [xProfileUrl, setXProfileUrl] = useState("");
+  const [methodLabel, setMethodLabel] = useState("");
+  const [showMethod, setShowMethod] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    void Promise.all([
-      getCreatorProfile(),
-      getPayoutMethods(),
-    ])
+    void Promise.all([getCreatorProfile(), getPayoutMethods()])
       .then(([profileResult, payoutResult]) => {
         const creator = profileResult.data;
 
         setProfile(creator);
         setName(creator.name ?? "");
-        setLinkedinUrl(
-          creator.linkedin_url ?? "",
-        );
-        setXProfileUrl(
-          creator.x_profile_url ?? "",
-        );
+        setLinkedinUrl(creator.linkedin_url ?? "");
+        setXProfileUrl(creator.x_profile_url ?? "");
         setMethods(payoutResult.data);
       })
       .catch((value) =>
         setError(
-          value instanceof Error
-            ? value.message
-            : "Unable to load settings.",
+          value instanceof Error ? value.message : "Unable to load settings.",
         ),
       );
   }, []);
@@ -114,34 +92,22 @@ export default function Settings() {
     setSaved(false);
 
     try {
-      const { data } =
-        await updateCreatorProfile({
-          name: name.trim(),
-          linkedinUrl:
-            linkedinUrl.trim(),
-          xProfileUrl:
-            xProfileUrl.trim(),
-        });
+      const { data } = await updateCreatorProfile({
+        name: name.trim(),
+        linkedinUrl: linkedinUrl.trim(),
+        xProfileUrl: xProfileUrl.trim(),
+      });
 
       setProfile(data);
       setName(data.name ?? "");
-      setLinkedinUrl(
-        data.linkedin_url ?? "",
-      );
-      setXProfileUrl(
-        data.x_profile_url ?? "",
-      );
+      setLinkedinUrl(data.linkedin_url ?? "");
+      setXProfileUrl(data.x_profile_url ?? "");
       setSaved(true);
 
-      window.setTimeout(
-        () => setSaved(false),
-        2000,
-      );
+      window.setTimeout(() => setSaved(false), 2000);
     } catch (value) {
       setError(
-        value instanceof Error
-          ? value.message
-          : "Unable to save profile.",
+        value instanceof Error ? value.message : "Unable to save profile.",
       );
     } finally {
       setBusy(false);
@@ -152,9 +118,7 @@ export default function Settings() {
     const value = methodLabel.trim();
 
     if (!value) {
-      setError(
-        "Enter a name for the payout method.",
-      );
+      setError("Enter a name for the payout method.");
       return;
     }
 
@@ -162,16 +126,12 @@ export default function Settings() {
     setError("");
 
     try {
-      const { data } =
-        await addPayoutMethod({
-          type: "stripe",
-          label: value,
-        });
+      const { data } = await addPayoutMethod({
+        type: "stripe",
+        label: value,
+      });
 
-      setMethods((current) => [
-        data,
-        ...current,
-      ]);
+      setMethods((current) => [data, ...current]);
       setMethodLabel("");
       setShowMethod(false);
     } catch (value) {
@@ -196,9 +156,7 @@ export default function Settings() {
     try {
       await deleteAccount();
       dispatch(signOut());
-      await logout().catch(
-        () => undefined,
-      );
+      await logout().catch(() => undefined);
       navigate("/login", {
         replace: true,
       });
@@ -241,8 +199,7 @@ export default function Settings() {
         </h1>
 
         <p className="mt-1 text-[17px] text-[#74819a]">
-          Manage your profile, payments and
-          account.
+          Manage your profile, payments and account.
         </p>
       </section>
 
@@ -261,9 +218,7 @@ export default function Settings() {
               <button
                 key={item.id}
                 type="button"
-                onClick={() =>
-                  setTab(item.id)
-                }
+                onClick={() => setTab(item.id)}
                 className={
                   tab === item.id
                     ? "flex w-full cursor-pointer items-center gap-3 rounded-xl bg-[#eef4ff] px-4 py-3 text-left text-sm font-semibold text-[#2864f0]"
@@ -285,8 +240,8 @@ export default function Settings() {
                   Personal profile
                 </h2>
                 <p className="mt-1 text-sm text-[#7d899f]">
-                  Manage the public profile information
-                  connected to your creator card.
+                  Manage the public profile information connected to your
+                  creator card.
                 </p>
               </div>
 
@@ -299,26 +254,18 @@ export default function Settings() {
                   <div className="mt-2 flex gap-2">
                     <input
                       value={name}
-                      onChange={(event) =>
-                        setName(
-                          event.target.value,
-                        )
-                      }
+                      onChange={(event) => setName(event.target.value)}
                       className="auth-input flex-1"
                     />
 
                     <Button
                       type="button"
-                      onClick={() =>
-                        void saveProfile()
-                      }
+                      onClick={() => void saveProfile()}
                       disabled={busy}
                       className="cursor-pointer bg-[#171d2b] hover:bg-[#111827]"
                     >
                       <Save className="mr-2 h-4 w-4" />
-                      {saved
-                        ? "Saved"
-                        : "Save name"}
+                      {saved ? "Saved" : "Save name"}
                     </Button>
                   </div>
                 </div>
@@ -332,8 +279,7 @@ export default function Settings() {
                   </div>
 
                   <p className="mt-1 text-sm text-[#7d899f]">
-                    Keep your public profile links
-                    connected to your account.
+                    Keep your public profile links connected to your account.
                   </p>
 
                   <div className="mt-5 space-y-4">
@@ -344,11 +290,7 @@ export default function Settings() {
 
                       <input
                         value={linkedinUrl}
-                        onChange={(event) =>
-                          setLinkedinUrl(
-                            event.target.value,
-                          )
-                        }
+                        onChange={(event) => setLinkedinUrl(event.target.value)}
                         className="auth-input mt-2"
                         placeholder="https://linkedin.com/in/your-profile"
                       />
@@ -361,11 +303,7 @@ export default function Settings() {
 
                       <input
                         value={xProfileUrl}
-                        onChange={(event) =>
-                          setXProfileUrl(
-                            event.target.value,
-                          )
-                        }
+                        onChange={(event) => setXProfileUrl(event.target.value)}
                         className="auth-input mt-2"
                         placeholder="https://x.com/your-handle"
                       />
@@ -374,9 +312,7 @@ export default function Settings() {
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() =>
-                        void saveProfile()
-                      }
+                      onClick={() => void saveProfile()}
                       disabled={busy}
                       className="cursor-pointer"
                     >
@@ -396,8 +332,7 @@ export default function Settings() {
                 </h2>
 
                 <p className="mt-1 text-sm text-[#7d899f]">
-                  Manage payout methods used for
-                  creator earnings.
+                  Manage payout methods used for creator earnings.
                 </p>
               </div>
 
@@ -410,19 +345,14 @@ export default function Settings() {
                       </h3>
 
                       <p className="mt-1 text-xs text-[#8794aa]">
-                        Saved payout destinations for
-                        withdrawals.
+                        Saved payout destinations for withdrawals.
                       </p>
                     </div>
 
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() =>
-                        setShowMethod(
-                          (value) => !value,
-                        )
-                      }
+                      onClick={() => setShowMethod((value) => !value)}
                       className="cursor-pointer"
                     >
                       Add
@@ -433,20 +363,14 @@ export default function Settings() {
                     <div className="mt-4 flex gap-2">
                       <input
                         value={methodLabel}
-                        onChange={(event) =>
-                          setMethodLabel(
-                            event.target.value,
-                          )
-                        }
+                        onChange={(event) => setMethodLabel(event.target.value)}
                         className="auth-input flex-1"
                         placeholder="Primary payout account"
                       />
 
                       <Button
                         type="button"
-                        onClick={() =>
-                          void saveMethod()
-                        }
+                        onClick={() => void saveMethod()}
                         disabled={busy}
                         className="cursor-pointer bg-[#171d2b] hover:bg-[#111827]"
                       >
@@ -468,8 +392,7 @@ export default function Settings() {
                             </p>
 
                             <p className="mt-1 text-xs text-[#8b97aa]">
-                              {method.type} ·{" "}
-                              {method.status}
+                              {method.type} · {method.status}
                             </p>
                           </div>
 
@@ -501,9 +424,8 @@ export default function Settings() {
                     </h2>
 
                     <p className="mt-2 max-w-[680px] text-sm leading-6 text-[#8d6262]">
-                      Permanently delete your account
-                      and associated workspace data.
-                      This action cannot be undone.
+                      Permanently delete your account and associated workspace
+                      data. This action cannot be undone.
                     </p>
                   </div>
                 </div>
@@ -511,9 +433,7 @@ export default function Settings() {
                 <Button
                   type="button"
                   variant="destructive"
-                  onClick={() =>
-                    setShowDelete(true)
-                  }
+                  onClick={() => setShowDelete(true)}
                   className="mt-5 cursor-pointer"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
@@ -546,19 +466,16 @@ export default function Settings() {
             </DialogTitle>
 
             <DialogDescription className="text-sm leading-6 text-[#6f7c92]">
-              This permanently deletes your Naano
-              account, creator profile, social account
-              connections, campaigns, applications,
-              messages, earnings records and other
-              associated workspace data.
+              This permanently deletes your Naano account, creator profile,
+              social account connections, campaigns, applications, messages,
+              earnings records and other associated workspace data.
             </DialogDescription>
           </DialogHeader>
 
           <div className="rounded-xl border border-[#f1d7d7] bg-[#fff8f8] p-4">
             <p className="text-xs leading-5 text-[#8a5d5d]">
-              There is no undo after deletion. Make
-              sure you have saved anything you need
-              before continuing.
+              There is no undo after deletion. Make sure you have saved anything
+              you need before continuing.
             </p>
           </div>
 
@@ -573,11 +490,7 @@ export default function Settings() {
             <input
               id="delete-confirmation"
               value={deleteConfirmation}
-              onChange={(event) =>
-                setDeleteConfirmation(
-                  event.target.value,
-                )
-              }
+              onChange={(event) => setDeleteConfirmation(event.target.value)}
               autoComplete="off"
               className="auth-input"
               placeholder="DELETE"
@@ -588,9 +501,7 @@ export default function Settings() {
             <Button
               type="button"
               variant="outline"
-              onClick={() =>
-                setShowDelete(false)
-              }
+              onClick={() => setShowDelete(false)}
               disabled={busy}
               className="cursor-pointer"
             >
@@ -601,19 +512,11 @@ export default function Settings() {
               type="button"
               variant="destructive"
               onClick={() => void handleDelete()}
-              disabled={
-                busy ||
-                deleteConfirmation !==
-                  "DELETE"
-              }
+              disabled={busy || deleteConfirmation !== "DELETE"}
               className="cursor-pointer"
             >
-              {busy && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              {busy
-                ? "Deleting..."
-                : "Delete account permanently"}
+              {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {busy ? "Deleting..." : "Delete account permanently"}
             </Button>
           </DialogFooter>
         </DialogContent>

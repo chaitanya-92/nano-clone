@@ -80,10 +80,7 @@ export function verifyEmailOtp(email: string, code: string) {
 }
 
 export async function deleteAccount() {
-  return request<{ ok: true }>(
-    "/api/auth/account",
-    {
-      method: "DELETE",
-    },
-  );
+  return request<{ ok: true }>("/api/auth/account", {
+    method: "DELETE",
+  });
 }
