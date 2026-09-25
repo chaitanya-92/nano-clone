@@ -2,6 +2,7 @@ import { Copy, ExternalLink, Pencil, Save, Share2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,6 +27,7 @@ export default function MyCard() {
   });
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     void getCreatorProfile()
@@ -69,11 +71,29 @@ export default function MyCard() {
       return;
     }
 
-    await navigator.clipboard.writeText(publicUrl);
+    try {
+      await navigator.clipboard.writeText(
+        publicUrl,
+      );
+    } catch {
+      const textarea =
+        document.createElement("textarea");
+
+      textarea.value = publicUrl;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      textarea.remove();
+    }
 
     setCopied(true);
 
-    window.setTimeout(() => setCopied(false), 1600);
+    window.setTimeout(
+      () => setCopied(false),
+      1600,
+    );
   };
 
   const share = async () => {
@@ -82,17 +102,35 @@ export default function MyCard() {
     }
 
     if (navigator.share) {
-      await navigator
-        .share({
-          title: (profile?.name ?? "Creator") + " on Naano",
+      try {
+        await navigator.share({
+          title:
+            (profile?.name ??
+              "Creator") +
+            " on Naano",
           url: publicUrl,
-        })
-        .catch(() => undefined);
+        });
 
-      return;
+        return;
+      } catch {
+        return;
+      }
     }
 
     await copyLink();
+  };
+
+  const preview = () => {
+    if (!publicUrl) {
+      navigate("/dashboard/my-card");
+      return;
+    }
+
+    window.open(
+      publicUrl,
+      "_blank",
+      "noopener,noreferrer",
+    );
   };
 
   if (!profile) {
@@ -147,20 +185,15 @@ export default function MyCard() {
             Edit
           </Button>
 
-          <a
-            href={publicUrl || "#"}
-            target={publicUrl ? "_blank" : undefined}
-            rel="noreferrer"
-            onClick={(event) => {
-              if (!publicUrl) {
-                event.preventDefault();
-              }
-            }}
-            className="inline-flex cursor-pointer items-center rounded-md border border-[#dce3ec] px-4 text-sm font-medium text-[#59667e]"
+          <Button
+            type="button"
+            variant="outline"
+            onClick={preview}
+            className="cursor-pointer"
           >
             <ExternalLink className="mr-2 h-4 w-4" />
             Preview
-          </a>
+          </Button>
         </div>
       </div>
 

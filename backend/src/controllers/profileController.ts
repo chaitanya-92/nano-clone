@@ -17,22 +17,80 @@ export function getPublicCard(
 ) {
   const profile = db
     .prepare(
-      "SELECT name,slug,linkedin_url,headline,category,bio,country,industries,followers,impressions,engagement_count,post_count,profile_photo_url,price_cents,currency,card_status FROM creator_profiles WHERE slug=? AND card_status='published'",
+      "SELECT name,slug,linkedin_url,x_profile_url,headline,category,bio,country,industries,followers,impressions,engagement_count,post_count,profile_photo_url,price_cents,currency,card_status FROM creator_profiles WHERE slug=?",
     )
     .get(slug);
   if (!profile)
     return error(response, 404, "CARD_NOT_FOUND", "Creator card not found.");
   return json(response, 200, { data: profile });
 }
-export function getProfile(request: IncomingMessage, response: ServerResponse) {
-  const user = requireAuth(request, response);
-  if (!user) return;
-  if (user.role === "creator")
+export function getProfile(
+  request: IncomingMessage,
+  response: ServerResponse,
+) {
+  const user = requireAuth(
+    request,
+    response,
+  );
+
+  if (!user) {
+    return;
+  }
+
+  if (user.role === "creator") {
+    const profile = db
+      .prepare(
+        "SELECT * FROM creator_profiles WHERE user_id=?",
+      )
+      .get(user.id) as
+      | Record<string, unknown>
+      | undefined;
+
+    if (!profile) {
+      return error(
+        response,
+        404,
+        "PROFILE_NOT_FOUND",
+        "Creator profile not found.",
+      );
+    }
+
+    if (!String(profile.slug ?? "").trim()) {
+      const base =
+        String(profile.name ?? "").trim() ||
+        user.name ||
+        "creator";
+
+      const normalizedBase =
+        base
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-|-$/g, "") ||
+        "creator";
+
+      const slug =
+        normalizedBase +
+        "-" +
+        user.id
+          .replace(/[^a-z0-9]/gi, "")
+          .slice(-10)
+          .toLowerCase();
+
+      db.prepare(
+        "UPDATE creator_profiles SET slug=?,updated_at=? WHERE user_id=?",
+      ).run(
+        slug,
+        now(),
+        user.id,
+      );
+
+      profile.slug = slug;
+    }
+
     return json(response, 200, {
-      data: db
-        .prepare("SELECT * FROM creator_profiles WHERE user_id=?")
-        .get(user.id),
+      data: profile,
     });
+  }
   return json(response, 200, {
     data: db
       .prepare("SELECT * FROM brand_profiles WHERE user_id=?")
