@@ -14,6 +14,7 @@ import {
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/toast";
 import {
   Dialog,
   DialogContent,
@@ -532,20 +533,40 @@ export default function Settings() {
 
     try {
       await deleteAccount();
+
+      toast.add({
+        title: "Account deleted",
+        description:
+          "Your account and workspace data were permanently deleted.",
+        type: "success",
+        timeout: 1800,
+      });
+
       dispatch(signOut());
       await logout().catch(
         () => undefined,
       );
 
-      navigate("/login", {
-        replace: true,
-      });
+      window.setTimeout(() => {
+        navigate("/login", {
+          replace: true,
+        });
+      }, 700);
     } catch (value) {
-      setError(
+      const message =
         value instanceof Error
           ? value.message
-          : "Unable to delete your account.",
-      );
+          : "Unable to delete your account.";
+
+      setError(message);
+
+      toast.add({
+        title: "Account deletion failed",
+        description: message,
+        type: "error",
+        timeout: 4000,
+      });
+
       setBusy(false);
     }
   };
@@ -993,7 +1014,7 @@ export default function Settings() {
                 deleteConfirmation !==
                   "DELETE"
               }
-              className="h-10 cursor-pointer rounded-lg bg-[#d84343] px-4 text-white hover:bg-[#c93636] focus-visible:ring-[#d84343]/30"
+              className="h-10 min-w-[190px] cursor-pointer rounded-lg bg-[#d84343] px-4 text-white hover:bg-[#c93636] focus-visible:ring-[#d84343]/30"
             >
               {busy && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
