@@ -444,10 +444,11 @@ export default function Settings() {
     }));
 
     try {
-      await connectSocial(
-        provider,
-        normalized,
-      );
+      const connectResult =
+        await connectSocial(
+          provider,
+          normalized,
+        );
 
       const { data } =
         await getCreatorProfile();
@@ -469,7 +470,11 @@ export default function Settings() {
 
       setSocialStatus((current) => ({
         ...current,
-        [provider]: "verified",
+        [provider]:
+          connectResult.data
+            .refreshAvailable
+            ? "verified"
+            : "valid",
       }));
 
       return true;
@@ -882,7 +887,7 @@ export default function Settings() {
                   onClick={() =>
                     setShowDelete(true)
                   }
-                  className="mt-5 h-10 cursor-pointer rounded-lg bg-destructive px-4 text-white hover:bg-destructive/90"
+                  className="mt-5 h-10 cursor-pointer rounded-lg bg-[#dc2626] px-4 text-white hover:bg-[#b91c1c]"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete my account
@@ -972,7 +977,7 @@ export default function Settings() {
                 deleteConfirmation !==
                   "DELETE"
               }
-              className="h-10 min-w-[132px] cursor-pointer rounded-lg bg-destructive px-4 text-white hover:bg-destructive/90"
+              className="h-10 min-w-[132px] cursor-pointer rounded-lg bg-[#dc2626] px-4 text-white hover:bg-[#b91c1c]"
             >
               {busy && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
