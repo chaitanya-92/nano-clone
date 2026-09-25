@@ -44,7 +44,7 @@ function EmailField({
   const email = formik.values.email;
 
   const validateEmail = (value: string) => {
-    return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(value);
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   };
 
   const handleEmailChange = (
@@ -119,7 +119,7 @@ function EmailField({
   };
 
   const handleVerifyOtp = async () => {
-    if (!/^\\d{6}$/.test(otp) || !email) {
+    if (!/^\d{6}$/.test(otp) || !email) {
       return;
     }
 
@@ -212,7 +212,7 @@ function EmailField({
               onChange={(event) => {
                 setOtp(
                   event.target.value
-                    .replace(/\\D/g, "")
+                    .replace(/\D/g, "")
                     .slice(0, 6),
                 );
               }}
