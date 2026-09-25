@@ -16,6 +16,16 @@ import { initializeDatabaseConnection } from "./config/database";
 
 import { authRoutes } from "./routes/authRoutes";
 import { onboardingRoutes } from "./routes/onboardingRoutes";
+import { dashboardRoutes } from "./routes/dashboardRoutes";
+import { campaignRoutes } from "./routes/campaignRoutes";
+import { applicationRoutes } from "./routes/applicationRoutes";
+import { collaborationRoutes } from "./routes/collaborationRoutes";
+import { analyticsRoutes } from "./routes/analyticsRoutes";
+import { earningsRoutes } from "./routes/earningsRoutes";
+import { messageRoutes } from "./routes/messageRoutes";
+import { notificationRoutes } from "./routes/notificationRoutes";
+import { communityRoutes } from "./routes/communityRoutes";
+import { affiliateRoutes } from "./routes/affiliateRoutes";
 
 import { handleError } from "./middleware/errorMiddleware";
 
@@ -152,7 +162,7 @@ const server = createServer(
       if (
         url.pathname.startsWith("/api/")
       ) {
-        const handlers = [authRoutes, onboardingRoutes];
+        const handlers = [authRoutes, onboardingRoutes, dashboardRoutes, campaignRoutes, applicationRoutes, collaborationRoutes, analyticsRoutes, earningsRoutes, messageRoutes, notificationRoutes, communityRoutes, affiliateRoutes];
 
         for (const handler of handlers) {
           const handled = await handler(request, response, url);
