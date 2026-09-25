@@ -5,6 +5,7 @@ import {
   OAUTH_STATE_COOKIE,
 } from "../config/env";
 import { setCookie } from "../utils/session";
+import { db } from "../db/client";
 import {
   createOAuthUser,
   findUserByEmail,
@@ -154,9 +155,30 @@ export async function handleGoogleCallback(code: string, role: "creator" | "bran
     isNewUser = true;
   }
 
+  const profileTable =
+    role === "brand"
+      ? "brand_profiles"
+      : "creator_profiles";
+
+  const onboarding = db
+    .prepare(
+      `SELECT onboarding_status
+       FROM ${profileTable}
+       WHERE user_id = ?
+       LIMIT 1`,
+    )
+    .get(user.id) as
+    | { onboarding_status?: string }
+    | undefined;
+
+  const needsOnboarding =
+    onboarding?.onboarding_status !==
+    "completed";
+
   return {
     user,
     isNewUser,
+    needsOnboarding,
   };
 }
 
