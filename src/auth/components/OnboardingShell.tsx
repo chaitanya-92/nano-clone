@@ -17,6 +17,7 @@ interface Props {
   saving?: boolean;
   modal?: boolean;
   onClose?: () => void;
+  statusLabel?: string;
 }
 
 export function OnboardingShell({
@@ -32,32 +33,37 @@ export function OnboardingShell({
   onNext,
   saving,
   modal = false,
-  onClose
+  onClose,
+  statusLabel,
 }: Props) {
   return (
     <div className={modal ? "fixed inset-0 z-50 flex items-center justify-center bg-[#0b1020]/55 p-3 backdrop-blur-md md:p-6" : "min-h-screen bg-[#f5f7fb] text-[#151923]"}>
       <div className={modal ? "relative flex h-[calc(100vh-24px)] max-h-[920px] w-full max-w-[1180px] min-h-0 overflow-hidden rounded-[28px] bg-white shadow-[0_40px_120px_rgba(8,15,30,.28)]" : "mx-auto flex min-h-screen max-w-[1540px]"}>
-        <aside className="relative hidden w-[39%] shrink-0 overflow-hidden bg-[#0c1220] px-10 py-10 text-white lg:flex lg:flex-col xl:px-14">
-          <div className="absolute -left-28 top-24 h-72 w-72 rounded-full bg-[#2864f0]/30 blur-3xl" />
-          <div className="absolute -right-20 bottom-20 h-80 w-80 rounded-full bg-[#63b8ff]/20 blur-3xl" />
+        <aside className="relative hidden w-[39%] shrink-0 overflow-hidden bg-[#2864f0] px-10 py-10 text-white lg:flex lg:flex-col xl:px-14">
           <div className="relative flex items-center justify-between gap-2 text-2xl font-bold tracking-[-.05em]">
             <span>naano<span className="text-[#63b8ff]">.</span></span>
-            {modal && onClose && <button type="button" onClick={onClose} aria-label="Close onboarding" className="cursor-pointer rounded-lg p-2 text-white/55 transition hover:bg-white/10 hover:text-white lg:hidden"><X className="h-5 w-5" /></button>}
+            {modal && onClose && <button type="button" onClick={onClose} aria-label="Close onboarding" className="cursor-pointer rounded-lg p-2 text-white/70 transition hover:bg-white/10 hover:text-white lg:hidden"><X className="h-5 w-5" /></button>}
           </div>
           <div className="relative mt-auto max-w-md pb-10">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[.06] px-3 py-1.5 text-xs font-semibold text-[#bcd8ff]"><Sparkles className="h-3.5 w-3.5" />Build your presence once</div>
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white"><Sparkles className="h-3.5 w-3.5" />Build your presence once</div>
             <h2 className="text-[clamp(2.6rem,4vw,4.5rem)] font-semibold leading-[.98] tracking-[-.06em]">Turn your profile into your next opportunity.</h2>
             <p className="mt-6 max-w-sm text-[15px] leading-7 text-white/55">Set up your identity, positioning and marketplace details. Everything stays connected to your workspace.</p>
             <div className="mt-10 grid grid-cols-2 gap-3">
-              {[["01", "Identity"], ["02", "Positioning"], ["03", "Proof"], ["04", "Launch"]].map(([num, label]) => <div key={num} className="rounded-2xl border border-white/10 bg-white/[.045] p-4"><span className="text-[11px] font-bold text-[#63b8ff]">{num}</span><p className="mt-5 text-sm font-medium text-white/75">{label}</p></div>)}
+              {[["01", "Identity"], ["02", "Positioning"], ["03", "Proof"], ["04", "Launch"]].map(([num, label]) => <div key={num} className="rounded-2xl border border-white/20 bg-white/10 p-4"><span className="text-[11px] font-bold text-white/90">{num}</span><p className="mt-5 text-sm font-medium text-white/75">{label}</p></div>)}
             </div>
           </div>
-          <div className="relative flex items-center justify-between border-t border-white/10 pt-5 text-xs text-white/35"><span>Creator & brand marketplace</span><span>Secure onboarding</span></div>
+          <div className="relative flex items-center justify-between border-t border-white/20 pt-5 text-xs text-white/65"><span>Creator & brand marketplace</span><span>Secure onboarding</span></div>
         </aside>
         <main className="flex min-h-0 min-w-0 flex-1 flex-col bg-white">
           <header className="relative z-10 flex shrink-0 items-center justify-between border-b border-[#edf0f4] bg-white px-6 py-5 md:px-10">
             <div className="text-xl font-bold tracking-[-.05em] lg:hidden">naano<span className="text-[#2864f0]">.</span></div>
-            <div className="ml-auto flex items-center gap-4 text-xs font-medium text-[#8992a2]">
+            <div className="ml-auto flex items-center gap-3 text-xs font-medium text-[#8992a2]">
+              {statusLabel && (
+                <span className="inline-flex items-center gap-2 rounded-full border border-[#dfe5ee] bg-[#f8fafc] px-3 py-1.5 font-semibold text-[#4f5969]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#2864f0]" />
+                  {statusLabel}
+                </span>
+              )}
               <span>Step {current + 1} of {steps.length}</span>
               <span className="h-1 w-1 rounded-full bg-[#cbd1da]" />
               <span>English</span>
