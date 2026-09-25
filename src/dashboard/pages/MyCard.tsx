@@ -75,7 +75,7 @@ function creatorInitials(
   return (
     name
       ?.trim()
-      .split(/\\s+/)
+      .split(/\s+/)
       .filter(Boolean)
       .map((part) => part[0])
       .slice(0, 2)

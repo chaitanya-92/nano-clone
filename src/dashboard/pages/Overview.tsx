@@ -289,10 +289,11 @@ export default function Overview() {
         toast.add({
           title: "Copy failed",
           description:
-          "Your browser did not allow clipboard access.",
-        type: "error",
-        timeout: 2600,
-      });
+            "Your browser did not allow clipboard access.",
+          type: "error",
+          timeout: 2600,
+        });
+      }
     }
   };
 
