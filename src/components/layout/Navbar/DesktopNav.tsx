@@ -17,11 +17,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 
-import {
-  navItems,
-  resourceLinks,
-  navigationActions,
-} from "@/data/data";
+import { navItems, resourceLinks, navigationActions } from "@/data/data";
 
 export function DesktopNav() {
   const navigate = (href: string) => {
@@ -34,7 +30,7 @@ export function DesktopNav() {
         <NavigationMenuList className="gap-7">
           {navItems.map((item) => (
             <NavigationMenuItem key={item.label}>
-                <NavigationMenuLink
+              <NavigationMenuLink
                 render={<a href={item.href} />}
                 className="
                     inline-flex
@@ -48,9 +44,9 @@ export function DesktopNav() {
                     hover:text-[hsl(var(--naano-ink))]
                     hover:bg-transparent
                 "
-                >
+              >
                 {item.label}
-                </NavigationMenuLink>
+              </NavigationMenuLink>
             </NavigationMenuItem>
           ))}
 
@@ -81,10 +77,7 @@ export function DesktopNav() {
               >
                 <span>{navigationActions.resources.label}</span>
 
-                <ChevronDown
-                  className="h-3 w-3"
-                  strokeWidth={1.8}
-                />
+                <ChevronDown className="h-3 w-3" strokeWidth={1.8} />
               </DropdownMenuTrigger>
 
               <DropdownMenuContent
@@ -142,10 +135,7 @@ export function DesktopNav() {
             focus-visible:ring-0
           "
         >
-          <Globe2
-            className="h-3.5 w-3.5"
-            strokeWidth={1.8}
-          />
+          <Globe2 className="h-3.5 w-3.5" strokeWidth={1.8} />
 
           <span>{navigationActions.language.label}</span>
         </Button>

@@ -1,20 +1,22 @@
-import type {
-  IncomingMessage,
-  ServerResponse,
-} from "node:http";
-import { createSession, destroySession, getCurrentUser, setCookie } from "../utils/session";
+import type { IncomingMessage, ServerResponse } from "node:http";
+import {
+  createSession,
+  destroySession,
+  getCurrentUser,
+  setCookie,
+} from "../utils/session";
 import { db } from "../db/client";
+import { validateLogin, validateRegistration } from "../utils/validation";
+import { loginUser, registerUser, publicUser } from "../services/authService";
 import {
-  validateLogin,
-  validateRegistration,
-} from "../utils/validation";
+  handleLinkedInCallback,
+  getFrontendLinkedInErrorUrl,
+  startLinkedInOAuth,
+} from "../services/linkedinOAuthService";
 import {
-  loginUser,
-  registerUser,
-  publicUser,
-} from "../services/authService";
-import { handleLinkedInCallback, getFrontendLinkedInErrorUrl, startLinkedInOAuth } from "../services/linkedinOAuthService";
-import { requestEmailVerification, verifyEmailCode } from "../services/emailVerificationService";
+  requestEmailVerification,
+  verifyEmailCode,
+} from "../services/emailVerificationService";
 import { createHash } from "node:crypto";
 import {
   getFrontendDashboardUrl,
@@ -24,17 +26,11 @@ import {
   startGoogleOAuth,
 } from "../services/googleOAuthService";
 
-async function readJson(
-  request: IncomingMessage,
-) {
+async function readJson(request: IncomingMessage) {
   const chunks: Buffer[] = [];
 
   for await (const chunk of request) {
-    chunks.push(
-      Buffer.isBuffer(chunk)
-        ? chunk
-        : Buffer.from(chunk),
-    );
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
   }
 
   const body = Buffer.concat(chunks).toString("utf8");
@@ -50,24 +46,16 @@ async function readJson(
   }
 }
 
-function json(
-  response: ServerResponse,
-  status: number,
-  body: unknown,
-) {
+function json(response: ServerResponse, status: number, body: unknown) {
   response.writeHead(status, {
-    "Content-Type":
-      "application/json; charset=utf-8",
+    "Content-Type": "application/json; charset=utf-8",
     "Cache-Control": "no-store",
   });
 
   response.end(JSON.stringify(body));
 }
 
-function redirect(
-  response: ServerResponse,
-  location: string,
-) {
+function redirect(response: ServerResponse, location: string) {
   response.writeHead(302, {
     Location: location,
     "Cache-Control": "no-store",
@@ -98,7 +86,9 @@ function hashValue(value: string) {
 function hasVerifiedEmail(request: IncomingMessage, email: string) {
   const token = parseCookies(request).naano_email_verified;
   if (!token) return false;
-  const row = db.prepare(`
+  const row = db
+    .prepare(
+      `
     SELECT id
     FROM email_verifications
     WHERE email = ?
@@ -107,10 +97,11 @@ function hasVerifiedEmail(request: IncomingMessage, email: string) {
       AND expires_at > ?
     ORDER BY verified_at DESC
     LIMIT 1
-  `).get(email.trim().toLowerCase(), hashValue(token), Date.now());
+  `,
+    )
+    .get(email.trim().toLowerCase(), hashValue(token), Date.now());
   return Boolean(row);
 }
-
 
 export async function register(
   request: IncomingMessage,
@@ -118,8 +109,7 @@ export async function register(
 ) {
   const data: any = await readJson(request);
 
-  const validationError =
-    validateRegistration(data);
+  const validationError = validateRegistration(data);
 
   if (validationError) {
     return json(response, 422, {
@@ -142,7 +132,9 @@ export async function register(
     });
 
     createSession(response, user.id);
-    db.prepare("DELETE FROM email_verifications WHERE email = ?").run(data.email.trim().toLowerCase());
+    db.prepare("DELETE FROM email_verifications WHERE email = ?").run(
+      data.email.trim().toLowerCase(),
+    );
     setCookie(response, "naano_email_verified", "", { maxAge: 0 });
 
     return json(response, 201, {
@@ -150,9 +142,7 @@ export async function register(
     });
   } catch (error: any) {
     return json(response, 409, {
-      error:
-        error?.message ??
-        "Unable to create account.",
+      error: error?.message ?? "Unable to create account.",
     });
   }
 }
@@ -163,8 +153,7 @@ export async function login(
 ) {
   const data: any = await readJson(request);
 
-  const validationError =
-    validateLogin(data);
+  const validationError = validateLogin(data);
 
   if (validationError) {
     return json(response, 422, {
@@ -173,10 +162,7 @@ export async function login(
   }
 
   try {
-    const user = await loginUser(
-      data.email,
-      data.password,
-    );
+    const user = await loginUser(data.email, data.password);
 
     createSession(response, user.id);
 
@@ -185,26 +171,18 @@ export async function login(
     });
   } catch (error: any) {
     return json(response, 401, {
-      error:
-        error?.message ??
-        "Incorrect email or password.",
+      error: error?.message ?? "Incorrect email or password.",
     });
   }
 }
 
-export function me(
-  request: IncomingMessage,
-  response: ServerResponse,
-) {
+export function me(request: IncomingMessage, response: ServerResponse) {
   return json(response, 200, {
     user: getCurrentUser(request),
   });
 }
 
-export function logout(
-  request: IncomingMessage,
-  response: ServerResponse,
-) {
+export function logout(request: IncomingMessage, response: ServerResponse) {
   destroySession(request, response);
 
   return json(response, 200, {
@@ -217,27 +195,15 @@ export function google(
   response: ServerResponse,
   url: URL,
 ) {
-  const role =
-    url.searchParams.get("role") === "brand"
-      ? "brand"
-      : "creator";
-  const flow =
-    url.searchParams.get("flow") === "signup"
-      ? "signup"
-      : "login";
+  const role = url.searchParams.get("role") === "brand" ? "brand" : "creator";
+  const flow = url.searchParams.get("flow") === "signup" ? "signup" : "login";
 
-  const started = startGoogleOAuth(
-    response,
-    role,
-    flow,
-  );
+  const started = startGoogleOAuth(response, role, flow);
 
   if (!started) {
     return redirect(
       response,
-      getFrontendLoginErrorUrl(
-        "google_not_configured",
-      ),
+      getFrontendLoginErrorUrl("google_not_configured"),
     );
   }
 }
@@ -247,9 +213,7 @@ export async function googleCallback(
   response: ServerResponse,
   url: URL,
 ) {
-  const params = Object.fromEntries(
-    url.searchParams,
-  );
+  const params = Object.fromEntries(url.searchParams);
 
   const cookies = Object.fromEntries(
     (request.headers.cookie ?? "")
@@ -260,9 +224,7 @@ export async function googleCallback(
 
         return [
           part.slice(0, index).trim(),
-          decodeURIComponent(
-            part.slice(index + 1),
-          ),
+          decodeURIComponent(part.slice(index + 1)),
         ];
       }),
   );
@@ -273,88 +235,39 @@ export async function googleCallback(
       params.error,
       params.error_description,
     );
-  
-    return redirect(
-      response,
-      getFrontendLoginErrorUrl(
-        "google_failed",
-      ),
-    );
+
+    return redirect(response, getFrontendLoginErrorUrl("google_failed"));
   }
-  
+
   if (!params.code) {
-    console.error(
-      "Google OAuth callback missing authorization code.",
-    );
-  
-    return redirect(
-      response,
-      getFrontendLoginErrorUrl(
-        "google_failed",
-      ),
-    );
+    console.error("Google OAuth callback missing authorization code.");
+
+    return redirect(response, getFrontendLoginErrorUrl("google_failed"));
   }
-  
-  if (
-    params.state !==
-    cookies.naano_oauth_state
-  ) {
-    console.error(
-      "Google OAuth state mismatch.",
-      {
-        received: params.state,
-        expected: cookies.naano_oauth_state,
-        hasCookie: Boolean(
-          cookies.naano_oauth_state,
-        ),
-      },
-    );
-  
-    return redirect(
-      response,
-      getFrontendLoginErrorUrl(
-        "google_failed",
-      ),
-    );
+
+  if (params.state !== cookies.naano_oauth_state) {
+    console.error("Google OAuth state mismatch.", {
+      received: params.state,
+      expected: cookies.naano_oauth_state,
+      hasCookie: Boolean(cookies.naano_oauth_state),
+    });
+
+    return redirect(response, getFrontendLoginErrorUrl("google_failed"));
   }
 
   try {
-    const role =
-      cookies.naano_oauth_role === "brand"
-        ? "brand"
-        : "creator";
-    const flow =
-      cookies.naano_oauth_flow === "signup"
-        ? "signup"
-        : "login";
+    const role = cookies.naano_oauth_role === "brand" ? "brand" : "creator";
+    const flow = cookies.naano_oauth_flow === "signup" ? "signup" : "login";
 
-    const {
-      user,
-      needsOnboarding,
-    } = await handleGoogleCallback(
+    const { user, needsOnboarding } = await handleGoogleCallback(
       params.code,
       role,
     );
 
     createSession(response, user.id);
-    setCookie(
-      response,
-      "naano_oauth_state",
-      "",
-      { maxAge: 0 },
-    );
-    setCookie(
-      response,
-      "naano_oauth_role",
-      "",
-      { maxAge: 0 },
-    );
-    setCookie(
-      response,
-      "naano_oauth_flow",
-      "",
-      { maxAge: 0 },
-    );
+    setCookie(response, "naano_oauth_state", "", { maxAge: 0 });
+    setCookie(response, "naano_oauth_role", "", { maxAge: 0 });
+    setCookie(response, "naano_oauth_flow", "", { maxAge: 0 });
 
     return redirect(
       response,
@@ -363,28 +276,48 @@ export async function googleCallback(
         : getFrontendDashboardUrl(),
     );
   } catch {
-    return redirect(
-      response,
-      getFrontendLoginErrorUrl(
-        "google_failed",
-      ),
-    );
+    return redirect(response, getFrontendLoginErrorUrl("google_failed"));
   }
 }
 
-export function linkedin(_request: IncomingMessage, response: ServerResponse, url: URL) {
+export function linkedin(
+  _request: IncomingMessage,
+  response: ServerResponse,
+  url: URL,
+) {
   const role = url.searchParams.get("role") === "brand" ? "brand" : "creator";
   const started = startLinkedInOAuth(response, role);
-  if (!started) return redirect(response, getFrontendLinkedInErrorUrl("linkedin_not_configured"));
+  if (!started)
+    return redirect(
+      response,
+      getFrontendLinkedInErrorUrl("linkedin_not_configured"),
+    );
 }
 
-export async function linkedinCallback(request: IncomingMessage, response: ServerResponse, url: URL) {
+export async function linkedinCallback(
+  request: IncomingMessage,
+  response: ServerResponse,
+  url: URL,
+) {
   const params = Object.fromEntries(url.searchParams);
-  const cookies = Object.fromEntries((request.headers.cookie ?? "").split(";").filter(Boolean).map((part) => {
-    const index = part.indexOf("=");
-    return [part.slice(0, index).trim(), decodeURIComponent(part.slice(index + 1))];
-  }));
-  if (params.error || !params.code || params.state !== cookies.naano_oauth_state) return redirect(response, getFrontendLinkedInErrorUrl("linkedin_failed"));
+  const cookies = Object.fromEntries(
+    (request.headers.cookie ?? "")
+      .split(";")
+      .filter(Boolean)
+      .map((part) => {
+        const index = part.indexOf("=");
+        return [
+          part.slice(0, index).trim(),
+          decodeURIComponent(part.slice(index + 1)),
+        ];
+      }),
+  );
+  if (
+    params.error ||
+    !params.code ||
+    params.state !== cookies.naano_oauth_state
+  )
+    return redirect(response, getFrontendLinkedInErrorUrl("linkedin_failed"));
   try {
     const role = cookies.naano_oauth_role === "brand" ? "brand" : "creator";
     const user = await handleLinkedInCallback(params.code, role);
@@ -400,7 +333,8 @@ export async function requestEmailOtp(
   response: ServerResponse,
 ) {
   const data: any = await readJson(request);
-  const email = typeof data.email === "string" ? data.email.trim().toLowerCase() : "";
+  const email =
+    typeof data.email === "string" ? data.email.trim().toLowerCase() : "";
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return json(response, 422, { error: "Enter a valid email address." });
@@ -414,7 +348,13 @@ export async function requestEmailOtp(
     });
   } catch (error: any) {
     const message = error?.message ?? "Unable to send verification code.";
-    const status = message.includes("wait") ? 429 : message.includes("already exists") ? 409 : message.includes("not configured") ? 503 : 502;
+    const status = message.includes("wait")
+      ? 429
+      : message.includes("already exists")
+        ? 409
+        : message.includes("not configured")
+          ? 503
+          : 502;
     return json(response, status, { error: message });
   }
 }
@@ -424,11 +364,14 @@ export async function verifyEmailOtp(
   response: ServerResponse,
 ) {
   const data: any = await readJson(request);
-  const email = typeof data.email === "string" ? data.email.trim().toLowerCase() : "";
+  const email =
+    typeof data.email === "string" ? data.email.trim().toLowerCase() : "";
   const code = typeof data.code === "string" ? data.code.trim() : "";
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !/^\d{6}$/.test(code)) {
-    return json(response, 422, { error: "Enter the 6-digit verification code." });
+    return json(response, 422, {
+      error: "Enter the 6-digit verification code.",
+    });
   }
 
   try {
@@ -442,9 +385,16 @@ export async function verifyEmailOtp(
   }
 }
 
-export function checkEmail(_request: IncomingMessage, response: ServerResponse, url: URL) {
+export function checkEmail(
+  _request: IncomingMessage,
+  response: ServerResponse,
+  url: URL,
+) {
   const email = (url.searchParams.get("email") ?? "").trim().toLowerCase();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json(response, 200, { valid: false, available: false });
-  const existing = db.prepare("SELECT id FROM users WHERE email = ?").get(email);
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    return json(response, 200, { valid: false, available: false });
+  const existing = db
+    .prepare("SELECT id FROM users WHERE email = ?")
+    .get(email);
   return json(response, 200, { valid: true, available: !existing });
 }

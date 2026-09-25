@@ -23,9 +23,7 @@ export default function Login() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
 
-  const { isAuthenticated, isLoading } = useAppSelector(
-    (state) => state.auth,
-  );
+  const { isAuthenticated, isLoading } = useAppSelector((state) => state.auth);
 
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
@@ -58,11 +56,7 @@ export default function Login() {
         replace: true,
       });
     } catch (reason) {
-      setError(
-        reason instanceof Error
-          ? reason.message
-          : "Unable to sign in.",
-      );
+      setError(reason instanceof Error ? reason.message : "Unable to sign in.");
     } finally {
       setSubmitting(false);
     }
@@ -78,18 +72,11 @@ export default function Login() {
           {content.title}
         </h1>
 
-        <p className="mt-1 text-[16px] text-[#747c8d]">
-          {content.subtitle}
-        </p>
+        <p className="mt-1 text-[16px] text-[#747c8d]">{content.subtitle}</p>
 
         <div className="mt-7 space-y-3">
           <AuthSocialButton
-            icon={
-              <LinkedinIcon
-                className="h-5 w-5"
-                variant="brand"
-              />
-            }
+            icon={<LinkedinIcon className="h-5 w-5" variant="brand" />}
             disabled
           >
             LinkedIn sign-in coming soon
@@ -99,9 +86,7 @@ export default function Login() {
             href={`${import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8787"}/api/auth/google?flow=login`}
             className="block"
           >
-            <AuthSocialButton
-              icon={<GoogleIcon className="h-5 w-5" />}
-            >
+            <AuthSocialButton icon={<GoogleIcon className="h-5 w-5" />}>
               {content.social.google}
             </AuthSocialButton>
           </a>
@@ -115,11 +100,7 @@ export default function Login() {
           <div className="h-px flex-1 bg-[#e1e3e7]" />
         </div>
 
-        <form
-          className="space-y-4"
-          onSubmit={handleSubmit}
-          noValidate
-        >
+        <form className="space-y-4" onSubmit={handleSubmit} noValidate>
           <label className="block">
             <span className="mb-2 block text-[12px] font-semibold tracking-wide text-[#62666d]">
               {content.emailLabel}
@@ -165,9 +146,7 @@ export default function Login() {
                 type="button"
                 onClick={() => setShowPassword((value) => !value)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-[#9ba0a8] transition hover:text-[#555b64]"
-                aria-label={
-                  showPassword ? "Hide password" : "Show password"
-                }
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
                   <EyeOff className="h-5 w-5" />
@@ -187,11 +166,7 @@ export default function Login() {
             </p>
           )}
 
-          <button
-            disabled={submitting}
-            type="submit"
-            className="auth-submit"
-          >
+          <button disabled={submitting} type="submit" className="auth-submit">
             {submitting ? "Signing in…" : content.submit}
           </button>
         </form>

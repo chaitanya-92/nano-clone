@@ -1,7 +1,4 @@
-import type {
-  IncomingMessage,
-  ServerResponse,
-} from "node:http";
+import type { IncomingMessage, ServerResponse } from "node:http";
 import { getCurrentUser } from "../utils/session";
 
 export function requireAuth(
@@ -12,8 +9,7 @@ export function requireAuth(
 
   if (!user) {
     response.writeHead(401, {
-      "Content-Type":
-        "application/json; charset=utf-8",
+      "Content-Type": "application/json; charset=utf-8",
     });
 
     response.end(

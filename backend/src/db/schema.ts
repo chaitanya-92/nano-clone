@@ -304,8 +304,11 @@ export function initializeDatabase() {
 
 export function migrateDatabase() {
   try {
-    db.exec("ALTER TABLE users ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 0");
+    db.exec(
+      "ALTER TABLE users ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 0",
+    );
   } catch (error: any) {
-    if (!String(error?.message ?? "").includes("duplicate column name")) throw error;
+    if (!String(error?.message ?? "").includes("duplicate column name"))
+      throw error;
   }
 }

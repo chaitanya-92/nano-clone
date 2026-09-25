@@ -1,8 +1,23 @@
 import { useRef, useState } from "react";
-import { ArrowRight, BriefcaseBusiness, CalendarDays, Pencil, Send, Share2, Upload, UserRound, X } from "lucide-react";
+import {
+  ArrowRight,
+  BriefcaseBusiness,
+  CalendarDays,
+  Pencil,
+  Send,
+  Share2,
+  Upload,
+  UserRound,
+  X,
+} from "lucide-react";
 import { myCardData } from "../data/dashboardData";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function MyCard() {
   const [photoOpen, setPhotoOpen] = useState(false);
@@ -48,11 +63,17 @@ export default function MyCard() {
             </div>
 
             <div className="flex shrink-0 overflow-hidden rounded-[12px] border border-[#dfe5ed] bg-white shadow-[0_3px_10px_rgba(20,40,80,0.04)]">
-              <Button variant="ghost" className="h-11 rounded-none px-6 text-[14px] font-medium text-[#65738a] hover:bg-[#f7f9fc]">
+              <Button
+                variant="ghost"
+                className="h-11 rounded-none px-6 text-[14px] font-medium text-[#65738a] hover:bg-[#f7f9fc]"
+              >
                 Edit
               </Button>
 
-              <Button variant="ghost" className="h-11 rounded-none border-l border-[#e5e9ef] px-6 text-[14px] font-medium text-[#65738a] hover:bg-[#f7f9fc]">
+              <Button
+                variant="ghost"
+                className="h-11 rounded-none border-l border-[#e5e9ef] px-6 text-[14px] font-medium text-[#65738a] hover:bg-[#f7f9fc]"
+              >
                 Preview
               </Button>
             </div>
@@ -76,10 +97,23 @@ export default function MyCard() {
 
                 <div className="mt-7 grid grid-cols-2 gap-4">
                   {myCardData.share.items.map((item, index) => (
-                    <div key={item.title} className="rounded-[18px] bg-white/85 p-6 shadow-[0_5px_20px_rgba(45,80,120,0.03)]">
+                    <div
+                      key={item.title}
+                      className="rounded-[18px] bg-white/85 p-6 shadow-[0_5px_20px_rgba(45,80,120,0.03)]"
+                    >
                       <div className="flex items-start gap-4">
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-[#eef4ff] text-[#2864f0]">
-                          {index === 0 ? <BriefcaseBusiness className="h-[18px] w-[18px]" strokeWidth={1.7} /> : <Send className="h-[18px] w-[18px]" strokeWidth={1.7} />}
+                          {index === 0 ? (
+                            <BriefcaseBusiness
+                              className="h-[18px] w-[18px]"
+                              strokeWidth={1.7}
+                            />
+                          ) : (
+                            <Send
+                              className="h-[18px] w-[18px]"
+                              strokeWidth={1.7}
+                            />
+                          )}
                         </div>
 
                         <div>
@@ -97,7 +131,10 @@ export default function MyCard() {
                 </div>
 
                 <Button className="mt-7 h-12 rounded-[13px] bg-[#17191d] px-6 text-[14px] font-medium text-white hover:bg-[#292c31]">
-                  <Share2 className="mr-2 h-[16px] w-[16px]" strokeWidth={1.8} />
+                  <Share2
+                    className="mr-2 h-[16px] w-[16px]"
+                    strokeWidth={1.8}
+                  />
                   Copy or share my Deal Link
                 </Button>
               </div>
@@ -141,7 +178,11 @@ export default function MyCard() {
                   className="absolute -bottom-10 left-1/2 flex h-20 w-20 -translate-x-1/2 items-center justify-center overflow-hidden rounded-full border-[3px] border-[#2864f0] bg-[#5969c9] text-[32px] text-white shadow-lg"
                 >
                   {photo ? (
-                    <img src={photo} alt="Profile" className="h-full w-full object-cover" />
+                    <img
+                      src={photo}
+                      alt="Profile"
+                      className="h-full w-full object-cover"
+                    />
                   ) : (
                     "L"
                   )}
@@ -167,7 +208,10 @@ export default function MyCard() {
 
                 <div className="mt-7 flex justify-center">
                   <span className="flex items-center gap-2 rounded-full border border-[#e0e5ec] bg-[#fafbfc] px-4 py-2 text-[12px] text-[#78869b]">
-                    <CalendarDays className="h-[14px] w-[14px]" strokeWidth={1.7} />
+                    <CalendarDays
+                      className="h-[14px] w-[14px]"
+                      strokeWidth={1.7}
+                    />
                     No post data available
                   </span>
                 </div>
@@ -183,9 +227,7 @@ export default function MyCard() {
                     <p className="text-[25px] font-medium text-[#172033]">
                       {myCardData.profile.followers}
                     </p>
-                    <p className="mt-1 text-[12px] text-[#8a95a8]">
-                      Followers
-                    </p>
+                    <p className="mt-1 text-[12px] text-[#8a95a8]">Followers</p>
                   </div>
 
                   <div className="border-x border-[#e7eaf0]">
@@ -282,7 +324,11 @@ export default function MyCard() {
                 className="relative flex h-[122px] w-[122px] items-center justify-center overflow-hidden rounded-full bg-[#5969c9] text-[55px] text-white"
               >
                 {photo ? (
-                  <img src={photo} alt="Profile preview" className="h-full w-full object-cover" />
+                  <img
+                    src={photo}
+                    alt="Profile preview"
+                    className="h-full w-full object-cover"
+                  />
                 ) : (
                   "L"
                 )}

@@ -107,7 +107,6 @@ export function CreatorPosts() {
                 bg-[#3d7396]
               "
             />
-
             The results
           </p>
 
@@ -213,12 +212,7 @@ export function CreatorPosts() {
               index={2}
             />
 
-            <StatCard
-              value={5}
-              suffix="K+"
-              label="Posts published"
-              index={3}
-            />
+            <StatCard value={5} suffix="K+" label="Posts published" index={3} />
           </div>
         </motion.div>
 
@@ -238,11 +232,7 @@ export function CreatorPosts() {
           "
         >
           {creatorPosts.map((post, index) => (
-            <CreatorPostCard
-              key={post.id}
-              post={post}
-              index={index}
-            />
+            <CreatorPostCard key={post.id} post={post} index={index} />
           ))}
         </div>
       </div>
@@ -302,10 +292,7 @@ function StatCard({
     >
       {/* Count */}
 
-      <CountUp
-        value={value}
-        suffix={suffix}
-      />
+      <CountUp value={value} suffix={suffix} />
 
       {/* Label */}
 
@@ -327,15 +314,8 @@ function StatCard({
 /* COUNT UP                                                                   */
 /* ========================================================================== */
 
-function CountUp({
-  value,
-  suffix,
-}: {
-  value: number;
-  suffix: string;
-}) {
+function CountUp({ value, suffix }: { value: number; suffix: string }) {
   const ref = useRef<HTMLDivElement>(null);
-
 
   const isInView = useInView(ref, {
     once: true,
@@ -357,34 +337,27 @@ function CountUp({
     const animate = (currentTime: number) => {
       const elapsed = currentTime - startTime;
 
-      const progress = Math.min(
-        elapsed / duration,
-        1,
-      );
+      const progress = Math.min(elapsed / duration, 1);
 
       /*
        * Ease-out:
        * starts quickly and slows down near the final number.
        */
 
-      const easedProgress =
-        1 - Math.pow(1 - progress, 3);
+      const easedProgress = 1 - Math.pow(1 - progress, 3);
 
-      const currentValue =
-        value * easedProgress;
+      const currentValue = value * easedProgress;
 
       setCount(currentValue);
 
       if (progress < 1) {
-        animationFrame =
-          requestAnimationFrame(animate);
+        animationFrame = requestAnimationFrame(animate);
       } else {
         setCount(value);
       }
     };
 
-    animationFrame =
-      requestAnimationFrame(animate);
+    animationFrame = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(animationFrame);

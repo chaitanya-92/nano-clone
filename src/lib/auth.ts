@@ -4,10 +4,7 @@ type AuthResponse = { user: User };
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8787";
 
-async function request<T>(
-  path: string,
-  options: RequestInit = {},
-): Promise<T> {
+async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(`${API_URL}${path}`, {
     ...options,
     credentials: "include",
@@ -22,9 +19,7 @@ async function request<T>(
   };
 
   if (!response.ok) {
-    throw new Error(
-      body.error ?? "Something went wrong. Please try again.",
-    );
+    throw new Error(body.error ?? "Something went wrong. Please try again.");
   }
 
   return body;
@@ -59,16 +54,22 @@ export function logout() {
   });
 }
 export async function checkEmail(email: string) {
-  const response = await fetch(`${API_URL}/api/auth/check-email?email=${encodeURIComponent(email.trim())}`, { credentials: "include" });
+  const response = await fetch(
+    `${API_URL}/api/auth/check-email?email=${encodeURIComponent(email.trim())}`,
+    { credentials: "include" },
+  );
   if (!response.ok) return { valid: false, available: false };
   return response.json() as Promise<{ valid: boolean; available: boolean }>;
 }
 
 export function requestEmailOtp(email: string) {
-  return request<{ ok: true; expiresAt: number }>("/api/auth/email/request-otp", {
-    method: "POST",
-    body: JSON.stringify({ email }),
-  });
+  return request<{ ok: true; expiresAt: number }>(
+    "/api/auth/email/request-otp",
+    {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    },
+  );
 }
 
 export function verifyEmailOtp(email: string, code: string) {

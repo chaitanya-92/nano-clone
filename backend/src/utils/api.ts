@@ -1,11 +1,19 @@
 import type { ServerResponse } from "node:http";
 
 export function json(response: ServerResponse, status: number, body: unknown) {
-  response.writeHead(status, {"Content-Type":"application/json; charset=utf-8","Cache-Control":"no-store"});
+  response.writeHead(status, {
+    "Content-Type": "application/json; charset=utf-8",
+    "Cache-Control": "no-store",
+  });
   response.end(JSON.stringify(body));
 }
 
-export function error(response: ServerResponse, status: number, code: string, message: string) {
+export function error(
+  response: ServerResponse,
+  status: number,
+  code: string,
+  message: string,
+) {
   return json(response, status, { error: { code, message } });
 }
 
@@ -20,8 +28,11 @@ export async function readJson(request: AsyncIterable<Buffer | string>) {
   }
   const body = Buffer.concat(chunks).toString("utf8");
   if (!body) return {};
-  try { return JSON.parse(body) as Record<string, unknown>; }
-  catch { throw new Error("INVALID_JSON"); }
+  try {
+    return JSON.parse(body) as Record<string, unknown>;
+  } catch {
+    throw new Error("INVALID_JSON");
+  }
 }
 
 export function stringValue(value: unknown, fallback = "") {
@@ -34,7 +45,9 @@ export function integerValue(value: unknown, fallback = 0) {
 }
 
 export function arrayValue(value: unknown) {
-  return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string")
+    : [];
 }
 
 export function now() {

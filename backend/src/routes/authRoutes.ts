@@ -1,7 +1,4 @@
-import type {
-  IncomingMessage,
-  ServerResponse,
-} from "node:http";
+import type { IncomingMessage, ServerResponse } from "node:http";
 import {
   google,
   googleCallback,
@@ -21,24 +18,15 @@ export async function authRoutes(
   response: ServerResponse,
   url: URL,
 ) {
-  if (
-    url.pathname === "/api/auth/me" &&
-    request.method === "GET"
-  ) {
+  if (url.pathname === "/api/auth/me" && request.method === "GET") {
     return me(request, response);
   }
 
-  if (
-    url.pathname === "/api/auth/logout" &&
-    request.method === "POST"
-  ) {
+  if (url.pathname === "/api/auth/logout" && request.method === "POST") {
     return logout(request, response);
   }
 
-  if (
-    url.pathname === "/api/auth/register" &&
-    request.method === "POST"
-  ) {
+  if (url.pathname === "/api/auth/register" && request.method === "POST") {
     return register(request, response);
   }
 
@@ -60,10 +48,7 @@ export async function authRoutes(
     return verifyEmailOtp(request, response);
   }
 
-  if (
-    url.pathname === "/api/auth/login" &&
-    request.method === "POST"
-  ) {
+  if (url.pathname === "/api/auth/login" && request.method === "POST") {
     return login(request, response);
   }
 
@@ -71,27 +56,22 @@ export async function authRoutes(
     return linkedin(request, response, url);
   }
 
-  if (url.pathname === "/api/auth/linkedin/callback" && request.method === "GET") {
+  if (
+    url.pathname === "/api/auth/linkedin/callback" &&
+    request.method === "GET"
+  ) {
     return linkedinCallback(request, response, url);
   }
 
-  if (
-    url.pathname === "/api/auth/google" &&
-    request.method === "GET"
-  ) {
+  if (url.pathname === "/api/auth/google" && request.method === "GET") {
     return google(request, response, url);
   }
 
   if (
-    url.pathname ===
-      "/api/auth/google/callback" &&
+    url.pathname === "/api/auth/google/callback" &&
     request.method === "GET"
   ) {
-    return googleCallback(
-      request,
-      response,
-      url,
-    );
+    return googleCallback(request, response, url);
   }
 
   return false;

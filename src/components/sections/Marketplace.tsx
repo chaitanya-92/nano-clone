@@ -184,10 +184,7 @@ export function Marketplace() {
           </div>
 
           {/* Bottom breathing space inside cloud panel */}
-          <div
-            aria-hidden="true"
-            className="h-20 sm:h-24"
-          />
+          <div aria-hidden="true" className="h-20 sm:h-24" />
         </div>
       </div>
     </section>

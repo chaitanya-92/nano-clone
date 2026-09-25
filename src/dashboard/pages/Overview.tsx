@@ -45,12 +45,18 @@ export default function Overview() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <Button variant="outline" className="h-9 rounded-lg border-[#dce3ec] px-3 text-[12px] text-[#60708a]">
+              <Button
+                variant="outline"
+                className="h-9 rounded-lg border-[#dce3ec] px-3 text-[12px] text-[#60708a]"
+              >
                 <ExternalLink className="h-3.5 w-3.5" />
                 {creatorCard.actions.open}
               </Button>
 
-              <Button variant="outline" className="h-9 rounded-lg border-[#dce3ec] px-3 text-[12px] text-[#60708a]">
+              <Button
+                variant="outline"
+                className="h-9 rounded-lg border-[#dce3ec] px-3 text-[12px] text-[#60708a]"
+              >
                 <Copy className="h-3.5 w-3.5" />
                 {creatorCard.actions.copy}
               </Button>
@@ -86,9 +92,7 @@ export default function Overview() {
                 Lord Lord
               </h3>
 
-              <p className="mt-1 text-[15px] text-[#8792a6]">
-                Web3 / Crypto
-              </p>
+              <p className="mt-1 text-[15px] text-[#8792a6]">Web3 / Crypto</p>
 
               <p className="mt-6 text-[13px] leading-5 text-[#7f8a9d]">
                 Your LinkedIn headline and top positioning appear here.
@@ -109,7 +113,10 @@ export default function Overview() {
               </p>
             </div>
 
-            <Button variant="ghost" className="h-auto p-0 text-[13px] font-medium text-[#2864f0] hover:bg-transparent hover:text-[#1f58dc]">
+            <Button
+              variant="ghost"
+              className="h-auto p-0 text-[13px] font-medium text-[#2864f0] hover:bg-transparent hover:text-[#1f58dc]"
+            >
               {launchGuide.action}
             </Button>
           </div>
@@ -134,7 +141,11 @@ export default function Overview() {
                 {launchGuide.step.status}
               </span>
 
-              <Button variant="outline" size="icon" className="h-10 w-10 rounded-xl border-[#dce3ec] text-[#65738a]">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-10 w-10 rounded-xl border-[#dce3ec] text-[#65738a]"
+              >
                 <ArrowUpRight className="h-4 w-4" />
               </Button>
             </div>

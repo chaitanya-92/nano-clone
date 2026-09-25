@@ -1,13 +1,8 @@
 export function isEmail(value: unknown): value is string {
-  return (
-    typeof value === "string" &&
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-  );
+  return typeof value === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
-export function isValidRole(
-  value: unknown,
-): value is "creator" | "brand" {
+export function isValidRole(value: unknown): value is "creator" | "brand" {
   return value === "creator" || value === "brand";
 }
 
@@ -21,10 +16,7 @@ export function validateRegistration(data: {
     return "Enter a valid email address.";
   }
 
-  if (
-    typeof data.password !== "string" ||
-    data.password.length < 8
-  ) {
+  if (typeof data.password !== "string" || data.password.length < 8) {
     return "Password must be at least 8 characters.";
   }
 
@@ -43,10 +35,7 @@ export function validateRegistration(data: {
   return null;
 }
 
-export function validateLogin(data: {
-  email?: unknown;
-  password?: unknown;
-}) {
+export function validateLogin(data: { email?: unknown; password?: unknown }) {
   if (!isEmail(data.email) || typeof data.password !== "string") {
     return "Enter your email and password.";
   }

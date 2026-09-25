@@ -23,7 +23,12 @@ const optionIcons = {
 
 function NaanoMark({ className }: { className?: string }) {
   return (
-    <div className={cn("relative h-10 w-10 rounded-xl bg-white shadow-sm ring-1 ring-[#dfe5ef]", className)}>
+    <div
+      className={cn(
+        "relative h-10 w-10 rounded-xl bg-white shadow-sm ring-1 ring-[#dfe5ef]",
+        className,
+      )}
+    >
       <div className="absolute left-[9px] top-[12px] h-[9px] w-[20px] rounded-[5px] bg-[#090b0f]" />
       <div className="absolute left-[15px] top-[19px] h-[9px] w-[20px] rounded-[5px] bg-[#090b0f]" />
       <div className="absolute right-[7px] bottom-[8px] h-[5px] w-[5px] rounded-full bg-[#1f5eff]" />
@@ -171,7 +176,10 @@ function ConversationArea() {
         )}
       </div>
 
-      <form onSubmit={handleSubmit} className="border-t border-[#e2e6ed] bg-[#f8f9fb] p-4">
+      <form
+        onSubmit={handleSubmit}
+        className="border-t border-[#e2e6ed] bg-[#f8f9fb] p-4"
+      >
         <div className="flex items-center gap-2">
           <Input
             value={message}

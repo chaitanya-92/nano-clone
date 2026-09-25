@@ -1,8 +1,8 @@
-import type { IncomingMessage,ServerResponse } from "node:http";
+import type { IncomingMessage, ServerResponse } from "node:http";
 import { randomUUID } from "node:crypto";
 import { requireAuth } from "../middleware/authMiddleware";
 import { db } from "../db/client";
-import { error,json,now,stringValue } from "../utils/api";
+import { error, json, now, stringValue } from "../utils/api";
 type SocialProvider = "linkedin" | "x";
 
 function normalizeProfileUrl(provider: SocialProvider, value: string) {
@@ -87,7 +87,10 @@ async function verifyProfileUrl(provider: SocialProvider, profileUrl: string) {
       );
     }
   } catch (verificationError) {
-    if (verificationError instanceof Error && verificationError.name === "AbortError") {
+    if (
+      verificationError instanceof Error &&
+      verificationError.name === "AbortError"
+    ) {
       throw new Error("The social profile verification timed out. Try again.");
     }
 
@@ -101,10 +104,28 @@ async function verifyProfileUrl(provider: SocialProvider, profileUrl: string) {
   }
 }
 
-export function socialAccounts(request:IncomingMessage,response:ServerResponse){const user=requireAuth(request,response);if(!user)return;return json(response,200,{data:db.prepare("SELECT id,provider,username,profile_url,profile_image_url,status,verified_at,created_at,updated_at FROM social_accounts WHERE user_id=? ORDER BY provider").all(user.id)});}
-export async function connectSocial(request:IncomingMessage,response:ServerResponse){const user=requireAuth(request,response);if(!user)return;
-  const body = await import("../utils/api").then(
-    (module) => module.readJson(request),
+export function socialAccounts(
+  request: IncomingMessage,
+  response: ServerResponse,
+) {
+  const user = requireAuth(request, response);
+  if (!user) return;
+  return json(response, 200, {
+    data: db
+      .prepare(
+        "SELECT id,provider,username,profile_url,profile_image_url,status,verified_at,created_at,updated_at FROM social_accounts WHERE user_id=? ORDER BY provider",
+      )
+      .all(user.id),
+  });
+}
+export async function connectSocial(
+  request: IncomingMessage,
+  response: ServerResponse,
+) {
+  const user = requireAuth(request, response);
+  if (!user) return;
+  const body = await import("../utils/api").then((module) =>
+    module.readJson(request),
   );
 
   const provider = stringValue(body.provider) as SocialProvider;
@@ -132,14 +153,8 @@ export async function connectSocial(request:IncomingMessage,response:ServerRespo
   let profileUrl: string;
 
   try {
-    profileUrl = normalizeProfileUrl(
-      provider,
-      rawProfileUrl,
-    );
-    await verifyProfileUrl(
-      provider,
-      profileUrl,
-    );
+    profileUrl = normalizeProfileUrl(provider, rawProfileUrl);
+    await verifyProfileUrl(provider, profileUrl);
   } catch (verificationError) {
     return error(
       response,
@@ -154,31 +169,27 @@ export async function connectSocial(request:IncomingMessage,response:ServerRespo
   const t = now();
   const id = randomUUID();
 
-  db.prepare("INSERT INTO social_accounts (id,user_id,provider,profile_url,status,verified_at,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?) ON CONFLICT(user_id,provider) DO UPDATE SET profile_url=excluded.profile_url,status='connected',verified_at=excluded.verified_at,updated_at=excluded.updated_at").run(
-    id,
-    user.id,
-    provider,
-    profileUrl,
-    "connected",
-    t,
-    t,
-    t,
-  );
+  db.prepare(
+    "INSERT INTO social_accounts (id,user_id,provider,profile_url,status,verified_at,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?) ON CONFLICT(user_id,provider) DO UPDATE SET profile_url=excluded.profile_url,status='connected',verified_at=excluded.verified_at,updated_at=excluded.updated_at",
+  ).run(id, user.id, provider, profileUrl, "connected", t, t, t);
 
   if (provider === "linkedin") {
-    db.prepare("UPDATE creator_profiles SET linkedin_url=?,updated_at=? WHERE user_id=?").run(
-      profileUrl,
-      t,
-      user.id,
-    );
+    db.prepare(
+      "UPDATE creator_profiles SET linkedin_url=?,updated_at=? WHERE user_id=?",
+    ).run(profileUrl, t, user.id);
   }
 
   if (provider === "x") {
-    db.prepare("UPDATE creator_profiles SET x_profile_url=?,updated_at=? WHERE user_id=?").run(
-      profileUrl,
-      t,
-      user.id,
-    );
+    db.prepare(
+      "UPDATE creator_profiles SET x_profile_url=?,updated_at=? WHERE user_id=?",
+    ).run(profileUrl, t, user.id);
   }
 
-return json(response,200,{data:db.prepare("SELECT id,provider,profile_url,status,verified_at FROM social_accounts WHERE user_id=? AND provider=?").get(user.id,provider)});}
+  return json(response, 200, {
+    data: db
+      .prepare(
+        "SELECT id,provider,profile_url,status,verified_at FROM social_accounts WHERE user_id=? AND provider=?",
+      )
+      .get(user.id, provider),
+  });
+}

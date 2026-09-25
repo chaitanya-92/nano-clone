@@ -62,7 +62,9 @@ function StatsRow({
             {stat.value}
           </p>
           {stat.description && (
-            <p className="mt-1 text-[12px] text-[#8995a9]">{stat.description}</p>
+            <p className="mt-1 text-[12px] text-[#8995a9]">
+              {stat.description}
+            </p>
           )}
         </div>
       ))}
@@ -220,7 +222,8 @@ function BrandHero() {
         </div>
 
         <p className="mt-8 text-center text-[13px] text-[#718097]">
-          The three-month reward period starts after the company's first completed paid campaign.
+          The three-month reward period starts after the company's first
+          completed paid campaign.
         </p>
       </section>
     </>
@@ -423,7 +426,9 @@ function RewardSimulator() {
   const [campaignVolume, setCampaignVolume] = useState<number>(
     data.campaign.defaultValue,
   );
-  const [activeBrands, setActiveBrands] = useState<number>(data.brands.defaultValue);
+  const [activeBrands, setActiveBrands] = useState<number>(
+    data.brands.defaultValue,
+  );
 
   const reward = useMemo(() => {
     return campaignVolume * activeBrands * 0.2 * 0.25 * 3;

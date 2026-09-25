@@ -29,8 +29,7 @@ export function TermsReaderDialog({
   onReadComplete,
 }: TermsReaderDialogProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [hasReachedEnd, setHasReachedEnd] =
-    useState(false);
+  const [hasReachedEnd, setHasReachedEnd] = useState(false);
 
   useEffect(() => {
     if (!open) {
@@ -46,24 +45,16 @@ export function TermsReaderDialog({
 
     const updateReadState = () => {
       const reachedEnd =
-        element.scrollTop +
-          element.clientHeight >=
-        element.scrollHeight - 16;
+        element.scrollTop + element.clientHeight >= element.scrollHeight - 16;
 
       setHasReachedEnd(reachedEnd);
     };
 
     updateReadState();
-    element.addEventListener(
-      "scroll",
-      updateReadState,
-    );
+    element.addEventListener("scroll", updateReadState);
 
     return () => {
-      element.removeEventListener(
-        "scroll",
-        updateReadState,
-      );
+      element.removeEventListener("scroll", updateReadState);
     };
   }, [open]);
 
@@ -77,10 +68,7 @@ export function TermsReaderDialog({
   }
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={onOpenChange}
-    >
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton
         className="max-w-[720px] border-[#e2e7ee] bg-white p-0"
@@ -95,10 +83,7 @@ export function TermsReaderDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div
-          ref={scrollRef}
-          className="max-h-[52vh] overflow-y-auto px-6 py-5"
-        >
+        <div ref={scrollRef} className="max-h-[52vh] overflow-y-auto px-6 py-5">
           <div className="space-y-7 pr-2">
             {sections.map((section) => (
               <section key={section.heading}>
@@ -113,9 +98,8 @@ export function TermsReaderDialog({
             ))}
 
             <div className="rounded-xl border border-[#e4e8ee] bg-[#f8fafc] p-4 text-xs leading-6 text-[#687386]">
-              Please read through the complete text above.
-              The acknowledgement checkbox will become available
-              after you reach the end.
+              Please read through the complete text above. The acknowledgement
+              checkbox will become available after you reach the end.
             </div>
           </div>
         </div>
