@@ -1,9 +1,4 @@
-import {
-  Copy,
-  Link2,
-  Loader2,
-  Users,
-} from "lucide-react";
+import { Copy, Link2, Loader2, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,33 +7,20 @@ import {
   type AffiliateResponse,
 } from "@/lib/dashboard";
 
-function referralUrl(
-  code: string,
-) {
-  return (
-    window.location.origin +
-    "/register?ref=" +
-    code
-  );
+function referralUrl(code: string) {
+  return window.location.origin + "/register?ref=" + code;
 }
 
 export default function AffiliateProgram() {
-  const [data, setData] =
-    useState<AffiliateResponse["data"] | null>(
-      null,
-    );
-  const [loading, setLoading] =
-    useState(true);
-  const [busy, setBusy] =
-    useState(false);
-  const [copied, setCopied] =
-    useState<string | null>(null);
+  const [data, setData] = useState<AffiliateResponse["data"] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
+  const [copied, setCopied] = useState<string | null>(null);
   const [error, setError] = useState("");
 
   const load = async () => {
     try {
-      const { data: response } =
-        await getAffiliate();
+      const { data: response } = await getAffiliate();
       setData(response);
     } catch (value) {
       setError(
@@ -55,9 +37,7 @@ export default function AffiliateProgram() {
     void load();
   }, []);
 
-  const createLink = async (
-    type: "creator" | "brand",
-  ) => {
+  const createLink = async (type: "creator" | "brand") => {
     setBusy(true);
 
     try {
@@ -75,16 +55,11 @@ export default function AffiliateProgram() {
   };
 
   const copy = async (code: string) => {
-    await navigator.clipboard.writeText(
-      referralUrl(code),
-    );
+    await navigator.clipboard.writeText(referralUrl(code));
 
     setCopied(code);
 
-    window.setTimeout(
-      () => setCopied(null),
-      1600,
-    );
+    window.setTimeout(() => setCopied(null), 1600);
   };
 
   return (
@@ -98,8 +73,8 @@ export default function AffiliateProgram() {
       </h1>
 
       <p className="mt-1 text-[17px] text-[#74819a]">
-        Create referral links and track the
-        introductions connected to your account.
+        Create referral links and track the introductions connected to your
+        account.
       </p>
 
       {error && (
@@ -119,9 +94,7 @@ export default function AffiliateProgram() {
               icon={Users}
               title="Invite creators"
               description="Create a referral URL for a creator."
-              onClick={() =>
-                void createLink("creator")
-              }
+              onClick={() => void createLink("creator")}
               busy={busy}
             />
 
@@ -129,9 +102,7 @@ export default function AffiliateProgram() {
               icon={Link2}
               title="Invite brands"
               description="Create a referral URL for a company."
-              onClick={() =>
-                void createLink("brand")
-              }
+              onClick={() => void createLink("brand")}
               busy={busy}
             />
           </section>
@@ -144,55 +115,42 @@ export default function AffiliateProgram() {
 
               <div className="mt-4 space-y-2">
                 {data?.referrals.length ? (
-                  data.referrals.map(
-                    (referral) => {
-                      const code = String(
-                        referral.code ?? "",
-                      );
+                  data.referrals.map((referral) => {
+                    const code = String(referral.code ?? "");
 
-                      return (
-                        <div
-                          key={String(
-                            referral.id,
-                          )}
-                          className="rounded-xl border border-[#e6eaf0] p-4"
-                        >
-                          <div className="flex items-center justify-between gap-3">
-                            <div>
-                              <p className="text-sm font-semibold text-[#334057]">
-                                {String(
-                                  referral.type,
-                                )} referral
-                              </p>
+                    return (
+                      <div
+                        key={String(referral.id)}
+                        className="rounded-xl border border-[#e6eaf0] p-4"
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <p className="text-sm font-semibold text-[#334057]">
+                              {String(referral.type)} referral
+                            </p>
 
-                              <p className="mt-1 text-xs text-[#8b97aa]">
-                                {code}
-                              </p>
-                            </div>
-
-                            <Button
-                              type="button"
-                              variant="outline"
-                              onClick={() =>
-                                void copy(code)
-                              }
-                              className="cursor-pointer"
-                            >
-                              <Copy className="mr-2 h-3.5 w-3.5" />
-                              {copied ===
-                              code
-                                ? "Copied"
-                                : "Copy"}
-                            </Button>
+                            <p className="mt-1 text-xs text-[#8b97aa]">
+                              {code}
+                            </p>
                           </div>
 
-                          <p className="mt-3 break-all rounded-lg bg-[#f7f9fc] px-3 py-2 text-[11px] text-[#63728a]">
-                            {referralUrl(code)}
-                          </p>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => void copy(code)}
+                            className="cursor-pointer"
+                          >
+                            <Copy className="mr-2 h-3.5 w-3.5" />
+                            {copied === code ? "Copied" : "Copy"}
+                          </Button>
                         </div>
-                      );
-                    },
-                  )
+
+                        <p className="mt-3 break-all rounded-lg bg-[#f7f9fc] px-3 py-2 text-[11px] text-[#63728a]">
+                          {referralUrl(code)}
+                        </p>
+                      </div>
+                    );
+                  })
                 ) : (
                   <p className="py-12 text-center text-sm text-[#8b97aa]">
                     No referral links yet.
@@ -208,33 +166,23 @@ export default function AffiliateProgram() {
 
               <div className="mt-4 space-y-2">
                 {data?.rewards.length ? (
-                  data.rewards.map(
-                    (reward) => (
-                      <div
-                        key={String(
-                          reward.id,
-                        )}
-                        className="flex items-center justify-between rounded-xl border border-[#e6eaf0] px-4 py-3"
-                      >
-                        <span className="text-sm text-[#56647b]">
-                          {String(
-                            reward.status ??
-                              "pending",
-                          )}
-                        </span>
+                  data.rewards.map((reward) => (
+                    <div
+                      key={String(reward.id)}
+                      className="flex items-center justify-between rounded-xl border border-[#e6eaf0] px-4 py-3"
+                    >
+                      <span className="text-sm text-[#56647b]">
+                        {String(reward.status ?? "pending")}
+                      </span>
 
-                        <span className="text-sm font-semibold text-[#1a8b57]">
-                          €{" "}
-                          {(
-                            Number(
-                              reward.amount_cents ??
-                                0,
-                            ) / 100
-                          ).toLocaleString()}
-                        </span>
-                      </div>
-                    ),
-                  )
+                      <span className="text-sm font-semibold text-[#1a8b57]">
+                        €{" "}
+                        {(
+                          Number(reward.amount_cents ?? 0) / 100
+                        ).toLocaleString()}
+                      </span>
+                    </div>
+                  ))
                 ) : (
                   <p className="py-12 text-center text-sm text-[#8b97aa]">
                     No rewards yet.
@@ -268,13 +216,9 @@ function InviteCard({
         <Icon className="h-5 w-5" />
       </span>
 
-      <h2 className="mt-5 text-lg font-semibold text-[#182239]">
-        {title}
-      </h2>
+      <h2 className="mt-5 text-lg font-semibold text-[#182239]">{title}</h2>
 
-      <p className="mt-2 text-sm leading-6 text-[#77839a]">
-        {description}
-      </p>
+      <p className="mt-2 text-sm leading-6 text-[#77839a]">{description}</p>
 
       <Button
         type="button"

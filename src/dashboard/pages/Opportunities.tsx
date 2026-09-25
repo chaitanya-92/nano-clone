@@ -1,8 +1,4 @@
-import {
-  ArrowUpRight,
-  BriefcaseBusiness,
-  Loader2,
-} from "lucide-react";
+import { ArrowUpRight, BriefcaseBusiness, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   applyToCampaign,
@@ -18,10 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-function money(
-  cents: number,
-  currency: string,
-) {
+function money(cents: number, currency: string) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency,
@@ -30,17 +23,14 @@ function money(
 }
 
 export default function Opportunities() {
-  const [campaigns, setCampaigns] =
-    useState<Campaign[]>([]);
-  const [applications, setApplications] =
-    useState<Array<Record<string, unknown>>>([]);
-  const [selected, setSelected] =
-    useState<Campaign | null>(null);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [applications, setApplications] = useState<
+    Array<Record<string, unknown>>
+  >([]);
+  const [selected, setSelected] = useState<Campaign | null>(null);
   const [message, setMessage] = useState("");
-  const [loading, setLoading] =
-    useState(true);
-  const [submitting, setSubmitting] =
-    useState(false);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
   const load = async () => {
@@ -48,11 +38,10 @@ export default function Opportunities() {
     setError("");
 
     try {
-      const [campaignResult, applicationResult] =
-        await Promise.all([
-          getCampaigns(),
-          getApplications(),
-        ]);
+      const [campaignResult, applicationResult] = await Promise.all([
+        getCampaigns(),
+        getApplications(),
+      ]);
 
       setCampaigns(campaignResult.data);
       setApplications(applicationResult.data);
@@ -80,14 +69,10 @@ export default function Opportunities() {
     setError("");
 
     try {
-      await applyToCampaign(
-        selected.id,
-        {
-          message: message.trim(),
-          proposedPriceCents:
-            selected.budget_cents,
-        },
-      );
+      await applyToCampaign(selected.id, {
+        message: message.trim(),
+        proposedPriceCents: selected.budget_cents,
+      });
 
       setSelected(null);
       setMessage("");
@@ -114,8 +99,7 @@ export default function Opportunities() {
       </h1>
 
       <p className="mt-1 max-w-[700px] text-[17px] text-[#74819a]">
-        Find open campaigns and send applications
-        directly from your workspace.
+        Find open campaigns and send applications directly from your workspace.
       </p>
 
       {error && (
@@ -135,20 +119,16 @@ export default function Opportunities() {
             No open campaigns
           </h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#7d899f]">
-            Brands will appear here once they
-            publish a campaign that is open for
-            creators.
+            Brands will appear here once they publish a campaign that is open
+            for creators.
           </p>
         </div>
       ) : (
         <section className="mt-7 grid gap-4 lg:grid-cols-2">
           {campaigns.map((campaign) => {
-            const applied =
-              applications.some(
-                (application) =>
-                  application.campaign_id ===
-                  campaign.id,
-              );
+            const applied = applications.some(
+              (application) => application.campaign_id === campaign.id,
+            );
 
             return (
               <article
@@ -158,8 +138,7 @@ export default function Opportunities() {
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8a97aa]">
-                      {campaign.brand_name ||
-                        "Brand"}
+                      {campaign.brand_name || "Brand"}
                     </p>
 
                     <h2 className="mt-2 text-xl font-semibold text-[#172033]">
@@ -182,10 +161,7 @@ export default function Opportunities() {
                       Budget
                     </p>
                     <p className="mt-1 text-sm font-semibold text-[#253047]">
-                      {money(
-                        campaign.budget_cents,
-                        campaign.currency,
-                      )}
+                      {money(campaign.budget_cents, campaign.currency)}
                     </p>
                   </div>
 
@@ -212,17 +188,11 @@ export default function Opportunities() {
                   <Button
                     type="button"
                     disabled={applied}
-                    onClick={() =>
-                      setSelected(campaign)
-                    }
+                    onClick={() => setSelected(campaign)}
                     className="cursor-pointer bg-[#171d2b] hover:bg-[#111827]"
                   >
-                    {applied
-                      ? "Applied"
-                      : "Apply"}
-                    {!applied && (
-                      <ArrowUpRight className="ml-2 h-4 w-4" />
-                    )}
+                    {applied ? "Applied" : "Apply"}
+                    {!applied && <ArrowUpRight className="ml-2 h-4 w-4" />}
                   </Button>
                 </div>
               </article>
@@ -242,16 +212,13 @@ export default function Opportunities() {
       >
         <DialogContent className="max-w-[620px]">
           <DialogHeader>
-            <DialogTitle>
-              Apply to {selected?.title}
-            </DialogTitle>
+            <DialogTitle>Apply to {selected?.title}</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="rounded-xl bg-[#f7f9fc] p-4">
               <p className="text-sm leading-6 text-[#66748a]">
-                {selected?.brief ||
-                  selected?.description}
+                {selected?.brief || selected?.description}
               </p>
             </div>
 
@@ -262,9 +229,7 @@ export default function Opportunities() {
 
               <textarea
                 value={message}
-                onChange={(event) =>
-                  setMessage(event.target.value)
-                }
+                onChange={(event) => setMessage(event.target.value)}
                 rows={5}
                 placeholder="Tell the brand why you are a fit."
                 className="auth-input resize-none"
@@ -274,15 +239,11 @@ export default function Opportunities() {
             <div className="flex justify-end">
               <Button
                 type="button"
-                onClick={() =>
-                  void submitApplication()
-                }
+                onClick={() => void submitApplication()}
                 disabled={submitting}
                 className="cursor-pointer bg-[#171d2b] hover:bg-[#111827]"
               >
-                {submitting
-                  ? "Sending…"
-                  : "Send application"}
+                {submitting ? "Sending…" : "Send application"}
               </Button>
             </div>
           </div>

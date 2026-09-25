@@ -1,7 +1,4 @@
-import {
-  ExternalLink,
-  Loader2,
-} from "lucide-react";
+import { ExternalLink, Loader2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,31 +30,21 @@ const tabs = [
 function labelStatus(value: string) {
   return value
     .replaceAll("_", " ")
-    .replace(
-      /\b\w/g,
-      (letter) => letter.toUpperCase(),
-    );
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
 export default function Collaborations() {
-  const [items, setItems] =
-    useState<Collaboration[]>([]);
-  const [tab, setTab] =
-    useState<(typeof tabs)[number]["id"]>(
-      "all",
-    );
-  const [loading, setLoading] =
-    useState(true);
-  const [busyId, setBusyId] =
-    useState<string | null>(null);
+  const [items, setItems] = useState<Collaboration[]>([]);
+  const [tab, setTab] = useState<(typeof tabs)[number]["id"]>("all");
+  const [loading, setLoading] = useState(true);
+  const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState("");
 
   const load = async () => {
     setLoading(true);
 
     try {
-      const { data } =
-        await getCollaborations();
+      const { data } = await getCollaborations();
       setItems(data);
     } catch (value) {
       setError(
@@ -75,31 +62,18 @@ export default function Collaborations() {
   }, []);
 
   const filtered = useMemo(
-    () =>
-      tab === "all"
-        ? items
-        : items.filter(
-            (item) => item.status === tab,
-          ),
+    () => (tab === "all" ? items : items.filter((item) => item.status === tab)),
     [items, tab],
   );
 
-  const advance = async (
-    item: Collaboration,
-  ) => {
-    const transitions: Record<
-      string,
-      string | undefined
-    > = {
-      application_accepted:
-        "content_submitted",
-      content_submitted:
-        "content_approved",
+  const advance = async (item: Collaboration) => {
+    const transitions: Record<string, string | undefined> = {
+      application_accepted: "content_submitted",
+      content_submitted: "content_approved",
       content_approved: "completed",
     };
 
-    const next =
-      transitions[item.status];
+    const next = transitions[item.status];
 
     if (!next) {
       return;
@@ -108,17 +82,13 @@ export default function Collaborations() {
     setBusyId(item.id);
 
     try {
-      await updateCollaboration(
-        item.id,
-        {
-          status: next,
-          publishedUrl:
-            next === "completed"
-              ? item.published_url ||
-                "https://www.linkedin.com/"
-              : item.published_url,
-        },
-      );
+      await updateCollaboration(item.id, {
+        status: next,
+        publishedUrl:
+          next === "completed"
+            ? item.published_url || "https://www.linkedin.com/"
+            : item.published_url,
+      });
 
       await load();
     } catch (value) {
@@ -143,8 +113,7 @@ export default function Collaborations() {
       </h1>
 
       <p className="mt-1 text-[17px] text-[#74819a]">
-        Track accepted work through each delivery
-        state.
+        Track accepted work through each delivery state.
       </p>
 
       {error && (
@@ -181,8 +150,7 @@ export default function Collaborations() {
           </h2>
 
           <p className="mt-2 text-sm text-[#7d899f]">
-            Accepted campaign work will appear
-            here automatically.
+            Accepted campaign work will appear here automatically.
           </p>
         </div>
       ) : (
@@ -203,18 +171,12 @@ export default function Collaborations() {
                   </h2>
 
                   <p className="mt-2 text-sm leading-6 text-[#74819a]">
-                    {item.brief ||
-                      "No additional brief has been added."}
+                    {item.brief || "No additional brief has been added."}
                   </p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                  <Metric
-                    label="Status"
-                    value={labelStatus(
-                      item.status,
-                    )}
-                  />
+                  <Metric label="Status" value={labelStatus(item.status)} />
                   <Metric
                     label="Impressions"
                     value={item.impressions.toLocaleString()}
@@ -225,13 +187,7 @@ export default function Collaborations() {
                   />
                   <Metric
                     label="Earned"
-                    value={
-                      "€" +
-                      (
-                        item.net_amount_cents /
-                        100
-                      ).toLocaleString()
-                    }
+                    value={"€" + (item.net_amount_cents / 100).toLocaleString()}
                   />
                 </div>
 
@@ -248,25 +204,18 @@ export default function Collaborations() {
                     </a>
                   )}
 
-                  {item.status !==
-                    "completed" && (
+                  {item.status !== "completed" && (
                     <Button
                       type="button"
-                      onClick={() =>
-                        void advance(item)
-                      }
-                      disabled={
-                        busyId === item.id
-                      }
+                      onClick={() => void advance(item)}
+                      disabled={busyId === item.id}
                       className="cursor-pointer bg-[#171d2b] hover:bg-[#111827]"
                     >
                       {busyId === item.id
                         ? "Saving…"
-                        : item.status ===
-                            "application_accepted"
+                        : item.status === "application_accepted"
                           ? "Mark submitted"
-                          : item.status ===
-                              "content_submitted"
+                          : item.status === "content_submitted"
                             ? "Approve"
                             : "Complete"}
                     </Button>
@@ -281,22 +230,14 @@ export default function Collaborations() {
   );
 }
 
-function Metric({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
+function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl bg-[#f7f9fc] px-3 py-2 text-center">
       <p className="text-[9px] uppercase tracking-[0.08em] text-[#98a2b3]">
         {label}
       </p>
 
-      <p className="mt-1 text-xs font-semibold text-[#2a354b]">
-        {value}
-      </p>
+      <p className="mt-1 text-xs font-semibold text-[#2a354b]">{value}</p>
     </div>
   );
 }
