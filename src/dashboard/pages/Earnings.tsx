@@ -16,10 +16,7 @@ import {
   type PayoutMethod,
 } from "@/lib/dashboard";
 
-function money(
-  cents: number,
-  currency = "EUR",
-) {
+function money(cents: number, currency = "EUR") {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency,
@@ -28,39 +25,29 @@ function money(
 }
 
 export default function Earnings() {
-  const [data, setData] =
-    useState<EarningsResponse["data"] | null>(
-      null,
-    );
-  const [methods, setMethods] =
-    useState<PayoutMethod[]>([]);
+  const [data, setData] = useState<EarningsResponse["data"] | null>(null);
+  const [methods, setMethods] = useState<PayoutMethod[]>([]);
   const [amount, setAmount] = useState("");
   const [label, setLabel] = useState("");
-  const [showMethod, setShowMethod] =
-    useState(false);
-  const [loading, setLoading] =
-    useState(true);
-  const [busy, setBusy] =
-    useState(false);
+  const [showMethod, setShowMethod] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
   const load = async () => {
     setLoading(true);
 
     try {
-      const [earningsResult, methodsResult] =
-        await Promise.all([
-          getEarnings(),
-          getPayoutMethods(),
-        ]);
+      const [earningsResult, methodsResult] = await Promise.all([
+        getEarnings(),
+        getPayoutMethods(),
+      ]);
 
       setData(earningsResult.data);
       setMethods(methodsResult.data);
     } catch (value) {
       setError(
-        value instanceof Error
-          ? value.message
-          : "Unable to load earnings.",
+        value instanceof Error ? value.message : "Unable to load earnings.",
       );
     } finally {
       setLoading(false);
@@ -75,9 +62,7 @@ export default function Earnings() {
     const value = label.trim();
 
     if (!value) {
-      setError(
-        "Enter a name for the payout method.",
-      );
+      setError("Enter a name for the payout method.");
       return;
     }
 
@@ -94,9 +79,7 @@ export default function Earnings() {
       await load();
     } catch (value) {
       setError(
-        value instanceof Error
-          ? value.message
-          : "Unable to add payout method.",
+        value instanceof Error ? value.message : "Unable to add payout method.",
       );
     } finally {
       setBusy(false);
@@ -108,16 +91,12 @@ export default function Earnings() {
     const value = Number.parseFloat(amount);
 
     if (!method) {
-      setError(
-        "Add a payout method before requesting a withdrawal.",
-      );
+      setError("Add a payout method before requesting a withdrawal.");
       return;
     }
 
     if (!Number.isFinite(value) || value <= 0) {
-      setError(
-        "Enter a valid withdrawal amount.",
-      );
+      setError("Enter a valid withdrawal amount.");
       return;
     }
 
@@ -126,9 +105,7 @@ export default function Earnings() {
     try {
       await requestWithdrawal({
         payoutMethodId: method.id,
-        amountCents: Math.round(
-          value * 100,
-        ),
+        amountCents: Math.round(value * 100),
       });
 
       setAmount("");
@@ -155,8 +132,7 @@ export default function Earnings() {
       </h1>
 
       <p className="mt-1 text-[17px] text-[#74819a]">
-        Track your balances, activity and payout
-        setup.
+        Track your balances, activity and payout setup.
       </p>
 
       {error && (
@@ -174,26 +150,17 @@ export default function Earnings() {
           <section className="mt-7 grid gap-4 md:grid-cols-3">
             <Summary
               label="Total earned"
-              value={money(
-                data?.summary.total_earned ??
-                  0,
-              )}
+              value={money(data?.summary.total_earned ?? 0)}
               icon={ArrowUpRight}
             />
             <Summary
               label="Available"
-              value={money(
-                data?.summary.available ??
-                  0,
-              )}
+              value={money(data?.summary.available ?? 0)}
               icon={WalletCards}
             />
             <Summary
               label="Withdrawn"
-              value={money(
-                data?.summary.withdrawn ??
-                  0,
-              )}
+              value={money(data?.summary.withdrawn ?? 0)}
               icon={ArrowDownToLine}
             />
           </section>
@@ -213,14 +180,11 @@ export default function Earnings() {
                     >
                       <div>
                         <p className="text-sm font-medium text-[#334057]">
-                          {item.description ||
-                            item.type}
+                          {item.description || item.type}
                         </p>
 
                         <p className="mt-1 text-[11px] text-[#8b97aa]">
-                          {new Date(
-                            item.created_at,
-                          ).toLocaleString()}
+                          {new Date(item.created_at).toLocaleString()}
                           {" · "}
                           {item.status}
                         </p>
@@ -228,16 +192,12 @@ export default function Earnings() {
 
                       <span
                         className={
-                          item.amount_cents >=
-                          0
+                          item.amount_cents >= 0
                             ? "text-sm font-semibold text-[#198957]"
                             : "text-sm font-semibold text-[#b65a5a]"
                         }
                       >
-                        {money(
-                          item.amount_cents,
-                          item.currency,
-                        )}
+                        {money(item.amount_cents, item.currency)}
                       </span>
                     </div>
                   ))
@@ -258,19 +218,14 @@ export default function Earnings() {
                     </h2>
 
                     <p className="mt-1 text-xs text-[#8995aa]">
-                      Manage where withdrawals
-                      should go.
+                      Manage where withdrawals should go.
                     </p>
                   </div>
 
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() =>
-                      setShowMethod(
-                        (value) => !value,
-                      )
-                    }
+                    onClick={() => setShowMethod((value) => !value)}
                     className="cursor-pointer"
                   >
                     <Plus className="mr-2 h-4 w-4" />
@@ -282,26 +237,18 @@ export default function Earnings() {
                   <div className="mt-4 space-y-3">
                     <input
                       value={label}
-                      onChange={(event) =>
-                        setLabel(
-                          event.target.value,
-                        )
-                      }
+                      onChange={(event) => setLabel(event.target.value)}
                       placeholder="Primary Stripe account"
                       className="auth-input"
                     />
 
                     <Button
                       type="button"
-                      onClick={() =>
-                        void saveMethod()
-                      }
+                      onClick={() => void saveMethod()}
                       disabled={busy}
                       className="cursor-pointer bg-[#171d2b] hover:bg-[#111827]"
                     >
-                      {busy
-                        ? "Saving…"
-                        : "Save method"}
+                      {busy ? "Saving…" : "Save method"}
                     </Button>
                   </div>
                 )}
@@ -317,18 +264,16 @@ export default function Earnings() {
                       </p>
 
                       <p className="mt-1 text-xs text-[#8b97aa]">
-                        {method.type} ·{" "}
-                        {method.status}
+                        {method.type} · {method.status}
                       </p>
                     </div>
                   ))}
 
-                  {!methods.length &&
-                    !showMethod && (
-                      <p className="py-5 text-xs text-[#8b97aa]">
-                        No payout method added.
-                      </p>
-                    )}
+                  {!methods.length && !showMethod && (
+                    <p className="py-5 text-xs text-[#8b97aa]">
+                      No payout method added.
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -338,20 +283,12 @@ export default function Earnings() {
                 </h2>
 
                 <p className="mt-1 text-xs text-[#8995aa]">
-                  Available:{" "}
-                  {money(
-                    data?.summary.available ??
-                      0,
-                  )}
+                  Available: {money(data?.summary.available ?? 0)}
                 </p>
 
                 <input
                   value={amount}
-                  onChange={(event) =>
-                    setAmount(
-                      event.target.value,
-                    )
-                  }
+                  onChange={(event) => setAmount(event.target.value)}
                   type="number"
                   min="0"
                   step="1"
@@ -361,9 +298,7 @@ export default function Earnings() {
 
                 <Button
                   type="button"
-                  onClick={() =>
-                    void withdraw()
-                  }
+                  onClick={() => void withdraw()}
                   disabled={busy}
                   className="mt-3 w-full cursor-pointer bg-[#2864f0] hover:bg-[#1f58dc]"
                 >
@@ -390,9 +325,7 @@ function Summary({
   return (
     <div className="rounded-[18px] border border-[#dfe5ed] bg-white p-5">
       <div className="flex items-center justify-between">
-        <p className="text-xs text-[#77839a]">
-          {label}
-        </p>
+        <p className="text-xs text-[#77839a]">{label}</p>
 
         <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#eef4ff] text-[#2864f0]">
           <Icon className="h-4 w-4" />

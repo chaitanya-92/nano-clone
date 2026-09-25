@@ -1,35 +1,19 @@
-import {
-  ArrowUpRight,
-  ExternalLink,
-  Loader2,
-  Users,
-} from "lucide-react";
+import { ArrowUpRight, ExternalLink, Loader2, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  getCommunity,
-  type CommunityResponse,
-} from "@/lib/dashboard";
+import { getCommunity, type CommunityResponse } from "@/lib/dashboard";
 
 export default function Community() {
-  const [data, setData] =
-    useState<CommunityResponse["data"] | null>(
-      null,
-    );
-  const [loading, setLoading] =
-    useState(true);
+  const [data, setData] = useState<CommunityResponse["data"] | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     void getCommunity()
-      .then(({ data: response }) =>
-        setData(response),
-      )
+      .then(({ data: response }) => setData(response))
       .catch((value) =>
         setError(
-          value instanceof Error
-            ? value.message
-            : "Unable to load community.",
+          value instanceof Error ? value.message : "Unable to load community.",
         ),
       )
       .finally(() => setLoading(false));
@@ -46,8 +30,7 @@ export default function Community() {
       </h1>
 
       <p className="mt-1 max-w-[720px] text-[17px] text-[#74819a]">
-        Discover public creator activity and
-        open public cards.
+        Discover public creator activity and open public cards.
       </p>
 
       {error && (
@@ -70,8 +53,7 @@ export default function Community() {
                 </h2>
 
                 <p className="mt-1 text-xs text-[#8b97aa]">
-                  Public profile metrics across the
-                  creator network.
+                  Public profile metrics across the creator network.
                 </p>
               </div>
 
@@ -79,57 +61,42 @@ export default function Community() {
             </div>
 
             {data?.leaderboard.length ? (
-              data.leaderboard.map(
-                (creator, index) => (
-                  <div
-                    key={creator.id}
-                    className="flex flex-col gap-4 border-b border-[#edf0f4] px-6 py-5 last:border-b-0 md:flex-row md:items-center"
-                  >
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#eef4ff] text-sm font-semibold text-[#2864f0]">
-                      {index + 1}
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <h3 className="truncate text-sm font-semibold text-[#27344b]">
-                        {creator.name}
-                      </h3>
-
-                      <p className="mt-1 truncate text-xs text-[#8a96aa]">
-                        {creator.headline ||
-                          "Creator"}
-                      </p>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-2">
-                      <Mini
-                        label="Followers"
-                        value={creator.followers}
-                      />
-                      <Mini
-                        label="Impressions"
-                        value={creator.impressions}
-                      />
-                      <Mini
-                        label="Posts"
-                        value={creator.post_count}
-                      />
-                    </div>
-
-                    {creator.slug && (
-                      <Link
-                        to={
-                          "/creator/" +
-                          creator.slug
-                        }
-                        className="inline-flex cursor-pointer items-center rounded-lg border border-[#dce3ec] px-3 py-2 text-xs font-semibold text-[#59667e]"
-                      >
-                        View card
-                        <ArrowUpRight className="ml-2 h-3.5 w-3.5" />
-                      </Link>
-                    )}
+              data.leaderboard.map((creator, index) => (
+                <div
+                  key={creator.id}
+                  className="flex flex-col gap-4 border-b border-[#edf0f4] px-6 py-5 last:border-b-0 md:flex-row md:items-center"
+                >
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#eef4ff] text-sm font-semibold text-[#2864f0]">
+                    {index + 1}
                   </div>
-                ),
-              )
+
+                  <div className="min-w-0 flex-1">
+                    <h3 className="truncate text-sm font-semibold text-[#27344b]">
+                      {creator.name}
+                    </h3>
+
+                    <p className="mt-1 truncate text-xs text-[#8a96aa]">
+                      {creator.headline || "Creator"}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2">
+                    <Mini label="Followers" value={creator.followers} />
+                    <Mini label="Impressions" value={creator.impressions} />
+                    <Mini label="Posts" value={creator.post_count} />
+                  </div>
+
+                  {creator.slug && (
+                    <Link
+                      to={"/creator/" + creator.slug}
+                      className="inline-flex cursor-pointer items-center rounded-lg border border-[#dce3ec] px-3 py-2 text-xs font-semibold text-[#59667e]"
+                    >
+                      View card
+                      <ArrowUpRight className="ml-2 h-3.5 w-3.5" />
+                    </Link>
+                  )}
+                </div>
+              ))
             ) : (
               <div className="px-6 py-20 text-center">
                 <p className="text-sm text-[#7d899f]">
@@ -151,9 +118,8 @@ export default function Community() {
                 </h2>
 
                 <p className="mt-1 text-xs leading-5 text-[#74819a]">
-                  Each published creator card has a
-                  public URL that can be opened without
-                  signing in.
+                  Each published creator card has a public URL that can be
+                  opened without signing in.
                 </p>
               </div>
             </div>
@@ -164,13 +130,7 @@ export default function Community() {
   );
 }
 
-function Mini({
-  label,
-  value,
-}: {
-  label: string;
-  value: number;
-}) {
+function Mini({ label, value }: { label: string; value: number }) {
   return (
     <div className="min-w-[84px] rounded-lg bg-[#f7f9fc] px-3 py-2 text-center">
       <p className="text-[9px] uppercase tracking-[0.08em] text-[#9aa5b5]">

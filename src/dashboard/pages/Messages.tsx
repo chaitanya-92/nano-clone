@@ -1,7 +1,4 @@
-import {
-  Loader2,
-  Send,
-} from "lucide-react";
+import { Loader2, Send } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,32 +11,23 @@ import {
 } from "@/lib/dashboard";
 
 export default function Messages() {
-  const [conversations, setConversations] =
-    useState<Conversation[]>([]);
-  const [selectedId, setSelectedId] =
-    useState<string | null>(null);
-  const [messages, setMessages] =
-    useState<Message[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [draft, setDraft] = useState("");
-  const [loading, setLoading] =
-    useState(true);
-  const [sending, setSending] =
-    useState(false);
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
 
   const loadConversations = async () => {
     try {
-      const { data } =
-        await getConversations();
+      const { data } = await getConversations();
 
       setConversations(data);
       setSelectedId((current) =>
-        current &&
-        data.some(
-          (item) => item.id === current,
-        )
+        current && data.some((item) => item.id === current)
           ? current
-          : data[0]?.id ?? null,
+          : (data[0]?.id ?? null),
       );
     } catch (value) {
       setError(
@@ -52,24 +40,15 @@ export default function Messages() {
     }
   };
 
-  const loadMessages = async (
-    conversationId: string,
-  ) => {
+  const loadMessages = async (conversationId: string) => {
     try {
-      const { data } =
-        await getMessages(
-          conversationId,
-        );
+      const { data } = await getMessages(conversationId);
 
       setMessages(data);
-      await markConversationRead(
-        conversationId,
-      );
+      await markConversationRead(conversationId);
     } catch (value) {
       setError(
-        value instanceof Error
-          ? value.message
-          : "Unable to load messages.",
+        value instanceof Error ? value.message : "Unable to load messages.",
       );
     }
   };
@@ -97,19 +76,14 @@ export default function Messages() {
     setSending(true);
 
     try {
-      await sendConversationMessage(
-        selectedId,
-        value,
-      );
+      await sendConversationMessage(selectedId, value);
 
       setDraft("");
       await loadMessages(selectedId);
       await loadConversations();
     } catch (value) {
       setError(
-        value instanceof Error
-          ? value.message
-          : "Unable to send message.",
+        value instanceof Error ? value.message : "Unable to send message.",
       );
     } finally {
       setSending(false);
@@ -127,8 +101,7 @@ export default function Messages() {
       </h1>
 
       <p className="mt-1 text-[17px] text-[#74819a]">
-        Keep conversations with brands and
-        creators in one place.
+        Keep conversations with brands and creators in one place.
       </p>
 
       {error && (
@@ -150,42 +123,34 @@ export default function Messages() {
               <Loader2 className="h-5 w-5 animate-spin text-[#71809a]" />
             </div>
           ) : conversations.length ? (
-            conversations.map(
-              (conversation) => (
-                <button
-                  key={conversation.id}
-                  type="button"
-                  onClick={() =>
-                    setSelectedId(
-                      conversation.id,
-                    )
-                  }
-                  className={
-                    selectedId ===
-                    conversation.id
-                      ? "w-full cursor-pointer border-b border-[#e7ebf0] bg-[#f5f8ff] px-5 py-4 text-left"
-                      : "w-full cursor-pointer border-b border-[#e7ebf0] px-5 py-4 text-left hover:bg-[#fafbfc]"
-                  }
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="truncate text-sm font-semibold text-[#34415a]">
-                      {conversation.subject ||
-                        conversation.brand_name ||
-                        conversation.creator_name}
-                    </p>
-
-                    <span className="shrink-0 text-[10px] text-[#98a3b4]">
-                      {conversation.status}
-                    </span>
-                  </div>
-
-                  <p className="mt-2 truncate text-xs text-[#8490a5]">
-                    {conversation.last_message ||
-                      "No messages yet"}
+            conversations.map((conversation) => (
+              <button
+                key={conversation.id}
+                type="button"
+                onClick={() => setSelectedId(conversation.id)}
+                className={
+                  selectedId === conversation.id
+                    ? "w-full cursor-pointer border-b border-[#e7ebf0] bg-[#f5f8ff] px-5 py-4 text-left"
+                    : "w-full cursor-pointer border-b border-[#e7ebf0] px-5 py-4 text-left hover:bg-[#fafbfc]"
+                }
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <p className="truncate text-sm font-semibold text-[#34415a]">
+                    {conversation.subject ||
+                      conversation.brand_name ||
+                      conversation.creator_name}
                   </p>
-                </button>
-              ),
-            )
+
+                  <span className="shrink-0 text-[10px] text-[#98a3b4]">
+                    {conversation.status}
+                  </span>
+                </div>
+
+                <p className="mt-2 truncate text-xs text-[#8490a5]">
+                  {conversation.last_message || "No messages yet"}
+                </p>
+              </button>
+            ))
           ) : (
             <div className="px-5 py-16 text-center">
               <p className="text-sm font-medium text-[#69768d]">
@@ -193,8 +158,8 @@ export default function Messages() {
               </p>
 
               <p className="mt-2 text-xs leading-5 text-[#8d99aa]">
-                A conversation will appear when
-                a collaboration thread is created.
+                A conversation will appear when a collaboration thread is
+                created.
               </p>
             </div>
           )}
@@ -203,14 +168,9 @@ export default function Messages() {
         <div className="flex min-h-[620px] flex-col">
           <div className="border-b border-[#e7ebf0] px-6 py-5">
             <h2 className="text-sm font-semibold text-[#253047]">
-              {conversations.find(
-                (item) =>
-                  item.id === selectedId,
-              )?.subject ||
-                conversations.find(
-                  (item) =>
-                    item.id === selectedId,
-                )?.brand_name ||
+              {conversations.find((item) => item.id === selectedId)?.subject ||
+                conversations.find((item) => item.id === selectedId)
+                  ?.brand_name ||
                 "Select a conversation"}
             </h2>
           </div>
@@ -228,9 +188,7 @@ export default function Messages() {
                     </p>
 
                     <span className="text-[10px] text-[#98a3b4]">
-                      {new Date(
-                        message.created_at,
-                      ).toLocaleString()}
+                      {new Date(message.created_at).toLocaleString()}
                     </span>
                   </div>
 
@@ -257,29 +215,17 @@ export default function Messages() {
           >
             <input
               value={draft}
-              onChange={(event) =>
-                setDraft(
-                  event.target.value,
-                )
-              }
-              disabled={
-                !selectedId || sending
-              }
+              onChange={(event) => setDraft(event.target.value)}
+              disabled={!selectedId || sending}
               placeholder={
-                selectedId
-                  ? "Write a message…"
-                  : "Select a conversation first"
+                selectedId ? "Write a message…" : "Select a conversation first"
               }
               className="auth-input flex-1"
             />
 
             <Button
               type="submit"
-              disabled={
-                !selectedId ||
-                !draft.trim() ||
-                sending
-              }
+              disabled={!selectedId || !draft.trim() || sending}
               className="h-11 w-11 cursor-pointer rounded-xl bg-[#2864f0] p-0 hover:bg-[#1f58dc]"
             >
               <Send className="h-4 w-4" />
