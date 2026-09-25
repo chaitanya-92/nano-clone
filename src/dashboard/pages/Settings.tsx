@@ -686,7 +686,7 @@ export default function Settings() {
                         busy ||
                         !name.trim()
                       }
-                      className="cursor-pointer bg-[#171d2b] hover:bg-[#111827]"
+                      className="h-10 cursor-pointer rounded-lg bg-[#171d2b] px-4 hover:bg-[#111827]"
                     >
                       <Save className="mr-2 h-4 w-4" />
                       {nameSaved
@@ -757,7 +757,7 @@ export default function Settings() {
                         void saveSocialLinks()
                       }
                       disabled={busy}
-                      className="cursor-pointer bg-[#171d2b] hover:bg-[#111827]"
+                      className="h-10 cursor-pointer rounded-lg bg-[#171d2b] px-4 hover:bg-[#111827]"
                     >
                       <Save className="mr-2 h-4 w-4" />
                       {socialSaved
@@ -812,7 +812,7 @@ export default function Settings() {
                               !value,
                           )
                         }
-                        className="cursor-pointer"
+                        className="h-10 cursor-pointer rounded-lg px-4"
                       >
                         {showMethod
                           ? "Cancel"
@@ -842,7 +842,7 @@ export default function Settings() {
                             busy ||
                             !methodLabel.trim()
                           }
-                          className="cursor-pointer bg-[#171d2b] hover:bg-[#111827]"
+                          className="h-10 cursor-pointer rounded-lg bg-[#171d2b] px-4 hover:bg-[#111827]"
                         >
                           <Save className="mr-2 h-4 w-4" />
                           Save
@@ -917,7 +917,7 @@ export default function Settings() {
                   onClick={() =>
                     setShowDelete(true)
                   }
-                  className="mt-5 cursor-pointer"
+                  className="mt-5 h-10 cursor-pointer rounded-lg px-4"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete my account
@@ -991,7 +991,7 @@ export default function Settings() {
                 setShowDelete(false)
               }
               disabled={busy}
-              className="cursor-pointer"
+              className="h-10 cursor-pointer rounded-lg px-4"
             >
               Cancel
             </Button>
@@ -1007,7 +1007,7 @@ export default function Settings() {
                 deleteConfirmation !==
                   "DELETE"
               }
-              className="cursor-pointer"
+              className="h-10 cursor-pointer rounded-lg px-4"
             >
               {busy && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -1123,7 +1123,7 @@ function SocialField({
             !value.trim() ||
             Boolean(normalizedError)
           }
-          className="cursor-pointer whitespace-nowrap"
+          className="h-10 cursor-pointer rounded-lg px-4 whitespace-nowrap"
         >
           {status === "verifying" ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
