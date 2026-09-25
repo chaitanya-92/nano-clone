@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - building/auth-onboarding
+      - building/messages-assistant
   pull_request:
     branches:
       - building/auth-onboarding
