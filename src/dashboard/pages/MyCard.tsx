@@ -255,27 +255,21 @@ export default function MyCard() {
             <div className="mt-8 grid grid-cols-3 border-y border-[#e8ecf2] py-6">
               <div>
                 <p className="text-2xl font-semibold text-[#182239]">
-                  {Number(
-                    profile.followers ?? 0,
-                  ).toLocaleString()}
+                  {Number(profile.followers ?? 0).toLocaleString()}
                 </p>
                 <p className="mt-1 text-xs text-[#8794aa]">Followers</p>
               </div>
 
               <div className="border-x border-[#e8ecf2]">
                 <p className="text-2xl font-semibold text-[#182239]">
-                  {Number(
-                    profile.impressions ?? 0,
-                  ).toLocaleString()}
+                  {Number(profile.impressions ?? 0).toLocaleString()}
                 </p>
                 <p className="mt-1 text-xs text-[#8794aa]">Impressions</p>
               </div>
 
               <div>
                 <p className="text-2xl font-semibold text-[#182239]">
-                  {Number(
-                    profile.post_count ?? 0,
-                  ).toLocaleString()}
+                  {Number(profile.post_count ?? 0).toLocaleString()}
                 </p>
                 <p className="mt-1 text-xs text-[#8794aa]">Posts</p>
               </div>
