@@ -656,33 +656,29 @@ export default function Settings() {
                     Display name
                   </label>
 
-                  <div className="mt-2 flex gap-2">
-                    <input
-                      value={name}
-                      onChange={(event) =>
-                        setName(
-                          event.target.value,
-                        )
-                      }
-                      className="auth-input flex-1"
-                    />
-
-
-                  </div>
+                  <input
+                    value={name}
+                    onChange={(event) =>
+                      setName(event.target.value)
+                    }
+                    className="auth-input mt-2 w-full"
+                    placeholder="Your display name"
+                  />
                 </div>
 
                 <div className="border-t border-[#e8ecf2] pt-6">
                   <div className="flex items-center gap-2">
                     <Link2 className="h-4 w-4 text-[#6d7a91]" />
+
                     <h3 className="text-base font-semibold text-[#182239]">
                       Social links
                     </h3>
                   </div>
 
                   <p className="mt-1 text-sm text-[#7d899f]">
-                    Save public profile links and
-                    verify them before they are used
-                    for profile data.
+                    Save your public profile links. Naano
+                    will refresh available public profile
+                    information after saving.
                   </p>
 
                   <div className="mt-5 space-y-5">
@@ -695,9 +691,7 @@ export default function Settings() {
                       busy={busy}
                       placeholder="https://linkedin.com/in/your-profile"
                       onChange={(value) =>
-                        setLinkedinUrl(
-                          value,
-                        )
+                        setLinkedinUrl(value)
                       }
                     />
 
@@ -710,44 +704,32 @@ export default function Settings() {
                       busy={busy}
                       placeholder="https://x.com/your-handle"
                       onChange={(value) =>
-                        setXProfileUrl(
-                          value,
-                        )
+                        setXProfileUrl(value)
                       }
                     />
-
-                    <Button
-                      type="button"
-                      onClick={() =>
-                        void saveSocialLinks()
-                      }
-                      disabled={busy}
-                      className="h-10 cursor-pointer rounded-lg bg-[#171d2b] px-4 hover:bg-[#111827]"
-                    >
-                      <Save className="mr-2 h-4 w-4" />
-                      {socialSaved
-                        ? "Saved"
-                        : "Save social links"}
-
-                    <div className="flex justify-end border-t border-[#e8ecf2] pt-5">
-                      <Button
-                        type="button"
-                        onClick={() =>
-                          void saveChanges()
-                        }
-                        disabled={busy}
-                        className="h-10 min-w-[132px] cursor-pointer rounded-lg bg-[#171d2b] px-5 text-white hover:bg-[#111827]"
-                      >
-                        {busy && (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        )}
-                        {saved
-                          ? "Saved"
-                          : "Save changes"}
-                      </Button>
-                    </div>
-                    </Button>
                   </div>
+                </div>
+
+                <div className="flex justify-end border-t border-[#e8ecf2] pt-5">
+                  <Button
+                    type="button"
+                    onClick={() =>
+                      void saveChanges()
+                    }
+                    disabled={
+                      busy ||
+                      !name.trim()
+                    }
+                    className="h-10 min-w-[132px] cursor-pointer rounded-lg bg-[#171d2b] px-5 text-white hover:bg-[#111827]"
+                  >
+                    {busy && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+
+                    {saved
+                      ? "Saved"
+                      : "Save changes"}
+                  </Button>
                 </div>
               </div>
             </div>
