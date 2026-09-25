@@ -77,7 +77,8 @@ function EmailField({
       return;
     }
 
-    onStatus("checking");
+    formik.setFieldError("email", undefined);
+    onStatus("available");
 
     try {
       const result = await checkEmail(normalizedEmail);
@@ -85,18 +86,20 @@ function EmailField({
       if (!result.available) {
         onStatus("taken");
         onExistingEmail();
-        return;
       }
-
-      formik.setFieldError("email", undefined);
-      onStatus("available");
     } catch {
-      onStatus("idle");
+      onStatus("available");
     }
   };
 
   const handleRequestOtp = async () => {
-    if (status !== "available" || !validateEmail(email)) {
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!validateEmail(normalizedEmail)) {
+      formik.setFieldError(
+        "email",
+        "Enter a valid email address.",
+      );
       return;
     }
 
@@ -167,7 +170,7 @@ function EmailField({
             <CheckCircle2 className="h-4 w-4" />
             Verified
           </div>
-        ) : status === "available" ? (
+        ) : validateEmail(email) ? (
           <button
             type="button"
             onClick={handleRequestOtp}
