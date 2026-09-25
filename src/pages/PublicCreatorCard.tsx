@@ -1,4 +1,5 @@
 import { ArrowLeft, ExternalLink } from "lucide-react";
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getPublicCreatorCard } from "@/lib/dashboard";
@@ -69,7 +70,26 @@ export default function PublicCreatorCard() {
   return (
     <main className="min-h-screen bg-[#f6f8fc] px-6 py-12">
       <div className="mx-auto max-w-[720px]">
-        <div className="overflow-hidden rounded-[32px] border border-[#dce4ef] bg-white shadow-[0_24px_80px_rgba(30,55,95,0.10)]">
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 24,
+            scale: 0.985,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+            scale: 1,
+          }}
+          transition={{
+            duration: 0.55,
+            ease: "easeOut",
+          }}
+          whileHover={{
+            y: -4,
+          }}
+          className="overflow-hidden rounded-[32px] border border-[#dce4ef] bg-white shadow-[0_24px_80px_rgba(30,55,95,0.10)]"
+        >
           <div className="relative h-[170px] bg-gradient-to-br from-[#2159df] via-[#316df0] to-[#6f91f3]">
             <div className="absolute left-8 top-7 text-2xl font-bold text-white">
               naano
@@ -79,7 +99,23 @@ export default function PublicCreatorCard() {
               {card.country || "Global"}
             </div>
 
-            <div className="absolute -bottom-14 left-1/2 flex h-28 w-28 -translate-x-1/2 items-center justify-center overflow-hidden rounded-full border-4 border-[#316df0] bg-[#6572cc] text-4xl font-medium text-white">
+            <motion.div
+              initial={{
+                scale: 0.72,
+                opacity: 0,
+              }}
+              animate={{
+                scale: 1,
+                opacity: 1,
+              }}
+              transition={{
+                type: "spring",
+                stiffness: 240,
+                damping: 19,
+                delay: 0.1,
+              }}
+              className="absolute -bottom-14 left-1/2 flex h-28 w-28 -translate-x-1/2 items-center justify-center overflow-hidden rounded-full border-4 border-[#316df0] bg-[#6572cc] text-4xl font-medium text-white"
+            >
               {card.profile_photo_url ? (
                 <img
                   src={card.profile_photo_url}
@@ -93,7 +129,7 @@ export default function PublicCreatorCard() {
                   .slice(0, 2)
                   .join("")
               )}
-            </div>
+            </motion.div>
           </div>
 
           <div className="px-8 pb-10 pt-20 text-center">
@@ -157,7 +193,7 @@ export default function PublicCreatorCard() {
               </a>
             )}
           </div>
-        </div>
+        </motion.div>
       </div>
     </main>
   );

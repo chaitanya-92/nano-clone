@@ -1,4 +1,5 @@
 import { ArrowUpRight, Check, Copy, ExternalLink, Share2 } from "lucide-react";
+import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -117,13 +118,37 @@ export default function Overview() {
           const value = dashboard?.metrics?.[stat.key] ?? 0;
 
           return (
-            <button
+            <motion.button
               key={stat.key}
               type="button"
+              initial={{
+                opacity: 0,
+                y: 12,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
+              transition={{
+                duration: 0.35,
+                delay:
+                  0.05 +
+                  stats.indexOf(stat) * 0.06,
+              }}
+              whileHover={{
+                y: -4,
+                scale: 1.01,
+              }}
+              whileTap={{
+                scale: 0.995,
+              }}
               onClick={() =>
-                navigate("/dashboard/analytics?metric=" + stat.key)
+                navigate(
+                  "/dashboard/analytics?metric=" +
+                    stat.key,
+                )
               }
-              className="cursor-pointer rounded-[18px] border border-[#e1e6ee] bg-white px-5 py-5 text-left shadow-[0_3px_12px_rgba(20,35,60,0.025)] transition hover:-translate-y-0.5 hover:border-[#cfd7e3]"
+              className="cursor-pointer rounded-[18px] border border-[#e1e6ee] bg-white px-5 py-5 text-left shadow-[0_3px_12px_rgba(20,35,60,0.025)]"
             >
               <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8b9bb3]">
                 {stat.label}
@@ -138,13 +163,30 @@ export default function Overview() {
               <p className="mt-1 text-[12px] text-[#8794aa]">
                 {stat.description}
               </p>
-            </button>
+            </motion.button>
           );
         })}
       </section>
 
       <section className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-[410px_1fr]">
-        <div className="overflow-hidden rounded-[22px] border border-[#e1e6ee] bg-white shadow-[0_2px_8px_rgba(20,35,60,0.03)]">
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 18,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            duration: 0.45,
+            delay: 0.28,
+          }}
+          whileHover={{
+            y: -3,
+          }}
+          className="overflow-hidden rounded-[22px] border border-[#e1e6ee] bg-white shadow-[0_2px_8px_rgba(20,35,60,0.03)]"
+        >
           <div className="flex items-start justify-between gap-4 p-6">
             <div>
               <h2 className="text-[18px] font-semibold text-[#111827]">
@@ -234,9 +276,26 @@ export default function Overview() {
               </p>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="rounded-[22px] border border-[#e1e6ee] bg-white shadow-[0_2px_8px_rgba(20,35,60,0.03)]">
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 18,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            duration: 0.45,
+            delay: 0.34,
+          }}
+          whileHover={{
+            y: -3,
+          }}
+          className="rounded-[22px] border border-[#e1e6ee] bg-white shadow-[0_2px_8px_rgba(20,35,60,0.03)]"
+        >
           <div className="flex items-start justify-between p-6">
             <div>
               <h2 className="text-[18px] font-semibold text-[#111827]">
@@ -294,7 +353,7 @@ export default function Overview() {
               </Link>
             </div>
           </div>
-        </div>
+        </motion.div>
       </section>
     </div>
   );

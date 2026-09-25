@@ -82,13 +82,13 @@ export default function Collaborations() {
     setBusyId(item.id);
 
     try {
-      await updateCollaboration(item.id, {
-        status: next,
-        publishedUrl:
-          next === "completed"
-            ? item.published_url || "https://www.linkedin.com/"
-            : item.published_url,
-      });
+      await updateCollaboration(
+        item.id,
+        {
+          status: next,
+          publishedUrl: item.published_url,
+        },
+      );
 
       await load();
     } catch (value) {
