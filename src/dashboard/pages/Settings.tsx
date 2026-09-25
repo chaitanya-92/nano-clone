@@ -386,12 +386,15 @@ export default function Settings() {
       }
     };
 
+  const canDeleteAccount =
+    deleteConfirmation
+      .trim()
+      .toUpperCase() ===
+    "DELETE";
+
   const handleDelete =
     async () => {
-      if (
-        deleteConfirmation !==
-        "DELETE"
-      ) {
+      if (!canDeleteAccount) {
         return;
       }
 
@@ -827,6 +830,16 @@ export default function Settings() {
                   event.target.value,
                 )
               }
+              onKeyDown={(event) => {
+                if (
+                  event.key === "Enter" &&
+                  canDeleteAccount &&
+                  !busy
+                ) {
+                  event.preventDefault();
+                  void handleDelete();
+                }
+              }
               autoComplete="off"
               className="auth-input"
               placeholder="DELETE"
@@ -854,10 +867,9 @@ export default function Settings() {
               }
               disabled={
                 busy ||
-                deleteConfirmation !==
-                  "DELETE"
+                !canDeleteAccount
               }
-              className="cursor-pointer !bg-[#d83f3f] px-4 !text-white hover:!bg-[#bd3535]"
+              className="h-10 min-w-[148px] cursor-pointer rounded-lg !bg-[#d83f3f] px-4 !text-white shadow-none hover:!bg-[#bd3535] focus-visible:!ring-2 focus-visible:!ring-[#d83f3f]/30 disabled:!cursor-not-allowed disabled:!bg-[#f3a1a1] disabled:!text-white disabled:!opacity-100"
             >
               {busy && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
