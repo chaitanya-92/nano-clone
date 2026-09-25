@@ -1,6 +1,6 @@
 import type { User } from "@/features/authSlice";
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8787";
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8787";
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(API_URL + path, {
