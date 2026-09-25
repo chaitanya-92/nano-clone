@@ -33,8 +33,34 @@ function fileToDataUrl(
 ): Promise<string> {
   return new Promise(
     (resolve, reject) => {
-      const reader =
-        new FileReader();
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        if (typeof reader.result !== "string") {
+          reject(
+            new Error(
+              "Unable to read the selected image.",
+            ),
+          );
+
+          return;
+        }
+
+        resolve(reader.result);
+      };
+
+      reader.onerror = () => {
+        reject(
+          new Error(
+            "Unable to read the selected image.",
+          ),
+        );
+      };
+
+      reader.readAsDataURL(file);
+    },
+  );
+}
 
 export default function MyCard() {
   const [profile, setProfile] = useState<CreatorProfile | null>(null);
@@ -48,6 +74,7 @@ export default function MyCard() {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState("");
   const [photoSaving, setPhotoSaving] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
