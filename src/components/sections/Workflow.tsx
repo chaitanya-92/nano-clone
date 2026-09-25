@@ -1,9 +1,6 @@
 import { motion } from "framer-motion";
 
-import {
-  workflowSection,
-  workflowSteps,
-} from "@/data/data";
+import { workflowSection, workflowSteps } from "@/data/data";
 
 import { WorkflowCard } from "../ui/WorkflowCard";
 
@@ -24,7 +21,7 @@ export function Workflow() {
       "
     >
       <div
-          className="
+        className="
             relative
             z-10
             mx-auto
@@ -34,9 +31,7 @@ export function Workflow() {
             lg:w-[calc(100%-5rem)]
             xl:w-[calc(100%-6rem)]
           "
-        >
-
-
+      >
         <div
           className="
             grid
@@ -128,7 +123,6 @@ export function Workflow() {
         {/* ================================================================ */}
 
         <div className="relative mt-12 lg:mt-14">
-
           {/* ============================================================ */}
           {/* CONNECTING LINE                                                */}
           {/* ============================================================ */}
@@ -196,7 +190,6 @@ export function Workflow() {
             />
           </svg>
 
-    
           <div
             className="
               relative

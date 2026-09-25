@@ -7,7 +7,10 @@ type WorkflowStep = (typeof workflowSteps)[number];
 type WorkflowVisual = WorkflowStep["visual"];
 type CreatorVisualData = Extract<WorkflowVisual, { type: "creators" }>;
 type BriefVisualData = Extract<WorkflowVisual, { type: "brief" }>;
-type CollaborationVisualData = Extract<WorkflowVisual, { type: "collaboration" }>;
+type CollaborationVisualData = Extract<
+  WorkflowVisual,
+  { type: "collaboration" }
+>;
 type ResultsVisualData = Extract<WorkflowVisual, { type: "results" }>;
 type PaymentVisualData = Extract<WorkflowVisual, { type: "payment" }>;
 
@@ -120,10 +123,7 @@ function BriefVisual({ visual }: { visual: BriefVisualData }) {
             className="flex items-start gap-2"
           >
             <span className="mt-[1px] grid h-3.5 w-3.5 shrink-0 place-items-center rounded-full bg-[#e0f1fa]">
-              <Check
-                className="h-2.5 w-2.5 text-[#5b8bae]"
-                strokeWidth={2.6}
-              />
+              <Check className="h-2.5 w-2.5 text-[#5b8bae]" strokeWidth={2.6} />
             </span>
 
             <span className="text-[8.5px] leading-[1.25] text-[#69727a]">
@@ -150,11 +150,7 @@ function BriefVisual({ visual }: { visual: BriefVisualData }) {
   );
 }
 
-function CollaborationVisual({
-  visual,
-}: {
-  visual: CollaborationVisualData;
-}) {
+function CollaborationVisual({ visual }: { visual: CollaborationVisualData }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10, scale: 0.97 }}
@@ -237,9 +233,7 @@ function ResultsVisual({ visual }: { visual: ResultsVisualData }) {
               ease: [0.22, 1, 0.36, 1],
             }}
             className={`flex-1 rounded-t-[3px] ${
-              index >= visual.bars.length - 2
-                ? "bg-[#315f7e]"
-                : "bg-[#cfeaf8]"
+              index >= visual.bars.length - 2 ? "bg-[#315f7e]" : "bg-[#cfeaf8]"
             }`}
           />
         ))}
@@ -270,10 +264,7 @@ function PaymentVisual({ visual }: { visual: PaymentVisualData }) {
           transition={{ duration: 0.35 }}
           className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#e2f2fb]"
         >
-          <CircleCheck
-            className="h-4 w-4 text-[#4d7895]"
-            strokeWidth={1.8}
-          />
+          <CircleCheck className="h-4 w-4 text-[#4d7895]" strokeWidth={1.8} />
         </motion.span>
 
         <div>

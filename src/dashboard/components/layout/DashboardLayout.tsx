@@ -5,7 +5,15 @@ import { DashboardSidebar } from "./DashboardSidebar";
 
 export function DashboardLayout() {
   return (
-    <SidebarProvider defaultOpen={false} style={{ "--sidebar-width": "296px", "--sidebar-width-icon": "72px" } as React.CSSProperties}>
+    <SidebarProvider
+      defaultOpen={false}
+      style={
+        {
+          "--sidebar-width": "296px",
+          "--sidebar-width-icon": "72px",
+        } as React.CSSProperties
+      }
+    >
       <DashboardSidebar />
       <SidebarInset>
         <DashboardNavbar />

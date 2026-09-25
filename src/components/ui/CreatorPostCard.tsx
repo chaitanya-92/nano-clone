@@ -78,12 +78,8 @@ const creatorAssets = {
 /* Creator Post Card                                                          */
 /* -------------------------------------------------------------------------- */
 
-export function CreatorPostCard({
-  post,
-  index,
-}: CreatorPostCardProps) {
-  const assets =
-    creatorAssets[post.id as keyof typeof creatorAssets];
+export function CreatorPostCard({ post, index }: CreatorPostCardProps) {
+  const assets = creatorAssets[post.id as keyof typeof creatorAssets];
 
   return (
     <motion.article
@@ -233,10 +229,7 @@ export function CreatorPostCard({
             hover:bg-[#f3f6f8]
           "
         >
-          <MoreHorizontal
-            className="h-[18px] w-[18px]"
-            strokeWidth={2}
-          />
+          <MoreHorizontal className="h-[18px] w-[18px]" strokeWidth={2} />
         </button>
       </div>
 
@@ -520,11 +513,7 @@ export function CreatorPostCard({
           "
         >
           View post
-
-          <ArrowUpRight
-            className="h-[14px] w-[14px]"
-            strokeWidth={2}
-          />
+          <ArrowUpRight className="h-[14px] w-[14px]" strokeWidth={2} />
         </a>
       </div>
     </motion.article>

@@ -1,9 +1,6 @@
 import type { ServerResponse } from "node:http";
 
-export function handleError(
-  response: ServerResponse,
-  error: unknown,
-) {
+export function handleError(response: ServerResponse, error: unknown) {
   console.error(error);
 
   if (response.headersSent) {

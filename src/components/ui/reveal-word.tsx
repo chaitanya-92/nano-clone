@@ -1,8 +1,4 @@
-import {
-  motion,
-  useTransform,
-  type MotionValue,
-} from "framer-motion";
+import { motion, useTransform, type MotionValue } from "framer-motion";
 
 interface RevealWordProps {
   word: string;
@@ -25,14 +21,8 @@ export function RevealWord({
   const color = useTransform(
     progress,
     [start, end],
-    highlight
-      ? ["#dfe7f3", "#1769ff"]
-      : ["#d7d7d7", "#202124"],
+    highlight ? ["#dfe7f3", "#1769ff"] : ["#d7d7d7", "#202124"],
   );
 
-  return (
-    <motion.span style={{ color }}>
-      {word}
-    </motion.span>
-  );
+  return <motion.span style={{ color }}>{word}</motion.span>;
 }

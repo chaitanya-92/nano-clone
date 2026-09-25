@@ -32,11 +32,7 @@ const trustedLogoAssets: Record<string, string> = {
 /* Count-up                                                                    */
 /* -------------------------------------------------------------------------- */
 
-function useCountUp(
-  target: number,
-  duration = 1500,
-  enabled = false,
-) {
+function useCountUp(target: number, duration = 1500, enabled = false) {
   const [value, setValue] = useState(0);
 
   useEffect(() => {
@@ -51,12 +47,9 @@ function useCountUp(
       const elapsed = time - startTime;
       const progress = Math.min(elapsed / duration, 1);
 
-      const easedProgress =
-        1 - Math.pow(1 - progress, 3);
+      const easedProgress = 1 - Math.pow(1 - progress, 3);
 
-      setValue(
-        Math.round(target * easedProgress),
-      );
+      setValue(Math.round(target * easedProgress));
 
       if (progress < 1) {
         frame = requestAnimationFrame(animate);
@@ -86,15 +79,9 @@ function Metric({
   label: string;
   animate: boolean;
 }) {
-  const numericValue = Number(
-    value.replace(/,/g, ""),
-  );
+  const numericValue = Number(value.replace(/,/g, ""));
 
-  const animatedValue = useCountUp(
-    numericValue,
-    1500,
-    animate,
-  );
+  const animatedValue = useCountUp(numericValue, 1500, animate);
 
   return (
     <div className="min-w-0 flex-1">
@@ -135,11 +122,9 @@ function Metric({
 function VideoTestimonial() {
   const { video } = proofSection;
 
-  const videoRef =
-    useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
-  const [isPlaying, setIsPlaying] =
-    useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const handlePlay = async () => {
     const element = videoRef.current;
@@ -430,49 +415,46 @@ function TrustedLogos() {
           lg:grid-cols-5
         "
       >
-        {caseStudy.trustedLogos.map(
-          (logoName) => {
-            const logo =
-              trustedLogoAssets[logoName];
+        {caseStudy.trustedLogos.map((logoName) => {
+          const logo = trustedLogoAssets[logoName];
 
-            if (!logo) {
-              return (
-                <span
-                  key={logoName}
-                  className="
+          if (!logo) {
+            return (
+              <span
+                key={logoName}
+                className="
                     text-[11px]
                     font-medium
                     tracking-[-0.02em]
                     text-[#73787e]
                   "
-                >
-                  {logoName}
-                </span>
-              );
-            }
+              >
+                {logoName}
+              </span>
+            );
+          }
 
-            return (
-              <div
-                key={logoName}
-                className="
+          return (
+            <div
+              key={logoName}
+              className="
                   flex
                   h-7
                   items-center
                 "
-              >
-                <img
-                  src={logo}
-                  alt={logoName}
-                  className="
+            >
+              <img
+                src={logo}
+                alt={logoName}
+                className="
                     max-h-[24px]
                     max-w-[100px]
                     object-contain
                   "
-                />
-              </div>
-            );
-          },
-        )}
+              />
+            </div>
+          );
+        })}
 
         <span
           className="
@@ -498,11 +480,9 @@ function TrustedLogos() {
 function CaseStudy() {
   const { caseStudy } = proofSection;
 
-  const caseStudyRef =
-    useRef<HTMLElement>(null);
+  const caseStudyRef = useRef<HTMLElement>(null);
 
-  const [shouldCount, setShouldCount] =
-    useState(false);
+  const [shouldCount, setShouldCount] = useState(false);
 
   useEffect(() => {
     const element = caseStudyRef.current;
@@ -511,21 +491,18 @@ function CaseStudy() {
       return;
     }
 
-    const observer =
-      new IntersectionObserver(
-        ([entry]) => {
-          if (
-            entry.isIntersecting
-          ) {
-            setShouldCount(true);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldCount(true);
 
-            observer.disconnect();
-          }
-        },
-        {
-          threshold: 0.25,
-        },
-      );
+          observer.disconnect();
+        }
+      },
+      {
+        threshold: 0.25,
+      },
+    );
 
     observer.observe(element);
 
@@ -685,36 +662,25 @@ function CaseStudy() {
           py-7
         "
       >
-        {caseStudy.metrics.map(
-          (metric, index) => (
-            <div
-              key={metric.label}
-              className={`
+        {caseStudy.metrics.map((metric, index) => (
+          <div
+            key={metric.label}
+            className={`
                 min-w-0
                 flex-1
 
-                ${
-                  index !== 0
-                    ? "border-l border-[#e8edef] pl-5 sm:pl-7"
-                    : ""
-                }
+                ${index !== 0 ? "border-l border-[#e8edef] pl-5 sm:pl-7" : ""}
 
-                ${
-                  index !==
-                  caseStudy.metrics.length - 1
-                    ? "pr-5 sm:pr-7"
-                    : ""
-                }
+                ${index !== caseStudy.metrics.length - 1 ? "pr-5 sm:pr-7" : ""}
               `}
-            >
-              <Metric
-                value={metric.value}
-                label={metric.label}
-                animate={shouldCount}
-              />
-            </div>
-          ),
-        )}
+          >
+            <Metric
+              value={metric.value}
+              label={metric.label}
+              animate={shouldCount}
+            />
+          </div>
+        ))}
       </div>
 
       {/* CTA */}
@@ -735,10 +701,7 @@ function CaseStudy() {
       >
         {caseStudy.cta}
 
-        <ArrowRight
-          className="h-4 w-4"
-          strokeWidth={1.8}
-        />
+        <ArrowRight className="h-4 w-4" strokeWidth={1.8} />
       </a>
 
       {/* Trusted logos */}
@@ -799,13 +762,9 @@ export function Proof() {
             ease: [0.22, 1, 0.36, 1],
           }}
         >
-          <h2 className="section-title">
-            {proofSection.title}
-          </h2>
+          <h2 className="section-title">{proofSection.title}</h2>
 
-          <p className="section-copy mt-5">
-            {proofSection.description}
-          </p>
+          <p className="section-copy mt-5">{proofSection.description}</p>
         </motion.div>
 
         {/* Card composition */}

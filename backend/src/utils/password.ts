@@ -14,10 +14,7 @@ export async function hashPassword(password: string) {
   return `${salt}:${derived.toString("hex")}`;
 }
 
-export async function passwordMatches(
-  password: string,
-  storedHash: string,
-) {
+export async function passwordMatches(password: string, storedHash: string) {
   const [salt, hash] = storedHash.split(":");
 
   if (!salt || !hash) {
