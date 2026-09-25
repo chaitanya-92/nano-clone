@@ -48,24 +48,161 @@ export async function patchProfile(
   const body = await readJson(request);
   if (user.role === "creator") {
     const p = db
-      .prepare("SELECT * FROM creator_profiles WHERE user_id=?")
-      .get(user.id) as any;
+      .prepare(
+        "SELECT * FROM creator_profiles WHERE user_id=?",
+      )
+      .get(user.id) as
+      | Record<string, unknown>
+      | undefined;
+
+    if (!p) {
+      return error(
+        response,
+        404,
+        "PROFILE_NOT_FOUND",
+        "Creator profile not found.",
+      );
+    }
+
+    const linkedinUrl = stringValue(
+      body.linkedinUrl,
+      String(p.linkedin_url ?? ""),
+    ).trim();
+
+    const xProfileUrl = stringValue(
+      body.xProfileUrl,
+      String(p.x_profile_url ?? ""),
+    ).trim();
+
+    const validateSocialUrl = (
+      provider: "linkedin" | "x",
+      value: string,
+    ) => {
+      if (!value) {
+        return null;
+      }
+
+      let parsed: URL;
+
+      try {
+        parsed = new URL(value);
+      } catch {
+        return "Enter a valid " +
+          (provider === "linkedin"
+            ? "LinkedIn"
+            : "X") +
+          " profile URL.";
+      }
+
+      if (
+        parsed.protocol !== "https:" ||
+        (provider === "linkedin" &&
+          parsed.hostname.toLowerCase().replace(/^www\./, "") !==
+            "linkedin.com") ||
+        (provider === "x" &&
+          !["x.com", "twitter.com"].includes(
+            parsed.hostname
+              .toLowerCase()
+              .replace(/^www\./, ""),
+          ))
+      ) {
+        return "Enter a valid " +
+          (provider === "linkedin"
+            ? "LinkedIn"
+            : "X") +
+          " profile URL.";
+      }
+
+      const pathname =
+        parsed.pathname.replace(
+          /\/$/,
+          "",
+        );
+
+      if (
+        provider === "linkedin" &&
+        !/^\/in\/[A-Za-z0-9][A-Za-z0-9._-]*$/.test(
+          pathname,
+        )
+      ) {
+        return "Enter a valid LinkedIn profile URL.";
+      }
+
+      if (
+        provider === "x" &&
+        !/^\/[A-Za-z0-9_]{1,15}$/.test(
+          pathname,
+        )
+      ) {
+        return "Enter a valid X profile URL.";
+      }
+
+      return null;
+    };
+
+    const linkedinError =
+      validateSocialUrl(
+        "linkedin",
+        linkedinUrl,
+      );
+
+    if (linkedinError) {
+      return error(
+        response,
+        422,
+        "INVALID_LINKEDIN_URL",
+        linkedinError,
+      );
+    }
+
+    const xError = validateSocialUrl(
+      "x",
+      xProfileUrl,
+    );
+
+    if (xError) {
+      return error(
+        response,
+        422,
+        "INVALID_X_URL",
+        xError,
+      );
+    }
+
     db.prepare(
       "UPDATE creator_profiles SET name=?,headline=?,category=?,bio=?,linkedin_url=?,x_profile_url=?,price_cents=?,updated_at=? WHERE user_id=?",
     ).run(
-      stringValue(body.name, p.name),
-      stringValue(body.headline, p.headline),
-      stringValue(body.category, p.category),
-      stringValue(body.bio, p.bio),
-      stringValue(body.linkedinUrl, p.linkedin_url),
-      stringValue(body.xProfileUrl, p.x_profile_url),
-      integerValue(body.priceCents, p.price_cents),
+      stringValue(
+        body.name,
+        String(p.name ?? ""),
+      ),
+      stringValue(
+        body.headline,
+        String(p.headline ?? ""),
+      ),
+      stringValue(
+        body.category,
+        String(p.category ?? ""),
+      ),
+      stringValue(
+        body.bio,
+        String(p.bio ?? ""),
+      ),
+      linkedinUrl,
+      xProfileUrl,
+      integerValue(
+        body.priceCents,
+        Number(p.price_cents ?? 0),
+      ),
       now(),
       user.id,
     );
+
     return json(response, 200, {
       data: db
-        .prepare("SELECT * FROM creator_profiles WHERE user_id=?")
+        .prepare(
+          "SELECT * FROM creator_profiles WHERE user_id=?",
+        )
         .get(user.id),
     });
   }
