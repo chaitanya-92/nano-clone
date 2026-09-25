@@ -26,6 +26,8 @@ import { messageRoutes } from "./routes/messageRoutes";
 import { notificationRoutes } from "./routes/notificationRoutes";
 import { communityRoutes } from "./routes/communityRoutes";
 import { affiliateRoutes } from "./routes/affiliateRoutes";
+import { profileRoutes } from "./routes/profileRoutes";
+import { brandOnboardingRoutes } from "./routes/brandOnboardingRoutes";
 
 import { handleError } from "./middleware/errorMiddleware";
 
@@ -75,7 +77,7 @@ function setCorsHeaders(
 
   response.setHeader(
     "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS",
+    "GET, POST, PATCH, PUT, DELETE, OPTIONS",
   );
 
   response.setHeader(
@@ -162,7 +164,7 @@ const server = createServer(
       if (
         url.pathname.startsWith("/api/")
       ) {
-        const handlers = [authRoutes, onboardingRoutes, dashboardRoutes, campaignRoutes, applicationRoutes, collaborationRoutes, analyticsRoutes, earningsRoutes, messageRoutes, notificationRoutes, communityRoutes, affiliateRoutes];
+        const handlers = [authRoutes, onboardingRoutes, dashboardRoutes, campaignRoutes, applicationRoutes, collaborationRoutes, analyticsRoutes, earningsRoutes, messageRoutes, notificationRoutes, communityRoutes, affiliateRoutes, profileRoutes, brandOnboardingRoutes];
 
         for (const handler of handlers) {
           const handled = await handler(request, response, url);
