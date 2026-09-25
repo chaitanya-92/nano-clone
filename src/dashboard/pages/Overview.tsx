@@ -288,7 +288,7 @@ export default function Overview() {
       } catch {
         toast.add({
           title: "Copy failed",
-        description:
+          description:
           "Your browser did not allow clipboard access.",
         type: "error",
         timeout: 2600,
