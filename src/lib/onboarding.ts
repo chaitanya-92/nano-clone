@@ -6,3 +6,6 @@ export function saveCreatorProfile(data:{headline:string;bio:string}){return req
 export function saveCreatorCard(data:{priceCents:number}){return request("/api/onboarding/card",{method:"POST",body:JSON.stringify(data)});}
 export function saveCreatorProfessional(data:Record<string,unknown>){return request("/api/onboarding/professional",{method:"POST",body:JSON.stringify(data)});}
 export function saveBrandOnboarding(data:Record<string,unknown>){return request("/api/onboarding/brand",{method:"POST",body:JSON.stringify(data)});}
+
+export function connectSocial(provider:"linkedin"|"x",profileUrl:string){return request("/api/social-accounts/connect",{method:"POST",body:JSON.stringify({provider,profileUrl})});}
+export function analyzeCompanyWebsite(website:string){return request("/api/company/analyze",{method:"POST",body:JSON.stringify({website})});}
