@@ -328,11 +328,13 @@ export async function googleCallback(
         ? "signup"
         : "login";
 
-    const { user, isNewUser } =
-      await handleGoogleCallback(
-        params.code,
-        role,
-      );
+    const {
+      user,
+      needsOnboarding,
+    } = await handleGoogleCallback(
+      params.code,
+      role,
+    );
 
     createSession(response, user.id);
     setCookie(
@@ -356,7 +358,7 @@ export async function googleCallback(
 
     return redirect(
       response,
-      isNewUser && flow === "signup"
+      flow === "signup" && needsOnboarding
         ? getFrontendOnboardingUrl(role)
         : getFrontendDashboardUrl(),
     );
