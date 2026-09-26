@@ -143,6 +143,18 @@ export interface EarningsResponse {
   };
 }
 
+export interface SocialAccount {
+  id: string;
+  provider: "linkedin" | "x";
+  username: string | null;
+  profile_url: string;
+  profile_image_url: string | null;
+  status: string;
+  verified_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface PayoutMethod {
   id: string;
   type: string;
@@ -200,6 +212,13 @@ export function getDashboard() {
 export function getCreatorProfile() {
   return request<{ data: CreatorProfile }>("/api/creator/profile");
 }
+
+export function getSocialAccounts() {
+  return request<{
+    data: SocialAccount[];
+  }>("/api/social-accounts");
+}
+
 
 export function updateCreatorProfile(payload: Record<string, unknown>) {
   return request<{ data: CreatorProfile }>("/api/creator/profile", {
