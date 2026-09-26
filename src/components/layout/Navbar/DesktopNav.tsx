@@ -1,4 +1,4 @@
-import { ChevronDown, Globe2 } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import {
@@ -19,7 +19,11 @@ import { Button } from "@/components/ui/button";
 import { useAppSelector } from "@/store/hooks";
 import { scrollToSection } from "@/lib/landingNavigation";
 
-import { navItems, resourceLinks, navigationActions } from "@/data/data";
+import {
+  navItems,
+  resourceLinks,
+  navigationActions,
+} from "@/data/data";
 
 export function DesktopNav() {
   const navigate = (href: string) => {
@@ -89,7 +93,6 @@ export function DesktopNav() {
                 }
               >
                 <span>{navigationActions.resources.label}</span>
-
                 <ChevronDown className="h-3 w-3" strokeWidth={1.8} />
               </DropdownMenuTrigger>
 
@@ -129,30 +132,6 @@ export function DesktopNav() {
       </NavigationMenu>
 
       <div className="ml-9 flex items-center gap-2.5">
-        <Button
-          variant="ghost"
-          onClick={() => navigate(navigationActions.language.href)}
-          aria-label={navigationActions.language.ariaLabel}
-          className="
-            h-10
-            gap-1.5
-            rounded-full
-            px-2
-            text-[14px]
-            font-medium
-            text-[#68717c]
-            shadow-none
-            transition-none
-            hover:bg-transparent
-            hover:text-[#68717c]
-            focus-visible:ring-0
-          "
-        >
-          <Globe2 className="h-3.5 w-3.5" strokeWidth={1.8} />
-
-          <span>{navigationActions.language.label}</span>
-        </Button>
-
         {!showDashboard ? (
           <Button
             variant="outline"
