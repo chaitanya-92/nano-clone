@@ -5,8 +5,6 @@ import {
   Globe2,
   LogOut,
   Settings,
-  PanelLeftClose,
-  PanelLeftOpen,
   Sparkles,
   WalletCards,
 } from "lucide-react";
@@ -60,13 +58,7 @@ function formatNotificationTime(value: string) {
   });
 }
 
-export function DashboardNavbar({
-  collapsed,
-  onToggleSidebar,
-}: {
-  collapsed: boolean;
-  onToggleSidebar: () => void;
-}) {
+export function DashboardNavbar() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.auth.user);
@@ -175,41 +167,9 @@ export function DashboardNavbar({
   };
 
   return (
-    <header className="sticky top-0 z-50 h-16 bg-white">
-      <div className="flex h-full items-center justify-between px-4 sm:px-6 lg:px-7">
-        <div className="flex h-10 w-[116px] shrink-0 items-center gap-1.5">
-          <button
-            type="button"
-            onClick={() => navigate("/dashboard")}
-            aria-label="Open Naano dashboard"
-            className="group flex h-10 items-center overflow-hidden rounded-xl px-1 text-left outline-none"
-          >
-            <span
-              className={[
-                "font-bold tracking-[-1.5px] text-[#171b18] transition-all duration-300 ease-[cubic-bezier(.22,1,.36,1)]",
-                collapsed ? "w-[22px] text-[21px]" : "w-[74px] text-[23px]",
-              ].join(" ")}
-            >
-              {collapsed ? "n." : "naano."}
-            </span>
-          </button>
+    <header className="sticky top-0 z-40 h-16 bg-white border-b border-[#edf0f5]">
+      <div className="flex h-full items-center justify-end px-4 sm:px-6 lg:px-7">
 
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={onToggleSidebar}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className="h-8 w-8 shrink-0 cursor-pointer rounded-lg text-[#687166] transition-all duration-200 hover:bg-[#f2f3ee] hover:text-[#20251f]"
-          >
-            {collapsed ? (
-              <PanelLeftOpen className="h-[17px] w-[17px]" strokeWidth={1.8} />
-            ) : (
-              <PanelLeftClose className="h-[17px] w-[17px]" strokeWidth={1.8} />
-            )}
-          </Button>
-        </div>
 
         <div className="flex items-center gap-1.5 sm:gap-2.5">
           <Button
