@@ -29,7 +29,7 @@ export function RegisterAccountStep() {
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <a
-          href={`${import.meta.env.VITE_API_URL ?? "https://nano-clone-lo9q.onrender.com"}/api/auth/google?role=${role}&flow=signup`}
+          href={`${(import.meta.env.VITE_API_URL ?? "https://nano-clone-lo9q.onrender.com").replace(/\/$/, "")}/api/auth/google?role=${role}&flow=signup`}
           className="flex h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border border-[#dfe3e8] bg-white text-sm font-semibold text-[#252a34] transition hover:bg-[#f7f8fa]"
         >
           <GoogleIcon className="h-5 w-5" />
