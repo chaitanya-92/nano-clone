@@ -16,13 +16,23 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { Button } from "@/components/ui/button";
+import { useAppSelector } from "@/store/hooks";
+import { scrollToSection } from "@/lib/landingNavigation";
 
 import { navItems, resourceLinks, navigationActions } from "@/data/data";
 
 export function DesktopNav() {
   const navigate = (href: string) => {
+    if (href.startsWith("#")) {
+      scrollToSection(href);
+      return;
+    }
+
     window.location.assign(href);
   };
+
+  const { isAuthenticated, isLoading } = useAppSelector((state) => state.auth);
+  const showDashboard = !isLoading && isAuthenticated;
 
   return (
     <div className="hidden items-center lg:flex">
@@ -31,7 +41,8 @@ export function DesktopNav() {
           {navItems.map((item) => (
             <NavigationMenuItem key={item.label}>
               <NavigationMenuLink
-                render={<a href={item.href} />}
+                render={<button type="button" onClick={() => navigate(item.href)} />}
+                onClick={(event) => event.preventDefault()}
                 className="
                     inline-flex
                     items-center
@@ -140,9 +151,10 @@ export function DesktopNav() {
           <span>{navigationActions.language.label}</span>
         </Button>
 
-        <Button
-          variant="outline"
-          render={<Link to="/login" />}
+        {!showDashboard ? (
+          <Button
+            variant="outline"
+            render={<Link to="/login" />}
           className="
             h-10
             rounded-full
@@ -159,11 +171,13 @@ export function DesktopNav() {
             focus-visible:ring-0
           "
         >
-          {navigationActions.signIn.label}
-        </Button>
+            {navigationActions.signIn.label}
+          </Button>
+        ) : null}
 
-        <Button
-          render={<Link to="/register" />}
+        {!showDashboard ? (
+          <Button
+            render={<Link to="/register" />}
           className="
             h-10
             rounded-full
@@ -179,8 +193,29 @@ export function DesktopNav() {
             focus-visible:ring-0
           "
         >
-          {navigationActions.signUp.label}
-        </Button>
+            {navigationActions.signUp.label}
+          </Button>
+        ) : (
+          <Button
+            render={<Link to="/dashboard" />}
+            className="
+              h-10
+              rounded-full
+              bg-black
+              px-5
+              text-[14px]
+              font-medium
+              !text-white
+              shadow-none
+              transition-none
+              hover:bg-black
+              hover:text-white
+              focus-visible:ring-0
+            "
+          >
+            Dashboard
+          </Button>
+        )}
       </div>
     </div>
   );
