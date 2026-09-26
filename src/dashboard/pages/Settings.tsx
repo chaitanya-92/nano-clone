@@ -262,8 +262,6 @@ export default function Settings() {
     setSaved(false);
 
     try {
-      let fetchedProfileImageUrl: string | null = null;
-
       if (nextLinkedin !== initialLinkedin) {
         setLinkedin((current) => ({
           ...current,
@@ -272,9 +270,6 @@ export default function Settings() {
         }));
 
         const result = await connectSocial("linkedin", nextLinkedin);
-
-        fetchedProfileImageUrl =
-          result.data.fetchedProfile?.profileImageUrl ?? null;
 
         setLinkedin({
           url: result.data.profileUrl ?? nextLinkedin,
@@ -294,11 +289,6 @@ export default function Settings() {
 
         const result = await connectSocial("x", nextX);
 
-        if (!fetchedProfileImageUrl) {
-          fetchedProfileImageUrl =
-            result.data.fetchedProfile?.profileImageUrl ?? null;
-        }
-
         setXProfile({
           url: result.data.profileUrl ?? nextX,
           status: "valid",
@@ -312,9 +302,6 @@ export default function Settings() {
         name: nextName,
         linkedinUrl: nextLinkedin,
         xProfileUrl: nextX,
-        ...(fetchedProfileImageUrl
-          ? { profilePhotoUrl: fetchedProfileImageUrl }
-          : {}),
       });
 
       setProfile(data);
