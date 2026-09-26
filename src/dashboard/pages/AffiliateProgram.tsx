@@ -165,7 +165,9 @@ export default function AffiliateProgram() {
                             className="cursor-pointer"
                           >
                             <Copy className="mr-2 h-3.5 w-3.5" />
-                            Copy
+                            {copied === code
+                              ? "Copied"
+                              : "Copy"}
                           </Button>
                         </div>
 

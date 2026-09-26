@@ -289,10 +289,11 @@ export default function Overview() {
         toast.add({
           title: "Copy failed",
           description:
-          "Your browser did not allow clipboard access.",
-        type: "error",
-        timeout: 2600,
-      });
+            "Your browser did not allow clipboard access.",
+          type: "error",
+          timeout: 2600,
+        });
+      }
     }
   };
 
@@ -478,7 +479,9 @@ export default function Overview() {
                     className="h-9 cursor-pointer rounded-lg border-[#dce3ec] px-3 text-[12px] text-[#60708a]"
                   >
                     <Copy className="h-3.5 w-3.5" />
-                    Copy card link
+                    {copied
+                      ? "Copied"
+                      : "Copy card link"}
                   </Button>
 
                   <Button
