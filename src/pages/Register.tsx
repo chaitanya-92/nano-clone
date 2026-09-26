@@ -699,7 +699,7 @@ export default function Register() {
               await saveBrandOnboarding({
                 ...formik.values,
                 step: step + 1,
-                icps: formik.values.icps.filter((item: ICP) => item.title),
+                icps: formik.values.icps.filter((item: RegistrationValues["icps"][number]) => item.title),
               });
             if (step < steps.length - 1) setStep((value) => value + 1);
             else navigate("/dashboard", { replace: true });
@@ -1732,7 +1732,7 @@ export default function Register() {
                     />
                   </div>
                   <div className="grid gap-4 md:grid-cols-3">
-                    {formik.values.icps.map((item: ICP, index: number) => (
+                    {formik.values.icps.map((item: RegistrationValues["icps"][number], index: number) => (
                       <div
                         key={index}
                         className="rounded-2xl border border-[#e3e7ed] p-4"
@@ -1785,8 +1785,8 @@ export default function Register() {
                   </div>
                   <div className="grid gap-3 md:grid-cols-3">
                     {formik.values.icps
-                      .filter((item: ICP) => item.title)
-                      .map((item: ICP) => (
+                      .filter((item: RegistrationValues["icps"][number]) => item.title)
+                      .map((item: RegistrationValues["icps"][number]) => (
                         <div
                           key={item.title}
                           className="rounded-xl border border-[#e4e8ee] p-4"
