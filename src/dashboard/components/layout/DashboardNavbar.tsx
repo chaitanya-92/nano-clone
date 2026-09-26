@@ -5,6 +5,8 @@ import {
   Globe2,
   LogOut,
   Settings,
+  PanelLeftClose,
+  PanelLeftOpen,
   Sparkles,
   WalletCards,
 } from "lucide-react";
@@ -58,7 +60,7 @@ function formatNotificationTime(value: string) {
   });
 }
 
-export function DashboardNavbar() {
+export function DashboardNavbar({ collapsed, onToggleSidebar }: { collapsed: boolean; onToggleSidebar: () => void }) {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.auth.user);
@@ -168,7 +170,22 @@ export function DashboardNavbar() {
 
   return (
     <header className="sticky top-0 z-40 h-16 bg-white border-b border-[#edf0f5]">
-      <div className="flex h-full items-center justify-end px-4 sm:px-6 lg:px-7">
+      <div className="flex h-full items-center justify-between px-4 sm:px-6 lg:px-7">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={onToggleSidebar}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          className="h-9 w-9 cursor-pointer rounded-lg text-[#687166] transition-all duration-200 hover:bg-[#f2f3ee] hover:text-[#20251f]"
+        >
+          {collapsed ? (
+            <PanelLeftOpen className="h-[18px] w-[18px]" strokeWidth={1.8} />
+          ) : (
+            <PanelLeftClose className="h-[18px] w-[18px]" strokeWidth={1.8} />
+          )}
+        </Button>
         <div className="flex items-center gap-1.5 sm:gap-2.5">
           <Button
             type="button"
