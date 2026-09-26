@@ -26,11 +26,9 @@ import {
   deleteAccount,
   getCreatorProfile,
   getPayoutMethods,
-  getSocialAccounts,
   updateCreatorProfile,
   type CreatorProfile,
   type PayoutMethod,
-  type SocialAccount,
 } from "@/lib/dashboard";
 import { connectSocial } from "@/lib/onboarding";
 import { logout } from "@/lib/auth";

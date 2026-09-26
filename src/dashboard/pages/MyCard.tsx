@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { toast } from "@/components/ui/toast";
 import { AnimatedNumber } from "@/components/dashboard/AnimatedNumber";
 import { Skeleton } from "@/components/ui/skeleton";
