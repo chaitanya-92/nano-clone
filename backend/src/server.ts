@@ -47,7 +47,7 @@ const mimeTypes: Record<string, string> = {
 
 const allowedOrigins = Array.from(
   new Set([
-    process.env.FRONTEND_ORIGIN ?? FRONTEND_ORIGIN,
+    process.env.FRONTEND_ORIGIN?.trim() || FRONTEND_ORIGIN,
     "https://jocular-longma-0f9c9d.netlify.app",
     "https://nano-clone.vercel.app",
     "http://localhost:5173",
@@ -62,16 +62,12 @@ function setCorsHeaders(response: ServerResponse, origin: string | undefined) {
   }
 
   response.setHeader("Access-Control-Allow-Origin", origin);
-
   response.setHeader("Access-Control-Allow-Credentials", "true");
-
   response.setHeader(
     "Access-Control-Allow-Methods",
     "GET, POST, PATCH, PUT, DELETE, OPTIONS",
   );
-
   response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
   response.setHeader("Vary", "Origin");
 }
 
@@ -120,7 +116,10 @@ const server = createServer(async (request, response) => {
   }
 
   try {
-    const url = new URL(request.url ?? "/", APP_ORIGIN);
+    const requestOrigin =
+      APP_ORIGIN ||
+      `http://${request.headers.host ?? `localhost:${PORT}`}`;
+    const url = new URL(request.url ?? "/", requestOrigin);
 
     if (url.pathname.startsWith("/api/")) {
       const handlers = [
@@ -158,5 +157,5 @@ const server = createServer(async (request, response) => {
 });
 
 server.listen(PORT, "0.0.0.0", () => {
-  console.log(`Naano backend running on ${APP_ORIGIN}`);
+  console.log(`Naano backend running on ${APP_ORIGIN || "request host"}`);
 });
