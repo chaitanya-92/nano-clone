@@ -204,6 +204,22 @@ export function initializeDatabase() {
       created_at TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS campaign_metrics (
+      id TEXT PRIMARY KEY,
+      collaboration_id TEXT NOT NULL REFERENCES collaborations(id) ON DELETE CASCADE,
+      impressions INTEGER NOT NULL DEFAULT 0,
+      reach INTEGER NOT NULL DEFAULT 0,
+      engagements INTEGER NOT NULL DEFAULT 0,
+      likes INTEGER NOT NULL DEFAULT 0,
+      comments INTEGER NOT NULL DEFAULT 0,
+      reposts INTEGER NOT NULL DEFAULT 0,
+      recorded_at TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS campaign_metrics_collaboration_id_idx
+      ON campaign_metrics(collaboration_id);
+
     CREATE TABLE IF NOT EXISTS earnings (
       id TEXT PRIMARY KEY,
       user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
