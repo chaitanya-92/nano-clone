@@ -3,6 +3,8 @@ import "dotenv/config";
 const getEnv = (key: string) => process.env[key]?.trim() || undefined;
 
 export const PORT = Number(getEnv("PORT") ?? 8787);
+export const NODE_ENV = getEnv("NODE_ENV") ?? "development";
+export const IS_PRODUCTION = NODE_ENV === "production";
 
 export const APP_ORIGIN =
   getEnv("APP_ORIGIN") ??
@@ -14,8 +16,6 @@ export const APP_ORIGIN =
 export const FRONTEND_ORIGIN =
   getEnv("FRONTEND_ORIGIN") ?? "https://jocular-longma-0f9c9d.netlify.app";
 
-export const NODE_ENV = getEnv("NODE_ENV") ?? "development";
-export const IS_PRODUCTION = NODE_ENV === "production";
 export const DATABASE_PATH = getEnv("DATABASE_PATH") ?? "./data/naano.sqlite";
 
 export const GOOGLE_CLIENT_ID = getEnv("GOOGLE_CLIENT_ID") ?? "";
