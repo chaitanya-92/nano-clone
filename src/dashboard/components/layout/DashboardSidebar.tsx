@@ -24,12 +24,48 @@ export function DashboardSidebar({
   return (
     <aside
       className={[
-        "fixed bottom-0 left-0 top-16 z-30 hidden bg-white lg:flex lg:flex-col",
+        "fixed inset-y-0 left-0 z-50 hidden bg-white lg:flex lg:flex-col",
         "border-r border-[#edf0f5] shadow-[4px_0_18px_rgba(24,35,57,0.025)]",
         "transition-[width] duration-300 ease-[cubic-bezier(.22,1,.36,1)]",
         collapsed ? "w-[76px]" : "w-[224px]",
       ].join(" ")}
     >
+      <div className="flex h-16 shrink-0 items-center px-4">
+        <div className="flex min-w-0 flex-1 items-center gap-2">
+          <Link
+            to="/dashboard"
+            aria-label="Open Naano dashboard"
+            className={[
+              "flex h-10 items-center overflow-hidden rounded-xl px-1 outline-none transition-all duration-300 ease-[cubic-bezier(.22,1,.36,1)]",
+              collapsed ? "w-[42px] justify-center" : "w-[86px]",
+            ].join(" ")}
+          >
+            <span
+              className={[
+                "font-bold tracking-[-1.5px] text-[#171b18] transition-all duration-300 ease-[cubic-bezier(.22,1,.36,1)]",
+                collapsed ? "text-[21px]" : "text-[23px]",
+              ].join(" ")}
+            >
+              {collapsed ? "n." : "naano."}
+            </span>
+          </Link>
+
+          <button
+            type="button"
+            onClick={onToggle}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-[#687166] transition-all duration-200 hover:bg-[#f2f3ee] hover:text-[#20251f]"
+          >
+            {collapsed ? (
+              <PanelLeftOpen className="h-[17px] w-[17px]" strokeWidth={1.8} />
+            ) : (
+              <PanelLeftClose className="h-[17px] w-[17px]" strokeWidth={1.8} />
+            )}
+          </button>
+        </div>
+      </div>
+
       <nav
         aria-label="Dashboard navigation"
         className="flex flex-1 flex-col gap-1.5 px-3 py-2"
