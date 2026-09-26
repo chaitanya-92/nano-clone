@@ -91,8 +91,25 @@ export async function analytics(
         engagement_count: Number(profileTotals.engagement_count ?? 0),
         post_count: Number(profileTotals.post_count ?? 0),
       },
-      summary,
-      posts,
+      summary: {
+        posts: Number((summary as any)?.posts ?? 0),
+        impressions: Number((summary as any)?.impressions ?? 0),
+        reach: Number((summary as any)?.reach ?? 0),
+        likes: Number((summary as any)?.likes ?? 0),
+        comments: Number((summary as any)?.comments ?? 0),
+        reposts: Number((summary as any)?.reposts ?? 0),
+        engagements: Number((summary as any)?.engagements ?? 0),
+      },
+      posts: (posts as any[]).map((post) => ({
+        ...post,
+        impressions: Number(post.impressions ?? 0),
+        reach: Number(post.reach ?? 0),
+        likes: Number(post.likes ?? 0),
+        comments: Number(post.comments ?? 0),
+        reposts: Number(post.reposts ?? 0),
+        engagements: Number(post.engagements ?? 0),
+      })),
+      syncStatuses,
     },
   });
 }
