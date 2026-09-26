@@ -10,9 +10,6 @@ export const DATABASE_PATH = process.env.DATABASE_PATH ?? "./data/naano.sqlite";
 export const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID ?? "";
 export const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET ?? "";
 export const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL ?? "";
-export const LINKEDIN_CLIENT_ID = process.env.LINKEDIN_CLIENT_ID ?? "";
-export const LINKEDIN_CLIENT_SECRET = process.env.LINKEDIN_CLIENT_SECRET ?? "";
-export const LINKEDIN_CALLBACK_URL = process.env.LINKEDIN_CALLBACK_URL ?? "";
 export const LINKEDIN_API_VERSION =
   process.env.LINKEDIN_API_VERSION ?? "202609";
 export const X_BEARER_TOKEN = process.env.X_BEARER_TOKEN ?? "";
