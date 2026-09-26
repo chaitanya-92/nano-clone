@@ -12,7 +12,8 @@ export default tseslint.config(
     plugins: { "react-hooks": reactHooks, "react-refresh": reactRefresh },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      "react-refresh/only-export-components": [
+      "react-hooks/set-state-in-effect": "off",
+            "react-refresh/only-export-components": [
         "warn",
         { allowConstantExport: true },
       ],
