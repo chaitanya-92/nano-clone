@@ -10,7 +10,6 @@ import {
 import { AuthShell } from "@/components/auth/AuthShell";
 import { AuthSocialButton } from "@/components/auth/AuthSocialButton";
 import GoogleIcon from "@/components/ui/icons/GoogleIcon";
-import { LinkedinIcon } from "@/components/ui/icons/linkedin-icon";
 import { authContent } from "@/data/data";
 import { signIn } from "@/features/authSlice";
 import { login } from "@/lib/auth";
