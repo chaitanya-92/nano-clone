@@ -78,10 +78,7 @@ export default function Login() {
         <p className="mt-1 text-[16px] text-[#747c8d]">{content.subtitle}</p>
 
         <div className="mt-7 space-y-3">
-          <a
-            href={`${API_URL}/api/auth/google?flow=login`}
-            className="block"
-          >
+          <a href={`${API_URL}/api/auth/google?flow=login`} className="block">
             <AuthSocialButton icon={<GoogleIcon className="h-5 w-5" />}>
               {content.social.google}
             </AuthSocialButton>
