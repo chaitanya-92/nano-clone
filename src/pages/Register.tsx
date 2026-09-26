@@ -47,7 +47,6 @@ import {
   verifyEmailOtp,
 } from "@/lib/auth";
 import GoogleIcon from "@/components/ui/icons/GoogleIcon";
-import { LinkedinIcon } from "@/components/ui/icons/linkedin-icon";
 import { signIn } from "@/features/authSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { toast } from "@/components/ui/toast";
@@ -790,13 +789,6 @@ export default function Register() {
                     >
                       <GoogleIcon className="h-5 w-5" />
                       Continue with Google
-                    </a>
-                    <a
-                      href={`${import.meta.env.VITE_API_URL ?? "http://localhost:8787"}/api/auth/linkedin?role=${role}`}
-                      className="flex h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border border-[#dfe3e8] bg-white text-sm font-semibold text-[#252a34] transition hover:bg-[#f7f8fa]"
-                    >
-                      <LinkedinIcon className="h-5 w-5" variant="brand" />
-                      Continue with LinkedIn
                     </a>
                   </div>
                   <div className="flex items-center gap-3">
