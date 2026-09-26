@@ -332,7 +332,7 @@ export default function MyCard() {
   const industries = parseIndustries(profile.industries);
 
   return (
-    <div className="mx-auto w-full max-w-[1240px] pb-10">
+    <div className="mx-auto w-full max-w-[1180px] pb-10">
       <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#2864f0]">
@@ -391,7 +391,7 @@ export default function MyCard() {
         </div>
       )}
 
-      <section className="mt-9 grid items-stretch gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <section className="mt-9 grid items-stretch gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
@@ -416,10 +416,10 @@ export default function MyCard() {
             <motion.div
               animate={{ rotateY: cardFlipped ? 180 : 0 }}
               transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-              className="relative h-[580px] w-full [transform-style:preserve-3d]"
+              className="relative h-[520px] w-full [transform-style:preserve-3d]"
             >
               <div className="absolute inset-0 overflow-hidden rounded-[28px] border border-[#dce4ef] bg-white shadow-[0_20px_60px_rgba(34,60,100,0.08)] transition-shadow duration-300 group-hover:shadow-[0_24px_70px_rgba(34,60,100,0.13)] [backface-visibility:hidden]">
-                <div className="relative h-[170px] bg-gradient-to-br from-[#2159df] via-[#316df0] to-[#6f91f3]">
+                <div className="relative h-[150px] bg-gradient-to-br from-[#2159df] via-[#316df0] to-[#6f91f3]">
                   <Logo
                     compact={false}
                     href="/dashboard"
@@ -438,7 +438,7 @@ export default function MyCard() {
                     }}
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.98 }}
-                    className="group/photo absolute -bottom-14 left-1/2 flex h-28 w-28 -translate-x-1/2 cursor-pointer items-center justify-center overflow-hidden rounded-full border-4 border-[#316df0] bg-[#6572cc] text-4xl text-white shadow-[0_8px_24px_rgba(28,76,180,0.18)]"
+                    className="group/photo absolute -bottom-12 left-1/2 flex h-24 w-24 -translate-x-1/2 cursor-pointer items-center justify-center overflow-hidden rounded-full border-4 border-[#316df0] bg-[#6572cc] text-4xl text-white shadow-[0_8px_24px_rgba(28,76,180,0.18)]"
                     aria-label="Change profile photo"
                   >
                     {profile.profile_photo_url ? (
@@ -462,23 +462,23 @@ export default function MyCard() {
                   </motion.button>
                 </div>
 
-                <div className="px-8 pb-7 pt-16 text-center">
-                  <h2 className="text-[32px] font-semibold tracking-[-1.2px] text-[#141a29]">
+                <div className="px-7 pb-5 pt-14 text-center sm:px-8">
+                  <h2 className="text-[28px] font-semibold tracking-[-1.2px] text-[#141a29]">
                     {profile.name || "Creator"}
                   </h2>
 
-                  <p className="mt-2 text-[16px] text-[#7b879d]">
+                  <p className="mt-1 text-[15px] text-[#7b879d]">
                     {profile.category || profile.headline || "Creator"}
                   </p>
 
-                  <p className="mx-auto mt-6 max-w-[640px] text-[15px] leading-7 text-[#64728a]">
+                  <p className="mx-auto mt-4 max-w-[640px] text-[14px] leading-6 text-[#64728a]">
                     {profile.bio ||
                       profile.headline ||
                       "Complete your card profile."}
                   </p>
 
                   {industries.length > 0 && (
-                    <div className="mt-5 flex flex-wrap justify-center gap-2">
+                    <div className="mt-4 flex flex-wrap justify-center gap-2">
                       {industries.map((industry) => (
                         <span
                           key={industry}
@@ -490,7 +490,7 @@ export default function MyCard() {
                     </div>
                   )}
 
-                  <div className="mt-6 grid grid-cols-3 border-y border-[#e8ecf2] py-5">
+                  <div className="mt-5 grid grid-cols-3 border-y border-[#e8ecf2] py-4">
                     <CardMetric label="Followers" value={profile.followers} />
                     <CardMetric
                       label="Impressions"
@@ -500,8 +500,8 @@ export default function MyCard() {
                     <CardMetric label="Posts" value={profile.post_count} />
                   </div>
 
-                  <div className="mt-5 flex justify-center">
-                    <span className="inline-flex items-center gap-2 rounded-full border border-[#dce4ef] bg-white px-5 py-2.5 text-xs font-semibold text-[#52617b] opacity-0 shadow-[0_4px_12px_rgba(30,55,100,0.06)] transition-all duration-200 group-hover:-translate-y-0.5 group-hover:opacity-100">
+                  <div className="mt-4 flex justify-center">
+                    <span className="inline-flex items-center gap-2 rounded-full border border-[#dce4ef] bg-white px-5 py-2.5 text-xs font-semibold text-[#52617b] shadow-[0_4px_12px_rgba(30,55,100,0.06)] transition-all duration-200 group-hover:-translate-y-0.5">
                       More details
                       <ArrowUpRight className="h-3.5 w-3.5" />
                     </span>
@@ -509,7 +509,7 @@ export default function MyCard() {
                 </div>
               </div>
 
-              <div className="absolute inset-0 overflow-hidden rounded-[28px] border border-[#dce4ef] bg-white p-7 shadow-[0_20px_60px_rgba(34,60,100,0.08)] [backface-visibility:hidden] [transform:rotateY(180deg)] sm:p-8">
+              <div className="absolute inset-0 overflow-hidden rounded-[28px] border border-[#dce4ef] bg-white p-6 shadow-[0_20px_60px_rgba(34,60,100,0.08)] [backface-visibility:hidden] [transform:rotateY(180deg)] sm:p-7">
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#2864f0]">
@@ -528,7 +528,7 @@ export default function MyCard() {
                   </span>
                 </div>
 
-                <div className="mt-8 grid grid-cols-2 gap-4">
+                <div className="mt-6 grid grid-cols-2 gap-3">
                   {[
                     ["Followers", profile.followers],
                     ["Impressions", profile.impressions],
@@ -537,7 +537,7 @@ export default function MyCard() {
                   ].map(([label, value]) => (
                     <div
                       key={String(label)}
-                      className="rounded-2xl border border-[#e2e8f0] bg-[#fbfcfe] p-5 text-center"
+                      className="rounded-2xl border border-[#e2e8f0] bg-[#fbfcfe] p-4 text-center"
                     >
                       <p className="text-xs font-medium text-[#8794aa]">
                         {label}
@@ -549,7 +549,7 @@ export default function MyCard() {
                   ))}
                 </div>
 
-                <div className="mt-5 rounded-2xl border border-[#e2e8f0] bg-white p-5">
+                <div className="mt-4 rounded-2xl border border-[#e2e8f0] bg-white p-5">
                   <p className="text-sm font-semibold text-[#27344b]">About</p>
                   <p className="mt-2 text-sm leading-6 text-[#7d899f]">
                     {profile.bio ||
@@ -558,7 +558,7 @@ export default function MyCard() {
                   </p>
                 </div>
 
-                <div className="mt-6 flex justify-center">
+                <div className="mt-4 flex justify-center")>
                   <span className="inline-flex items-center gap-2 rounded-full border border-[#dce4ef] bg-white px-5 py-2.5 text-xs font-semibold text-[#52617b]">
                     <ArrowLeft className="h-3.5 w-3.5" />
                     Back to card
@@ -569,21 +569,48 @@ export default function MyCard() {
           </div>
         </motion.div>
 
-        <aside className="h-fit rounded-[24px] border border-[#dfe5ed] bg-white p-6 shadow-[0_4px_16px_rgba(32,52,82,0.035)]">
+        <aside className="h-fit rounded-[24px] border border-[#dfe5ed] bg-white p-5 shadow-[0_4px_16px_rgba(32,52,82,0.035)] lg:min-h-[520px]">
           <div className="flex h-full flex-col">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#8a96aa]">
-              Public link
-            </p>
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#8a96aa]">
+                Public card
+              </p>
+              <span className={profile.card_status === "published"
+                ? "rounded-full bg-[#ecfdf3] px-2.5 py-1 text-[11px] font-semibold text-[#16834b]"
+                : "rounded-full bg-[#fff7ed] px-2.5 py-1 text-[11px] font-semibold text-[#b45309]"}>
+                {profile.card_status === "published" ? "Live" : "Draft"}
+              </span>
+            </div>
 
-            <p className="mt-4 min-h-[72px] break-all rounded-xl border border-[#e4e8ee] bg-[#f8fafc] px-4 py-3.5 text-[13px] leading-5 text-[#52617b]">
-              {publicUrl || "Publish your card to create a public link."}
-            </p>
+            <div className="mt-4 rounded-2xl border border-[#e4e8ee] bg-[#f8fafc] p-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8a96aa]">
+                Public link
+              </p>
+              <p className="mt-2 break-all text-[13px] leading-5 text-[#52617b]">
+                {publicUrl || "Publish your card to create a public link."}
+              </p>
+            </div>
 
             <div className="mt-4">
               <PublicCardActions
                 url={publicUrl}
                 title={(profile.name || "Creator") + " on Naano"}
               />
+            </div>
+
+            <div className="mt-auto grid grid-cols-3 border-t border-[#edf0f4] pt-5">
+              <div className="text-center">
+                <p className="text-lg font-semibold text-[#172033]">{profile.followers ?? 0}</p>
+                <p className="mt-1 text-[10px] font-medium text-[#8a96aa]">Followers</p>
+              </div>
+              <div className="border-x border-[#edf0f4] text-center">
+                <p className="text-lg font-semibold text-[#172033]">{profile.impressions ?? 0}</p>
+                <p className="mt-1 text-[10px] font-medium text-[#8a96aa]">Views</p>
+              </div>
+              <div className="text-center">
+                <p className="text-lg font-semibold text-[#172033]">{profile.post_count ?? 0}</p>
+                <p className="mt-1 text-[10px] font-medium text-[#8a96aa]">Posts</p>
+              </div>
             </div>
           </div>
         </aside>
