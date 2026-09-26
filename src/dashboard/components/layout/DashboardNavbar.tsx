@@ -218,7 +218,10 @@ export function DashboardNavbar({
                 title="Collapse sidebar"
                 className="ml-0.5 h-8 w-8 cursor-pointer rounded-lg text-[#687166] transition-all duration-200 hover:bg-[#f2f3ee] hover:text-[#20251f]"
               >
-                <PanelLeftClose className="h-[17px] w-[17px]" strokeWidth={1.8} />
+                <PanelLeftClose
+                  className="h-[17px] w-[17px]"
+                  strokeWidth={1.8}
+                />
               </Button>
             </>
           )}
