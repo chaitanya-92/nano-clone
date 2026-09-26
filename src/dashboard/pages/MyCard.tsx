@@ -308,28 +308,28 @@ export default function MyCard() {
   const industries = parseIndustries(profile.industries);
 
   return (
-    <div className="mx-auto w-full max-w-[1180px]">
-      <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+    <div className="mx-auto w-full max-w-[1240px] pb-10">
+      <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#2864f0]">
             Creator card
           </p>
 
-          <h1 className="mt-2 text-[38px] font-semibold tracking-[-1.8px] text-[#151b2a]">
+          <h1 className="mt-2 text-[36px] font-semibold leading-tight tracking-[-1.6px] text-[#151b2a] sm:text-[40px]">
             Your public profile
           </h1>
 
-          <p className="mt-2 max-w-[680px] text-[16px] leading-7 text-[#78869e]">
+          <p className="mt-2 max-w-[680px] text-[15px] leading-6 text-[#78869e] sm:text-[16px]">
             Review exactly what brands can discover from your Naano card.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center justify-end gap-2">
+        <div className="flex w-full flex-wrap items-center justify-start gap-2 md:w-auto md:justify-end">
           <Button
             type="button"
             variant="outline"
             onClick={() => setOpen(true)}
-            className="h-10 min-w-[84px] cursor-pointer"
+            className="h-11 min-w-[92px] cursor-pointer rounded-xl px-4"
           >
             <Pencil className="mr-2 h-4 w-4" />
             Edit
@@ -338,7 +338,7 @@ export default function MyCard() {
           <Button
             type="button"
             onClick={() => void togglePublish()}
-            className="h-10 min-w-[132px] cursor-pointer bg-[#2864f0] text-white hover:bg-[#2056d4]"
+            className="h-11 min-w-[138px] cursor-pointer rounded-xl bg-[#2864f0] px-4 text-white shadow-[0_4px_12px_rgba(40,100,240,0.18)] hover:bg-[#2056d4]"
           >
             <Globe className="mr-2 h-4 w-4" />
             {profile.card_status === "published" ? "Unpublish" : "Publish card"}
@@ -353,7 +353,7 @@ export default function MyCard() {
                 event.preventDefault();
               }
             }}
-            className="inline-flex h-10 min-w-[92px] cursor-pointer items-center justify-center rounded-lg border border-[#dce3ec] px-3 text-sm font-medium text-[#59667e] transition hover:bg-[#f8fafc]"
+            className="inline-flex h-11 min-w-[100px] cursor-pointer items-center justify-center rounded-xl border border-[#dce3ec] bg-white px-4 text-sm font-medium text-[#59667e] shadow-[0_1px_2px_rgba(20,30,50,0.03)] transition hover:bg-[#f8fafc] hover:text-[#202938]"
           >
             <ExternalLink className="mr-2 h-4 w-4" />
             Preview
@@ -367,7 +367,7 @@ export default function MyCard() {
         </div>
       )}
 
-      <section className="mt-8 grid gap-6 lg:grid-cols-[1fr_360px]">
+      <section className="mt-9 grid items-stretch gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
@@ -390,9 +390,9 @@ export default function MyCard() {
             <motion.div
               animate={{ rotateY: cardFlipped ? 180 : 0 }}
               transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-              className="relative min-h-[590px] w-full [transform-style:preserve-3d]"
+              className="relative h-[620px] w-full [transform-style:preserve-3d]"
             >
-              <div className="absolute inset-0 overflow-hidden rounded-[28px] border border-[#dce4ef] bg-white shadow-[0_20px_60px_rgba(34,60,100,0.08)] [backface-visibility:hidden]">
+              <div className="absolute inset-0 overflow-hidden rounded-[28px] border border-[#dce4ef] bg-white shadow-[0_20px_60px_rgba(34,60,100,0.08)] transition-shadow duration-300 group-hover:shadow-[0_24px_70px_rgba(34,60,100,0.13)] [backface-visibility:hidden]">
                 <div className="relative h-[170px] bg-gradient-to-br from-[#2159df] via-[#316df0] to-[#6f91f3]">
                   <Logo
                     compact={false}
@@ -461,7 +461,7 @@ export default function MyCard() {
                 </div>
               </div>
 
-              <div className="absolute inset-0 overflow-hidden rounded-[28px] border border-[#dce4ef] bg-white p-8 shadow-[0_20px_60px_rgba(34,60,100,0.08)] [backface-visibility:hidden] [transform:rotateY(180deg)]">
+              <div className="absolute inset-0 overflow-hidden rounded-[28px] border border-[#dce4ef] bg-white p-7 shadow-[0_20px_60px_rgba(34,60,100,0.08)] [backface-visibility:hidden] [transform:rotateY(180deg)] sm:p-8">
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#2864f0]">
@@ -514,12 +514,12 @@ export default function MyCard() {
           </div>
         </motion.div>
 
-        <aside className="rounded-[24px] border border-[#dfe5ed] bg-white p-6 shadow-[0_4px_16px_rgba(32,52,82,0.035)]">
+        <aside className="h-full min-h-[620px] rounded-[24px] border border-[#dfe5ed] bg-white p-6 shadow-[0_4px_16px_rgba(32,52,82,0.035)]">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#8a96aa]">
             Public link
           </p>
 
-          <p className="mt-3 break-all rounded-xl border border-[#e4e8ee] bg-[#f8fafc] px-4 py-3 text-sm text-[#52617b]">
+          <p className="mt-4 min-h-[72px] break-all rounded-xl border border-[#e4e8ee] bg-[#f8fafc] px-4 py-3.5 text-[13px] leading-5 text-[#52617b]">
             {publicUrl || "Publish your card to create a public link."}
           </p>
 
