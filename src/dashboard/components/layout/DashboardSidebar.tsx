@@ -3,7 +3,6 @@ import { Link, useLocation } from "react-router-dom";
 
 import { dashboardNavigation } from "@/dashboard/constants/navigation";
 
-const STORAGE_KEY = "naano-dashboard-sidebar-collapsed";
 
 export function DashboardSidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
   const location = useLocation();
