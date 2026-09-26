@@ -6,34 +6,44 @@ import { DashboardSidebar } from "./DashboardSidebar";
 
 const STORAGE_KEY = "naano-dashboard-sidebar-collapsed";
 
+function readSidebarPreference() {
+  try {
+    return window.localStorage.getItem(STORAGE_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function persistSidebarPreference(collapsed: boolean) {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, String(collapsed));
+  } catch {
+    // Storage can be unavailable in privacy-restricted environments.
+  }
+}
+
 export function DashboardLayout() {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(readSidebarPreference);
   const location = useLocation();
   const mainRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    try {
-      setCollapsed(window.localStorage.getItem(STORAGE_KEY) === "true");
-    } catch {
-      // Ignore unavailable localStorage.
-    }
-  }, []);
-
-  useEffect(() => {
-    mainRef.current?.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    mainRef.current?.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "auto",
+    });
   }, [location.pathname, location.search]);
 
   const toggleSidebar = () => {
-    setCollapsed((value) => {
-      const next = !value;
-      try {
-        window.localStorage.setItem(STORAGE_KEY, String(next));
-      } catch {
-        // Ignore unavailable localStorage.
-      }
+    setCollapsed((current) => {
+      const next = !current;
+      persistSidebarPreference(next);
       return next;
     });
   };
+
+  const contentMargin = collapsed ? "lg:ml-[76px]" : "lg:ml-[224px]";
 
   return (
     <div className="dashboard-shell h-screen overflow-hidden bg-[#f6f8fb]">
@@ -42,7 +52,7 @@ export function DashboardLayout() {
       <div
         className={[
           "h-full transition-[margin] duration-300 ease-[cubic-bezier(.22,1,.36,1)]",
-          collapsed ? "lg:ml-[76px]" : "lg:ml-[224px]",
+          contentMargin,
         ].join(" ")}
       >
         <DashboardNavbar
