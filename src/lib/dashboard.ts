@@ -88,6 +88,22 @@ export interface AnalyticsResponse {
       reposts: number;
       engagements: number;
     };
+    syncStatuses: Array<{
+      provider: "linkedin" | "x";
+      status: "synced" | "unavailable" | "error";
+      message: string;
+      syncedAt: string | null;
+    }>;
+    platforms: Array<{
+      provider: "linkedin" | "x";
+      status: string;
+      followers_count: number;
+      impressions: number;
+      engagements: number;
+      posts_count: number;
+      last_synced_at: string | null;
+      sync_error: string | null;
+    }>;
     posts: Array<{
       id: string;
       platform: string;
