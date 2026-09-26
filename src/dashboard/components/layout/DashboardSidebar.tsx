@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 
 import { dashboardNavigation } from "@/dashboard/constants/navigation";
+import { Logo } from "@/components/layout/Logo";
 
 export function DashboardSidebar({ collapsed }: { collapsed: boolean }) {
   const location = useLocation();
@@ -25,23 +26,21 @@ export function DashboardSidebar({ collapsed }: { collapsed: boolean }) {
     >
       <div className="flex h-16 shrink-0 items-center px-4">
         <div className="flex min-w-0 flex-1 items-center gap-2">
-          <Link
-            to="/dashboard"
-            aria-label="Open Naano dashboard"
+          <div
             className={[
-              "flex h-10 items-center overflow-hidden rounded-xl px-1 outline-none transition-all duration-300 ease-[cubic-bezier(.22,1,.36,1)]",
-              collapsed ? "w-[42px] justify-center" : "w-[86px]",
+              "flex h-10 items-center overflow-hidden transition-all duration-300 ease-[cubic-bezier(.22,1,.36,1)]",
+              collapsed ? "w-[42px] justify-center" : "w-[170px]",
             ].join(" ")}
           >
-            <span
-              className={[
-                "font-bold tracking-[-1.5px] text-[#171b18] transition-all duration-300 ease-[cubic-bezier(.22,1,.36,1)]",
-                collapsed ? "text-[21px]" : "text-[23px]",
-              ].join(" ")}
-            >
-              NAANO
-            </span>
-          </Link>
+            <Logo
+              compact={collapsed}
+              className={
+                collapsed
+                  ? "pointer-events-none [&>span:first-child]:scale-[0.82]"
+                  : "pointer-events-none [&>span:first-child]:scale-[0.9] [&>span:last-child]:text-[1.45rem]"
+              }
+            />
+          </div>
         </div>
       </div>
 
