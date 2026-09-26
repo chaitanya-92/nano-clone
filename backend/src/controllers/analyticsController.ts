@@ -66,6 +66,20 @@ export async function analytics(
     followers: 0,
   };
 
+  const platforms = db
+    .prepare(
+      `SELECT provider,status,followers_count,impressions,engagements,posts_count,last_synced_at,sync_error
+       FROM social_accounts WHERE user_id=? ORDER BY provider`,
+    )
+    .all(user.id)
+    .map((item: any) => ({
+      ...item,
+      followers_count: Number(item.followers_count ?? 0),
+      impressions: Number(item.impressions ?? 0),
+      engagements: Number(item.engagements ?? 0),
+      posts_count: Number(item.posts_count ?? 0),
+    }));
+
   const profileTotals = db
     .prepare(
       `SELECT
@@ -110,6 +124,7 @@ export async function analytics(
         engagements: Number(post.engagements ?? 0),
       })),
       syncStatuses,
+      platforms,
     },
   });
 }
