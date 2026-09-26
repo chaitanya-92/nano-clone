@@ -44,7 +44,7 @@ export function DashboardLayout() {
           onToggleSidebar={toggleSidebar}
         />
 
-        <main className="dashboard-panel dashboard-scroll-area mx-3 mb-3 h-[calc(100vh-76px)] overflow-y-auto overscroll-contain rounded-[26px] border border-[#e3e5df] bg-[#f6f5f0] lg:mx-4">
+        <main className="dashboard-panel dashboard-scroll-area mx-3 mb-3 h-[calc(100vh-76px)] overflow-y-auto overscroll-contain rounded-[26px] border border-[#e3e5df] bg-[#f6f8fb] lg:mx-4">
           <div className="px-5 py-5 sm:px-7 sm:py-6 lg:px-9">
             <Outlet />
           </div>
