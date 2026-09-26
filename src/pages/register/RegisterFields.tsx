@@ -1,5 +1,5 @@
 import { useState, type ChangeEvent } from "react";
-import { Formik, type FormikProps } from "formik";
+import type { FormikProps } from "formik";
 import { CheckCircle2 } from "lucide-react";
 import { FieldError } from "@/auth/components/FieldError";
 import { checkEmail, requestEmailOtp, verifyEmailOtp } from "@/lib/auth";
