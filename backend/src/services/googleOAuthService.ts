@@ -1,14 +1,17 @@
 import { randomBytes } from "node:crypto";
 import type { ServerResponse } from "node:http";
-import { FRONTEND_ORIGIN, OAUTH_STATE_COOKIE } from "../config/env";
+import {
+  FRONTEND_ORIGIN,
+  GOOGLE_CALLBACK_URL,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  OAUTH_STATE_COOKIE,
+} from "../config/env";
 import { setCookie } from "../utils/session";
 import { db } from "../db/client";
 import { createOAuthUser, findUserByEmail } from "./authService";
 
 function getGoogleConfig() {
-  const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_CALLBACK_URL } =
-    process.env;
-
   return {
     clientId: GOOGLE_CLIENT_ID,
     clientSecret: GOOGLE_CLIENT_SECRET,
@@ -109,7 +112,8 @@ export async function handleGoogleCallback(
     });
   }
 
-  const profileTable = role === "brand" ? "brand_profiles" : "creator_profiles";
+  const profileTable =
+    role === "brand" ? "brand_profiles" : "creator_profiles";
 
   const onboarding = db
     .prepare(
