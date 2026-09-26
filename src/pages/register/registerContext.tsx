@@ -3,6 +3,7 @@ import {
   useContext,
   type Dispatch,
   type SetStateAction,
+  type ReactNode,
 } from "react";
 import type { FormikProps } from "formik";
 import type {
@@ -53,7 +54,7 @@ export function RegistrationFormProvider({
   children,
 }: {
   value: RegistrationFormContextValue;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <RegistrationFormContext.Provider value={value}>
