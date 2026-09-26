@@ -173,8 +173,8 @@ export default function Messages() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-[1180px]">
-      <div className="grid overflow-hidden rounded-[22px] border border-[#dfe5ed] bg-white lg:grid-cols-[260px_minmax(0,1fr)]">
+    <div className="mx-auto flex h-[calc(100vh-128px)] min-h-0 w-full max-w-[1180px] flex-col">
+      <div className="grid min-h-0 flex-1 overflow-hidden rounded-[22px] border border-[#dfe5ed] bg-white shadow-[0_8px_30px_rgba(34,52,84,0.035)] lg:grid-cols-[238px_minmax(0,1fr)]">
         <aside className="border-b border-[#e7ebf0] bg-white lg:border-b-0 lg:border-r">
           <div className="border-b border-[#e7ebf0] p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#2864f0]">
@@ -226,7 +226,7 @@ export default function Messages() {
           </div>
         </aside>
 
-        <section className="min-w-0">
+        <section className="flex min-h-0 min-w-0 flex-col">
           <div className="flex h-[64px] shrink-0 items-center justify-between border-b border-[#e7ebf0] px-5">
             <div className="flex items-center gap-3">
               <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#dfe5ed] bg-white">
@@ -250,7 +250,7 @@ export default function Messages() {
             </div>
           </div>
 
-          <div className="min-h-0 flex-1">
+          <div className="min-h-0 flex-1 overflow-hidden">
             <MessageScrollerProvider
               autoScroll
               defaultScrollPosition="end"
