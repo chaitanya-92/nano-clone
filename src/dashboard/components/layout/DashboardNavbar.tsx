@@ -177,7 +177,7 @@ export function DashboardNavbar({
   return (
     <header className="relative z-40 h-16 bg-white">
       <div className="flex h-full items-center justify-between px-4 sm:px-6 lg:px-7">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <Button
             type="button"
             variant="ghost"
@@ -185,7 +185,7 @@ export function DashboardNavbar({
             onClick={onToggleSidebar}
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className="h-10 w-10 cursor-pointer rounded-xl text-[#5e6d84] transition-all duration-200 hover:bg-[#f6f8fb] hover:text-[#202938]"
+            className="h-9 w-9 cursor-pointer rounded-lg text-[#687166] transition-all duration-200 hover:bg-[#f2f3ee] hover:text-[#20251f]"
           >
             {collapsed ? (
               <PanelLeftOpen className="h-[19px] w-[19px]" strokeWidth={1.8} />
