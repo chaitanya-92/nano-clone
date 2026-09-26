@@ -26,7 +26,8 @@ const defaultAppOrigin = IS_PRODUCTION
 
 const defaultFrontendOrigin = "https://jocular-longma-0f9c9d.netlify.app";
 
-const configuredAppOrigin = getEnv("APP_ORIGIN") ?? getEnv("RENDER_EXTERNAL_URL");
+const configuredAppOrigin =
+  getEnv("APP_ORIGIN") ?? getEnv("RENDER_EXTERNAL_URL");
 const productionAppOrigin =
   configuredAppOrigin && isValidHttpOrigin(configuredAppOrigin)
     ? new URL(configuredAppOrigin)
