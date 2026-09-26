@@ -37,7 +37,7 @@ export default function NotFound() {
 
           <Button
             render={<Link to="/" />}
-            className="h-11 rounded-xl bg-[#202124] px-5 text-[14px] font-medium text-white hover:bg-[#111318]"
+            className="h-11 rounded-xl bg-[#2864f0] px-5 text-[14px] font-medium text-white hover:bg-[#245bdc]"
           >
             <Home className="h-4 w-4" />
             Back to home
