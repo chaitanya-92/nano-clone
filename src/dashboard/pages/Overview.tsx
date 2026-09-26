@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowUpRight, Check, ExternalLink, Share2 } from "lucide-react";
+import { ArrowUpRight, Check, ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -15,7 +15,6 @@ import {
 } from "@/lib/dashboard";
 import { AnimatedNumber } from "@/components/dashboard/AnimatedNumber";
 import { PublicCardActions } from "@/dashboard/components/shared/PublicCardActions";
-import { Logo } from "@/components/layout/Logo";
 
 const stats = [
   {
@@ -117,7 +116,6 @@ export default function Overview() {
   const [collaborations, setCollaborations] = useState<Collaboration[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [cardFlipped, setCardFlipped] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -266,99 +264,90 @@ export default function Overview() {
             >
               <div className="flex items-start justify-between gap-4 p-6">
                 <div>
-                  <h2 className="text-[18px] font-semibold text-[#111827]">Your creator card</h2>
+                  <h2 className="text-[18px] font-semibold text-[#111827]">
+                    Your creator card
+                  </h2>
+
                   <p className="mt-1 max-w-[190px] text-[13px] leading-5 text-[#8490a5]">
-                    Hover for details and click to flip.
+                    This is how brands discover your positioning.
                   </p>
                 </div>
-                <div className="flex w-[112px] flex-col gap-2">
-                  <Link to="/dashboard/my-card" className="inline-flex h-9 w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-[#dce3ec] px-3 text-[12px] font-medium text-[#60708a] transition hover:bg-[#f8fafc]">
+
+                <div className="flex flex-col gap-2">
+                  <Link
+                    to="/dashboard/my-card"
+                    className="inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded-lg border border-[#dce3ec] px-3 text-[12px] text-[#60708a] transition hover:bg-[#f8fafc]"
+                  >
                     <ExternalLink className="h-3.5 w-3.5" />
                     Open card
                   </Link>
-                  <PublicCardActions url={cardUrl} title={(profile?.name ?? "Creator") + " on Naano"} compact />
+
+                  <PublicCardActions
+                    url={cardUrl}
+                    title={(profile?.name ?? "Creator") + " on Naano"}
+                    compact
+                  />
                 </div>
               </div>
 
-              <div
-                className="group mx-6 mb-6 cursor-pointer [perspective:1200px]"
-                onClick={() => setCardFlipped((current) => !current)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    setCardFlipped((current) => !current);
-                  }
-                }}
-                role="button"
-                tabIndex={0}
-                aria-label={cardFlipped ? "Show creator card" : "Show creator details"}
-              >
-                <motion.div
-                  animate={{ rotateY: cardFlipped ? 180 : 0 }}
-                  transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-                  className="relative min-h-[390px] w-full [transform-style:preserve-3d]"
-                >
-                  <div className="absolute inset-0 overflow-hidden rounded-[20px] border border-[#e0e4ec] bg-white shadow-[0_8px_30px_rgba(30,55,100,0.06)] [backface-visibility:hidden]">
-                    <div className="relative h-[90px] bg-gradient-to-br from-[#2864f0] via-[#356cf3] to-[#6d8df4]">
-                      <span className="absolute left-5 top-4 flex h-9 w-9 items-center justify-center rounded-xl bg-white text-[13px] font-bold text-[#2864f0]">in</span>
-                      <Logo compact={false} href="/dashboard" className="absolute left-1/2 top-4 -translate-x-1/2 text-white [filter:brightness(0)_invert(1)] [&>span:last-child]:text-[1.25rem]" />
-                      <span className="absolute right-5 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white text-[18px]">
-                        {profile?.country === "India" ? "🇮🇳" : "🌐"}
-                      </span>
-                      <div className="absolute -bottom-10 left-1/2 flex h-20 w-20 -translate-x-1/2 items-center justify-center overflow-hidden rounded-full border-4 border-[#2864f0] bg-white">
-                        {profile?.profile_photo_url ? (
-                          <img src={profile.profile_photo_url} alt="" className="h-full w-full object-cover" />
-                        ) : (
-                          <Logo compact href="/dashboard" className="[&>span:first-child]:scale-[0.9]" />
-                        )}
-                      </div>
-                    </div>
-                    <div className="px-5 pb-5 pt-14 text-center">
-                      <h3 className="text-[23px] font-semibold text-[#111827]">{profile?.name ?? "Creator"}</h3>
-                      <p className="mt-1 text-[15px] text-[#8792a6]">{profile?.category || profile?.headline || "Creator"}</p>
-                      <p className="mt-5 line-clamp-3 text-[13px] leading-5 text-[#7f8a9d]">
-                        {profile?.bio || profile?.headline || "Complete your creator card to help brands understand your positioning."}
-                      </p>
-                      <div className="mt-5 flex justify-center">
-                        <span className="inline-flex items-center gap-2 rounded-full border border-[#dce4ef] bg-white px-4 py-2 text-xs font-semibold text-[#52617b] shadow-[0_4px_12px_rgba(30,55,100,0.06)] transition-transform duration-200 group-hover:-translate-y-0.5">
-                          More details <ArrowUpRight className="h-3.5 w-3.5" />
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+              <div className="mx-6 mb-6 overflow-hidden rounded-[20px] border border-[#e0e4ec] bg-white">
+                <div className="relative h-[90px] bg-gradient-to-br from-[#2864f0] via-[#356cf3] to-[#6d8df4]">
+                  <span className="absolute left-5 top-4 flex h-9 w-9 items-center justify-center rounded-xl bg-white text-[13px] font-bold text-[#2864f0]">
+                    in
+                  </span>
 
-                  <div className="absolute inset-0 overflow-hidden rounded-[20px] border border-[#dce4ef] bg-white p-5 shadow-[0_12px_35px_rgba(30,55,100,0.08)] [backface-visibility:hidden] [transform:rotateY(180deg)]">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8b9bb3]">Performance & ICP</p>
-                        <h3 className="mt-1 text-lg font-semibold text-[#172033]">{profile?.name ?? "Creator"}</h3>
-                      </div>
-                      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#eef4ff] text-[#2864f0]"><Share2 className="h-4 w-4" /></span>
-                    </div>
-                    <div className="mt-5 grid grid-cols-2 gap-3">
-                      {[
-                        ["Followers", Number(dashboard?.metrics?.followers ?? 0)],
-                        ["Impressions", Number(dashboard?.metrics?.impressions ?? 0)],
-                        ["Engagements", Number(dashboard?.metrics?.engagements ?? 0)],
-                        ["Posts", Number(dashboard?.metrics?.posts ?? 0)],
-                      ].map(([label, value]) => (
-                        <div key={String(label)} className="rounded-xl border border-[#e2e8f0] bg-[#fbfcfe] p-3 text-center">
-                          <p className="text-[10px] font-medium text-[#8794aa]">{label}</p>
-                          <p className="mt-2 text-lg font-semibold text-[#172033]">{Number(value) ? Number(value).toLocaleString() : "—"}</p>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="mt-4 rounded-xl border border-[#e2e8f0] bg-white p-4">
-                      <p className="text-xs font-semibold text-[#27344b]">About</p>
-                      <p className="mt-2 line-clamp-3 text-xs leading-5 text-[#7d899f]">{profile?.bio || profile?.headline || "No creator bio available yet."}</p>
-                    </div>
-                    <div className="mt-4 flex justify-center">
-                      <span className="inline-flex items-center gap-2 rounded-full border border-[#dce4ef] bg-white px-4 py-2 text-xs font-semibold text-[#52617b]">
-                        <ArrowLeft className="h-3.5 w-3.5" /> Back to card
-                      </span>
-                    </div>
-                  </div>
-                </motion.div>
+                  <span className="absolute left-1/2 top-4 -translate-x-1/2 text-[24px] font-bold text-white">
+                    naano
+                  </span>
+
+                  <span className="absolute right-5 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white text-[18px]">
+                    {profile?.country === "India" ? "🇮🇳" : "🌐"}
+                  </span>
+
+                  <motion.div
+                    initial={{
+                      scale: 0.72,
+                      opacity: 0,
+                    }}
+                    animate={{
+                      scale: 1,
+                      opacity: 1,
+                    }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 250,
+                      damping: 18,
+                      delay: 0.12,
+                    }}
+                    className="absolute -bottom-10 left-1/2 flex h-20 w-20 -translate-x-1/2 items-center justify-center overflow-hidden rounded-full border-4 border-[#2864f0] bg-[#6572cc] text-[34px] text-white"
+                  >
+                    {profile?.profile_photo_url ? (
+                      <img
+                        src={profile.profile_photo_url}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      (profile?.name?.trim().charAt(0).toUpperCase() ?? "N")
+                    )}
+                  </motion.div>
+                </div>
+
+                <div className="px-5 pb-6 pt-14 text-center">
+                  <h3 className="text-[23px] font-semibold text-[#111827]">
+                    {profile?.name ?? "Creator"}
+                  </h3>
+
+                  <p className="mt-1 text-[15px] text-[#8792a6]">
+                    {profile?.category || profile?.headline || "Creator"}
+                  </p>
+
+                  <p className="mt-6 text-[13px] leading-5 text-[#7f8a9d]">
+                    {profile?.bio ||
+                      profile?.headline ||
+                      "Complete your creator card to help brands understand your positioning."}
+                  </p>
+                </div>
               </div>
             </motion.div>
 
