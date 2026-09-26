@@ -195,7 +195,7 @@ export function DashboardNavbar({
   };
 
   return (
-    <header className="sticky top-0 z-40 h-16 bg-transparent">
+    <header className="sticky top-0 z-40 h-16 bg-white">
       <div className="flex h-full items-center justify-between pl-0 pr-4 sm:pr-6 lg:pr-7">
         <div className="flex min-w-0 items-center gap-4">
           <Button
@@ -205,7 +205,7 @@ export function DashboardNavbar({
             onClick={onToggleSidebar}
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className="h-10 w-10 cursor-pointer rounded-full border border-[#dfe3dc] bg-white text-[#687166] shadow-[0_1px_3px_rgba(25,35,25,0.04)] transition-all duration-200 hover:bg-[#f7f8f4] hover:text-[#20251f]"
+            className="h-9 w-9 cursor-pointer rounded-lg text-[#687166] transition-all duration-200 hover:bg-[#f2f3ee] hover:text-[#20251f]"
           >
             {collapsed ? (
               <PanelLeftOpen className="h-[18px] w-[18px]" strokeWidth={1.8} />
@@ -235,7 +235,7 @@ export function DashboardNavbar({
                   variant="ghost"
                   size="icon-lg"
                   aria-label="Notifications"
-                  className="relative cursor-pointer rounded-full border border-[#d9dee7] bg-white text-[#5e6d84] shadow-[0_1px_2px_rgba(20,30,50,0.03)] hover:bg-[#f6f8fb] hover:text-[#202938]"
+                  className="relative cursor-pointer rounded-xl border border-[#d9dee7] bg-white text-[#5e6d84] shadow-[0_1px_2px_rgba(20,30,50,0.03)] hover:bg-[#f6f8fb] hover:text-[#202938]"
                 />
               }
             >
@@ -327,7 +327,7 @@ export function DashboardNavbar({
                     <img
                       src={profilePhotoUrl}
                       alt=""
-                      className="h-full w-full object-cover"
+                      className="h-full w-full rounded-full object-cover"
                     />
                   ) : (
                     <AvatarFallback className="bg-[#5f6bc6] text-sm font-semibold text-white">
