@@ -4,7 +4,6 @@ const getEnv = (key: string) => process.env[key]?.trim() || undefined;
 
 export const PORT = Number(getEnv("PORT") ?? 8787);
 
-
 export const APP_ORIGIN =
   getEnv("APP_ORIGIN") ??
   getEnv("RENDER_EXTERNAL_URL") ??
