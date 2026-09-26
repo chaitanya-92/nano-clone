@@ -7,7 +7,9 @@ import { DashboardSidebar } from "./DashboardSidebar";
 const STORAGE_KEY = "naano-dashboard-sidebar-collapsed";
 
 export function DashboardLayout() {
-  const [collapsed, setCollapsed] = useState(false);\n  const location = useLocation();\n  const mainRef = useRef<HTMLElement | null>(null);
+  const [collapsed, setCollapsed] = useState(false);
+  const location = useLocation();
+  const mainRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     try {
@@ -17,7 +19,11 @@ export function DashboardLayout() {
     }
   }, []);
 
-  useEffect(() => {\n    mainRef.current?.scrollTo({ top: 0, left: 0, behavior: "auto" });\n  }, [location.pathname, location.search]);\n\n  const toggleSidebar = () => {
+  useEffect(() => {
+    mainRef.current?.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [location.pathname, location.search]);
+
+  const toggleSidebar = () => {
     setCollapsed((value) => {
       const next = !value;
       try {
