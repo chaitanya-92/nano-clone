@@ -4,10 +4,13 @@ const getEnv = (key: string) => process.env[key]?.trim() || undefined;
 
 export const PORT = Number(getEnv("PORT") ?? 8787);
 
+
 export const APP_ORIGIN =
   getEnv("APP_ORIGIN") ??
   getEnv("RENDER_EXTERNAL_URL") ??
-  `http://localhost:${PORT}`;
+  (IS_PRODUCTION
+    ? "https://nano-clone-lo9q.onrender.com"
+    : `http://localhost:${PORT}`);
 
 export const FRONTEND_ORIGIN =
   getEnv("FRONTEND_ORIGIN") ?? "https://jocular-longma-0f9c9d.netlify.app";
