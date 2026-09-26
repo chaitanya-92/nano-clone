@@ -129,7 +129,10 @@ export default function MyCard() {
     };
   }, []);
 
-  const publicUrl = profile?.slug ? getPublicCardUrl(profile.slug) : "";
+  const publicUrl =
+    profile?.card_status === "published" && profile.slug
+      ? getPublicCardUrl(profile.slug)
+      : "";
 
   const savePhoto = async () => {
     if (!photoFile) {
