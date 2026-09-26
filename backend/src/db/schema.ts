@@ -80,6 +80,10 @@ export function initializeDatabase() {
       token_expires_at INTEGER,
       last_synced_at TEXT,
       sync_error TEXT,
+      followers_count INTEGER NOT NULL DEFAULT 0,
+      impressions INTEGER NOT NULL DEFAULT 0,
+      engagements INTEGER NOT NULL DEFAULT 0,
+      posts_count INTEGER NOT NULL DEFAULT 0,
       username TEXT,
       profile_url TEXT,
       profile_image_url TEXT,
@@ -331,6 +335,10 @@ export function migrateDatabase() {
     "ALTER TABLE social_accounts ADD COLUMN token_expires_at INTEGER",
     "ALTER TABLE social_accounts ADD COLUMN last_synced_at TEXT",
     "ALTER TABLE social_accounts ADD COLUMN sync_error TEXT",
+    "ALTER TABLE social_accounts ADD COLUMN followers_count INTEGER NOT NULL DEFAULT 0",
+    "ALTER TABLE social_accounts ADD COLUMN impressions INTEGER NOT NULL DEFAULT 0",
+    "ALTER TABLE social_accounts ADD COLUMN engagements INTEGER NOT NULL DEFAULT 0",
+    "ALTER TABLE social_accounts ADD COLUMN posts_count INTEGER NOT NULL DEFAULT 0",
   ];
 
   for (const statement of migrations) {
