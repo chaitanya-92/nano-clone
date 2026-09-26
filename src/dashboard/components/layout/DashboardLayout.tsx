@@ -31,7 +31,7 @@ export function DashboardLayout() {
 
   return (
     <div className="dashboard-shell h-screen overflow-hidden bg-[#f6f8fb]">
-      <DashboardNavbar />
+      <DashboardNavbar collapsed={collapsed} onToggleSidebar={toggleSidebar} />
 
       <div className="h-[calc(100vh-64px)]">
         <DashboardSidebar collapsed={collapsed} onToggle={toggleSidebar} />
