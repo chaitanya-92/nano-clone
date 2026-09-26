@@ -1,0 +1,35 @@
+.dashboard-shell {
+  height: 100%;
+}
+
+.dashboard-shell button:not(:disabled),
+.dashboard-shell a {
+  cursor: pointer;
+}
+
+.dashboard-shell button:disabled {
+  cursor: not-allowed;
+}
+
+.dashboard-scroll-area {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.dashboard-scroll-area::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dashboard-scroll-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dashboard-scroll-area::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+
+.dashboard-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

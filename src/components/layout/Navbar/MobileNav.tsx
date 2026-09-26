@@ -15,7 +15,7 @@ import { navItems, resourceLinks, navigationActions } from "@/data/data";
 
 export function MobileNav() {
   const navigate = (href: string) => {
-    window.location.href = href;
+    window.location.assign(href);
   };
 
   return (

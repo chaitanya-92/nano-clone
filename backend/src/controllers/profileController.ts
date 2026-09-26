@@ -48,12 +48,8 @@ export async function patchProfile(
   const body = await readJson(request);
   if (user.role === "creator") {
     const p = db
-      .prepare(
-        "SELECT * FROM creator_profiles WHERE user_id=?",
-      )
-      .get(user.id) as
-      | Record<string, unknown>
-      | undefined;
+      .prepare("SELECT * FROM creator_profiles WHERE user_id=?")
+      .get(user.id) as Record<string, unknown> | undefined;
 
     if (!p) {
       return error(
@@ -74,19 +70,14 @@ export async function patchProfile(
       String(p.x_profile_url ?? ""),
     ).trim();
 
-    const profilePhotoUrl =
-      stringValue(
-        body.profilePhotoUrl,
-        String(
-          p.profile_photo_url ?? "",
-        ),
-      ).trim();
+    const profilePhotoUrl = stringValue(
+      body.profilePhotoUrl,
+      String(p.profile_photo_url ?? ""),
+    ).trim();
 
     if (
       profilePhotoUrl &&
-      !/^data:image\/(png|jpe?g|webp|gif);base64,/i.test(
-        profilePhotoUrl,
-      )
+      !/^data:image\/(png|jpe?g|webp|gif);base64,/i.test(profilePhotoUrl)
     ) {
       return error(
         response,
@@ -96,10 +87,7 @@ export async function patchProfile(
       );
     }
 
-    if (
-      profilePhotoUrl.length >
-      2_100_000
-    ) {
+    if (profilePhotoUrl.length > 2_100_000) {
       return error(
         response,
         422,
@@ -108,10 +96,7 @@ export async function patchProfile(
       );
     }
 
-    const validateSocialUrl = (
-      provider: "linkedin" | "x",
-      value: string,
-    ) => {
+    const validateSocialUrl = (provider: "linkedin" | "x", value: string) => {
       if (!value) {
         return null;
       }
@@ -121,11 +106,11 @@ export async function patchProfile(
       try {
         parsed = new URL(value);
       } catch {
-        return "Enter a valid " +
-          (provider === "linkedin"
-            ? "LinkedIn"
-            : "X") +
-          " profile URL.";
+        return (
+          "Enter a valid " +
+          (provider === "linkedin" ? "LinkedIn" : "X") +
+          " profile URL."
+        );
       }
 
       if (
@@ -135,110 +120,63 @@ export async function patchProfile(
             "linkedin.com") ||
         (provider === "x" &&
           !["x.com", "twitter.com"].includes(
-            parsed.hostname
-              .toLowerCase()
-              .replace(/^www\./, ""),
+            parsed.hostname.toLowerCase().replace(/^www\./, ""),
           ))
       ) {
-        return "Enter a valid " +
-          (provider === "linkedin"
-            ? "LinkedIn"
-            : "X") +
-          " profile URL.";
+        return (
+          "Enter a valid " +
+          (provider === "linkedin" ? "LinkedIn" : "X") +
+          " profile URL."
+        );
       }
 
-      const pathname =
-        parsed.pathname.replace(
-          /\/$/,
-          "",
-        );
+      const pathname = parsed.pathname.replace(/\/$/, "");
 
       if (
         provider === "linkedin" &&
-        !/^\/in\/[A-Za-z0-9][A-Za-z0-9._-]*$/.test(
-          pathname,
-        )
+        !/^\/in\/[A-Za-z0-9][A-Za-z0-9._-]*$/.test(pathname)
       ) {
         return "Enter a valid LinkedIn profile URL.";
       }
 
-      if (
-        provider === "x" &&
-        !/^\/[A-Za-z0-9_]{1,15}$/.test(
-          pathname,
-        )
-      ) {
+      if (provider === "x" && !/^\/[A-Za-z0-9_]{1,15}$/.test(pathname)) {
         return "Enter a valid X profile URL.";
       }
 
       return null;
     };
 
-    const linkedinError =
-      validateSocialUrl(
-        "linkedin",
-        linkedinUrl,
-      );
+    const linkedinError = validateSocialUrl("linkedin", linkedinUrl);
 
     if (linkedinError) {
-      return error(
-        response,
-        422,
-        "INVALID_LINKEDIN_URL",
-        linkedinError,
-      );
+      return error(response, 422, "INVALID_LINKEDIN_URL", linkedinError);
     }
 
-    const xError = validateSocialUrl(
-      "x",
-      xProfileUrl,
-    );
+    const xError = validateSocialUrl("x", xProfileUrl);
 
     if (xError) {
-      return error(
-        response,
-        422,
-        "INVALID_X_URL",
-        xError,
-      );
+      return error(response, 422, "INVALID_X_URL", xError);
     }
 
     db.prepare(
-      "UPDATE creator_profiles SET name=?,headline=?,category=?,bio=?,linkedin_url=?,x_profile_url=?,profile_photo_url=?,price_cents=?,updated_at=?" + 
-      " WHERE user_id=?",
+      "UPDATE creator_profiles SET name=?,headline=?,category=?,bio=?,linkedin_url=?,x_profile_url=?,profile_photo_url=?,price_cents=?,updated_at=?" +
+        " WHERE user_id=?",
     ).run(
-      stringValue(
-        body.name,
-        String(p.name ?? ""),
-      ),
-      stringValue(
-        body.headline,
-        String(p.headline ?? ""),
-      ),
-      stringValue(
-        body.category,
-        String(p.category ?? ""),
-      ),
-      stringValue(
-        body.bio,
-        String(p.bio ?? ""),
-      ),
+      stringValue(body.name, String(p.name ?? "")),
+      stringValue(body.headline, String(p.headline ?? "")),
+      stringValue(body.category, String(p.category ?? "")),
+      stringValue(body.bio, String(p.bio ?? "")),
       linkedinUrl,
       xProfileUrl,
       profilePhotoUrl || null,
-      integerValue(
-        body.priceCents,
-        Number(p.price_cents ?? 0),
-      ),
+      integerValue(body.priceCents, Number(p.price_cents ?? 0)),
       now(),
       user.id,
     );
 
     return json(response, 200, {
       data: db
-        .prepare(
-          "SELECT * FROM creator_profiles WHERE user_id=?",
-        )
+        .prepare("SELECT * FROM creator_profiles WHERE user_id=?")
         .get(user.id),
     });
   }

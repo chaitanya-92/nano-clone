@@ -1,5 +1,5 @@
 import { useState, type ChangeEvent } from "react";
-import { Formik, Form } from "formik";
+import { Formik, Form, type FormikProps } from "formik";
 import * as Yup from "yup";
 import {
   ArrowRight,
@@ -68,6 +68,11 @@ type ProfessionalTerm = {
   }>;
 };
 
+type WebsiteAnalysis = {
+  company_name?: string;
+  description?: string;
+};
+
 const creatorSteps = [
   "Account",
   "Social profiles",
@@ -110,6 +115,40 @@ const initialValues = {
   brief: "",
 };
 
+type RegistrationValues = {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  role: "creator" | "brand";
+  linkedinUrl: string;
+  xProfileUrl: string;
+  country: string;
+  industries: string[];
+  headline: string;
+  bio: string;
+  priceCents?: number;
+  registrationCountry: string;
+  registeredBusiness: boolean;
+  legalStatus: string;
+  legalName: string;
+  tradeName: string;
+  panGstin: string;
+  legalAddress: string;
+  taxResponsibilityConfirmed: boolean;
+  selfBillingMandateAccepted: boolean;
+  certificationAccepted: boolean;
+  website: string;
+  companyName: string;
+  description: string;
+  valueProposition: string;
+  icps: Array<{
+    title: string;
+    description: string;
+  }>;
+  brief: string;
+};
+
 function Input({
   name,
   label,
@@ -122,7 +161,7 @@ function Input({
   label: string;
   placeholder?: string;
   type?: string;
-  formik: any;
+  formik: FormikProps<RegistrationValues>;
   disabled?: boolean;
 }) {
   return (
@@ -160,7 +199,7 @@ function EmailField({
   onVerified,
   onExistingEmail,
 }: {
-  formik: any;
+  formik: FormikProps<RegistrationValues>;
   status: "idle" | "checking" | "available" | "taken";
   onStatus: (status: "idle" | "checking" | "available" | "taken") => void;
   verified: boolean;
@@ -493,7 +532,7 @@ export default function Register() {
     certificationAccepted: false,
   });
   const [activeTerm, setActiveTerm] = useState<ProfessionalTerm | null>(null);
-  const [analysis, setAnalysis] = useState<any>(null);
+  const [analysis, setAnalysis] = useState<WebsiteAnalysis | null>(null);
   const [emailStatus, setEmailStatus] = useState<
     "idle" | "checking" | "available" | "taken"
   >("idle");
@@ -531,7 +570,7 @@ export default function Register() {
     );
 
   return (
-    <Formik
+    <Formik<RegistrationValues>
       enableReinitialize
       initialValues={{
         ...initialValues,
@@ -551,7 +590,7 @@ export default function Register() {
         const steps = role === "creator" ? creatorSteps : brandSteps;
         const validateStep = async () => {
           setError("");
-          let schema: any;
+          let schema: Yup.AnyObjectSchema;
           if (step === 0) schema = accountSchema;
           else if (role === "creator" && step === 1)
             schema = creatorSocialSchema;
@@ -598,12 +637,19 @@ export default function Register() {
               return false;
             }
             return true;
-          } catch (e: any) {
+          } catch (e) {
+            if (!(e instanceof Yup.ValidationError)) {
+              return false;
+            }
+
             const errors: Record<string, string> = {};
-            (e.inner ?? []).forEach((item: any) => {
-              if (item.path && !errors[item.path])
+
+            e.inner.forEach((item) => {
+              if (item.path && !errors[item.path]) {
                 errors[item.path] = item.message;
+              }
             });
+
             formik.setErrors(errors);
             Object.keys(errors).forEach((key) =>
               formik.setFieldTouched(key, true, false),
