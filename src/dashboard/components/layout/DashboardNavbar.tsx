@@ -8,17 +8,10 @@ import {
   Sparkles,
   WalletCards,
 } from "lucide-react";
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import {
-  Avatar,
-  AvatarFallback,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -36,64 +29,44 @@ import {
   type Notification,
 } from "@/lib/dashboard";
 import { signOut } from "@/features/authSlice";
-import {
-  useAppDispatch,
-  useAppSelector,
-} from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
-function formatBalance(
-  cents: number,
-  currency: string,
-) {
+function formatBalance(cents: number, currency: string) {
   try {
-    return new Intl.NumberFormat(
-      "en-US",
-      {
-        style: "currency",
-        currency: currency || "EUR",
-        maximumFractionDigits: 0,
-      },
-    ).format(cents / 100);
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency || "EUR",
+      maximumFractionDigits: 0,
+    }).format(cents / 100);
   } catch {
     return "€0";
   }
 }
 
-function formatNotificationTime(
-  value: string,
-) {
+function formatNotificationTime(value: string) {
   const date = new Date(value);
 
   if (Number.isNaN(date.getTime())) {
     return "";
   }
 
-  return date.toLocaleString(
-    undefined,
-    {
-      day: "2-digit",
-      month: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-    },
-  );
+  return date.toLocaleString(undefined, {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 export function DashboardNavbar() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const user = useAppSelector(
-    (state) => state.auth.user,
-  );
+  const user = useAppSelector((state) => state.auth.user);
 
-  const [balance, setBalance] =
-    useState(0);
-  const [currency, setCurrency] =
-    useState("EUR");
-  const [notifications, setNotifications] =
-    useState<Notification[]>([]);
-  const [loadingNotifications, setLoadingNotifications] =
-    useState(true);
+  const [balance, setBalance] = useState(0);
+  const [currency, setCurrency] = useState("EUR");
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loadingNotifications, setLoadingNotifications] = useState(true);
 
   const initials = useMemo(
     () =>
@@ -111,32 +84,16 @@ export function DashboardNavbar() {
   useEffect(() => {
     let cancelled = false;
 
-    void Promise.all([
-      getDashboard(),
-      getNotifications(),
-    ])
-      .then(
-        ([
-          dashboardResult,
-          notificationsResult,
-        ]) => {
-          if (cancelled) {
-            return;
-          }
+    void Promise.all([getDashboard(), getNotifications()])
+      .then(([dashboardResult, notificationsResult]) => {
+        if (cancelled) {
+          return;
+        }
 
-          setBalance(
-            dashboardResult.data.earnings
-              ?.available ?? 0,
-          );
-          setCurrency(
-            dashboardResult.data.profile
-              ?.currency ?? "EUR",
-          );
-          setNotifications(
-            notificationsResult.data,
-          );
-        },
-      )
+        setBalance(dashboardResult.data.earnings?.available ?? 0);
+        setCurrency(dashboardResult.data.profile?.currency ?? "EUR");
+        setNotifications(notificationsResult.data);
+      })
       .catch(() => {
         if (!cancelled) {
           setNotifications([]);
@@ -153,34 +110,25 @@ export function DashboardNavbar() {
     };
   }, []);
 
-  const unreadCount =
-    notifications.filter(
-      (item) => !item.read_at,
-    ).length;
+  const unreadCount = notifications.filter((item) => !item.read_at).length;
 
-  const markNotificationRead = async (
-    notification: Notification,
-  ) => {
+  const markNotificationRead = async (notification: Notification) => {
     if (notification.read_at) {
       return;
     }
 
     try {
-      await markNotification(
-        notification.id,
-      );
+      await markNotification(notification.id);
 
-      setNotifications(
-        (current) =>
-          current.map((item) =>
-            item.id === notification.id
-              ? {
-                  ...item,
-                  read_at:
-                    new Date().toISOString(),
-                }
-              : item,
-          ),
+      setNotifications((current) =>
+        current.map((item) =>
+          item.id === notification.id
+            ? {
+                ...item,
+                read_at: new Date().toISOString(),
+              }
+            : item,
+        ),
       );
     } catch {
       return;
@@ -195,16 +143,13 @@ export function DashboardNavbar() {
     try {
       await markAllNotifications();
 
-      const readAt =
-        new Date().toISOString();
+      const readAt = new Date().toISOString();
 
-      setNotifications(
-        (current) =>
-          current.map((item) => ({
-            ...item,
-            read_at:
-              item.read_at ?? readAt,
-          })),
+      setNotifications((current) =>
+        current.map((item) => ({
+          ...item,
+          read_at: item.read_at ?? readAt,
+        })),
       );
     } catch {
       return;
@@ -212,9 +157,7 @@ export function DashboardNavbar() {
   };
 
   const handleLogout = async () => {
-    await logout().catch(
-      () => undefined,
-    );
+    await logout().catch(() => undefined);
 
     dispatch(signOut());
 
@@ -241,22 +184,12 @@ export function DashboardNavbar() {
           <Button
             type="button"
             variant="ghost"
-            onClick={() =>
-              navigate(
-                "/dashboard/earnings",
-              )
-            }
+            onClick={() => navigate("/dashboard/earnings")}
             className="h-10 cursor-pointer gap-2 rounded-xl px-2.5 text-[13px] font-medium text-[#55637b] hover:bg-[#f6f8fb] hover:text-[#202938] sm:px-3"
           >
-            <WalletCards
-              className="h-[17px] w-[17px]"
-              strokeWidth={1.8}
-            />
+            <WalletCards className="h-[17px] w-[17px]" strokeWidth={1.8} />
             <span className="hidden sm:inline">
-              {formatBalance(
-                balance,
-                currency,
-              )}
+              {formatBalance(balance, currency)}
             </span>
           </Button>
 
@@ -295,10 +228,7 @@ export function DashboardNavbar() {
                 />
               }
             >
-              <Bell
-                className="h-[19px] w-[19px]"
-                strokeWidth={1.8}
-              />
+              <Bell className="h-[19px] w-[19px]" strokeWidth={1.8} />
 
               {unreadCount > 0 && (
                 <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[#2864f0]" />
@@ -316,18 +246,14 @@ export function DashboardNavbar() {
                     Notifications
                   </p>
                   <p className="mt-0.5 text-[11px] text-[#8a96aa]">
-                    {unreadCount
-                      ? unreadCount + " unread"
-                      : "All caught up"}
+                    {unreadCount ? unreadCount + " unread" : "All caught up"}
                   </p>
                 </div>
 
                 <Button
                   type="button"
                   variant="ghost"
-                  onClick={() =>
-                    void markAllRead()
-                  }
+                  onClick={() => void markAllRead()}
                   disabled={!unreadCount}
                   className="h-8 cursor-pointer rounded-lg px-2 text-xs text-[#5c6980] hover:bg-[#f6f8fb] hover:text-[#202938]"
                 >
@@ -342,36 +268,28 @@ export function DashboardNavbar() {
                     Loading…
                   </div>
                 ) : notifications.length ? (
-                  notifications.map(
-                    (notification) => (
-                      <button
-                        key={notification.id}
-                        type="button"
-                        onClick={() =>
-                          void markNotificationRead(
-                            notification,
-                          )
-                        }
-                        className="flex w-full cursor-pointer gap-3 rounded-xl px-3 py-3 text-left transition hover:bg-[#f7f9fc]"
-                      >
-                        <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-[#2864f0]" />
+                  notifications.map((notification) => (
+                    <button
+                      key={notification.id}
+                      type="button"
+                      onClick={() => void markNotificationRead(notification)}
+                      className="flex w-full cursor-pointer gap-3 rounded-xl px-3 py-3 text-left transition hover:bg-[#f7f9fc]"
+                    >
+                      <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-[#2864f0]" />
 
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-xs font-semibold text-[#344059]">
-                            {notification.title}
-                          </span>
-                          <span className="mt-1 block text-xs leading-5 text-[#7c899f]">
-                            {notification.body}
-                          </span>
-                          <span className="mt-1 block text-[10px] text-[#9aa5b5]">
-                            {formatNotificationTime(
-                              notification.created_at,
-                            )}
-                          </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-xs font-semibold text-[#344059]">
+                          {notification.title}
                         </span>
-                      </button>
-                    ),
-                  )
+                        <span className="mt-1 block text-xs leading-5 text-[#7c899f]">
+                          {notification.body}
+                        </span>
+                        <span className="mt-1 block text-[10px] text-[#9aa5b5]">
+                          {formatNotificationTime(notification.created_at)}
+                        </span>
+                      </span>
+                    </button>
+                  ))
                 ) : (
                   <div className="flex min-h-[160px] items-center justify-center px-6 text-center text-sm text-[#8995aa]">
                     No notifications yet.
@@ -427,9 +345,7 @@ export function DashboardNavbar() {
                     {user?.name || "Naano member"}
                   </p>
                   <p className="mt-0.5 text-xs text-[#8b97aa]">
-                    {user?.role === "brand"
-                      ? "Brand"
-                      : "Creator"}
+                    {user?.role === "brand" ? "Brand" : "Creator"}
                   </p>
                 </div>
               </div>
@@ -437,9 +353,7 @@ export function DashboardNavbar() {
               <DropdownMenuSeparator />
 
               <DropdownMenuItem
-                onClick={() =>
-                  navigate("/dashboard")
-                }
+                onClick={() => navigate("/dashboard")}
                 className="h-10 cursor-pointer rounded-lg px-3 text-[13px] text-[#526078] focus:bg-[#f6f8fb] focus:text-[#202938]"
               >
                 <Sparkles className="mr-2 h-4 w-4" />
@@ -447,11 +361,7 @@ export function DashboardNavbar() {
               </DropdownMenuItem>
 
               <DropdownMenuItem
-                onClick={() =>
-                  navigate(
-                    "/dashboard/settings",
-                  )
-                }
+                onClick={() => navigate("/dashboard/settings")}
                 className="h-10 cursor-pointer rounded-lg px-3 text-[13px] text-[#526078] focus:bg-[#f6f8fb] focus:text-[#202938]"
               >
                 <Settings className="mr-2 h-4 w-4" />
@@ -459,9 +369,7 @@ export function DashboardNavbar() {
               </DropdownMenuItem>
 
               <DropdownMenuItem
-                render={
-                  <a href="mailto:hello@naano.co" />
-                }
+                render={<a href="mailto:hello@naano.co" />}
                 className="h-10 cursor-pointer rounded-lg px-3 text-[13px] text-[#526078] focus:bg-[#f6f8fb] focus:text-[#202938]"
               >
                 <Globe2 className="mr-2 h-4 w-4" />
@@ -471,9 +379,7 @@ export function DashboardNavbar() {
               <DropdownMenuSeparator />
 
               <DropdownMenuItem
-                onClick={() =>
-                  void handleLogout()
-                }
+                onClick={() => void handleLogout()}
                 className="h-10 cursor-pointer rounded-lg px-3 text-[13px] text-[#c34b4b] focus:bg-[#fff4f4] focus:text-[#c34b4b]"
               >
                 <LogOut className="mr-2 h-4 w-4" />

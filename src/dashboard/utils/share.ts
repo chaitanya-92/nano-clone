@@ -4,13 +4,8 @@ export type SharePayload = {
   text?: string;
 };
 
-async function copyWithClipboardApi(
-  value: string,
-) {
-  if (
-    typeof navigator === "undefined" ||
-    !navigator.clipboard
-  ) {
+async function copyWithClipboardApi(value: string) {
+  if (typeof navigator === "undefined" || !navigator.clipboard) {
     return false;
   }
 
@@ -18,11 +13,8 @@ async function copyWithClipboardApi(
   return true;
 }
 
-async function copyWithFallback(
-  value: string,
-) {
-  const textarea =
-    document.createElement("textarea");
+async function copyWithFallback(value: string) {
+  const textarea = document.createElement("textarea");
 
   textarea.value = value;
   textarea.setAttribute("readonly", "");
@@ -47,17 +39,13 @@ async function copyWithFallback(
   return copied;
 }
 
-export async function copyText(
-  value: string,
-) {
+export async function copyText(value: string) {
   if (!value) {
     return false;
   }
 
   try {
-    if (
-      await copyWithClipboardApi(value)
-    ) {
+    if (await copyWithClipboardApi(value)) {
       return true;
     }
   } catch {
@@ -67,9 +55,7 @@ export async function copyText(
   return copyWithFallback(value);
 }
 
-export async function shareContent(
-  payload: SharePayload,
-) {
+export async function shareContent(payload: SharePayload) {
   if (!payload.url) {
     return false;
   }

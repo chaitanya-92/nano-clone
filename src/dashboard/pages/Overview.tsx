@@ -1,17 +1,7 @@
-import {
-  ArrowUpRight,
-  Check,
-  ExternalLink,
-} from "lucide-react";
+import { ArrowUpRight, Check, ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
-import {
-  useEffect,
-  useState,
-} from "react";
-import {
-  Link,
-  useNavigate,
-} from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAppSelector } from "@/store/hooks";
 import {
@@ -108,68 +98,38 @@ function OverviewSkeleton() {
   );
 }
 
-function formatMoney(
-  cents: number,
-  currency: string,
-) {
-  return new Intl.NumberFormat(
-    "en-US",
-    {
-      style: "currency",
-      currency:
-        currency || "EUR",
-      maximumFractionDigits: 0,
-    },
-  ).format(cents / 100);
+function formatMoney(cents: number, currency: string) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: currency || "EUR",
+    maximumFractionDigits: 0,
+  }).format(cents / 100);
 }
 
 export default function Overview() {
   const navigate = useNavigate();
-  const user = useAppSelector(
-    (state) => state.auth.user,
+  const user = useAppSelector((state) => state.auth.user);
+  const [dashboard, setDashboard] = useState<DashboardResponse["data"] | null>(
+    null,
   );
-  const [dashboard, setDashboard] =
-    useState<
-      DashboardResponse["data"] | null
-    >(null);
-  const [campaigns, setCampaigns] =
-    useState<Campaign[]>([]);
-  const [collaborations, setCollaborations] =
-    useState<Collaboration[]>([]);
-  const [loading, setLoading] =
-    useState(true);
-  const [error, setError] =
-    useState("");
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [collaborations, setCollaborations] = useState<Collaboration[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     let cancelled = false;
 
-    void Promise.all([
-      getDashboard(),
-      getCampaigns(),
-      getCollaborations(),
-    ])
-      .then(
-        ([
-          dashboardResult,
-          campaignResult,
-          collaborationResult,
-        ]) => {
-          if (cancelled) {
-            return;
-          }
+    void Promise.all([getDashboard(), getCampaigns(), getCollaborations()])
+      .then(([dashboardResult, campaignResult, collaborationResult]) => {
+        if (cancelled) {
+          return;
+        }
 
-          setDashboard(
-            dashboardResult.data,
-          );
-          setCampaigns(
-            campaignResult.data,
-          );
-          setCollaborations(
-            collaborationResult.data,
-          );
-        },
-      )
+        setDashboard(dashboardResult.data);
+        setCampaigns(campaignResult.data);
+        setCollaborations(collaborationResult.data);
+      })
       .catch((value) => {
         if (cancelled) {
           return;
@@ -192,28 +152,17 @@ export default function Overview() {
     };
   }, []);
 
-  const profile =
-    dashboard?.profile;
+  const profile = dashboard?.profile;
 
-  const cardUrl =
-    profile?.slug
-      ? getPublicCardUrl(profile.slug)
-      : "";
+  const cardUrl = profile?.slug ? getPublicCardUrl(profile.slug) : "";
 
-  const activeCollaborations =
-    collaborations
-      .filter(
-        (item) =>
-          ![
-            "completed",
-            "declined",
-            "cancelled",
-          ].includes(item.status),
-      )
-      .slice(0, 3);
+  const activeCollaborations = collaborations
+    .filter(
+      (item) => !["completed", "declined", "cancelled"].includes(item.status),
+    )
+    .slice(0, 3);
 
-  const recommendedCampaigns =
-    campaigns.slice(0, 3);
+  const recommendedCampaigns = campaigns.slice(0, 3);
 
   return (
     <div className="mx-auto w-full max-w-[1180px]">
@@ -223,10 +172,7 @@ export default function Overview() {
         </p>
 
         <h1 className="mt-2 text-[34px] font-semibold tracking-[-1.7px] text-[#111827]">
-          Good to see you,{" "}
-          {profile?.name ??
-            user?.name ??
-            "there"}
+          Good to see you, {profile?.name ?? user?.name ?? "there"}
         </h1>
 
         <p className="mt-1 text-[18px] text-[#7d899f]">
@@ -247,74 +193,55 @@ export default function Overview() {
       ) : (
         <>
           <section className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {stats.map(
-              (stat, index) => {
-                const value =
-                  Number(
-                    dashboard
-                      ?.metrics?.[
-                      stat.key
-                    ] ?? 0,
-                  );
+            {stats.map((stat, index) => {
+              const value = Number(dashboard?.metrics?.[stat.key] ?? 0);
 
-                return (
-                  <motion.button
-                    key={stat.key}
-                    type="button"
-                    initial={{
-                      opacity: 0,
-                      y: 12,
-                    }}
-                    animate={{
-                      opacity: 1,
-                      y: 0,
-                    }}
-                    transition={{
-                      duration: 0.35,
-                      delay:
-                        0.05 +
-                        index * 0.06,
-                    }}
-                    whileHover={{
-                      y: -4,
-                      scale: 1.01,
-                    }}
-                    whileTap={{
-                      scale: 0.995,
-                    }}
-                    onClick={() =>
-                      navigate(
-                        "/dashboard/analytics?metric=" +
-                          stat.key,
-                      )
-                    }
-                    className="cursor-pointer rounded-[18px] border border-[#e1e6ee] bg-white px-5 py-5 text-left shadow-[0_3px_12px_rgba(20,35,60,0.025)]"
-                  >
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8b9bb3]">
-                      {stat.label}
-                    </p>
+              return (
+                <motion.button
+                  key={stat.key}
+                  type="button"
+                  initial={{
+                    opacity: 0,
+                    y: 12,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                  }}
+                  transition={{
+                    duration: 0.35,
+                    delay: 0.05 + index * 0.06,
+                  }}
+                  whileHover={{
+                    y: -4,
+                    scale: 1.01,
+                  }}
+                  whileTap={{
+                    scale: 0.995,
+                  }}
+                  onClick={() =>
+                    navigate("/dashboard/analytics?metric=" + stat.key)
+                  }
+                  className="cursor-pointer rounded-[18px] border border-[#e1e6ee] bg-white px-5 py-5 text-left shadow-[0_3px_12px_rgba(20,35,60,0.025)]"
+                >
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8b9bb3]">
+                    {stat.label}
+                  </p>
 
-                    <p className="mt-5 text-[29px] font-semibold tracking-[-1px] text-[#172033]">
-                      {stat.key ===
-                        "impressions" &&
-                      value === 0
-                        ? "—"
-                        : (
-                            <AnimatedNumber
-                              value={
-                                value
-                              }
-                            />
-                          )}
-                    </p>
+                  <p className="mt-5 text-[29px] font-semibold tracking-[-1px] text-[#172033]">
+                    {stat.key === "impressions" && value === 0 ? (
+                      "—"
+                    ) : (
+                      <AnimatedNumber value={value} />
+                    )}
+                  </p>
 
-                    <p className="mt-1 text-[12px] text-[#8794aa]">
-                      {stat.description}
-                    </p>
-                  </motion.button>
-                );
-              },
-            )}
+                  <p className="mt-1 text-[12px] text-[#8794aa]">
+                    {stat.description}
+                  </p>
+                </motion.button>
+              );
+            })}
           </section>
 
           <section className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-[410px_1fr]">
@@ -357,11 +284,7 @@ export default function Overview() {
 
                   <PublicCardActions
                     url={cardUrl}
-                    title={
-                      (profile?.name ??
-                        "Creator") +
-                      " on Naano"
-                    }
+                    title={(profile?.name ?? "Creator") + " on Naano"}
                     compact
                   />
                 </div>
@@ -378,10 +301,7 @@ export default function Overview() {
                   </span>
 
                   <span className="absolute right-5 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white text-[18px]">
-                    {profile?.country ===
-                    "India"
-                      ? "🇮🇳"
-                      : "🌐"}
+                    {profile?.country === "India" ? "🇮🇳" : "🌐"}
                   </span>
 
                   <motion.div
@@ -403,32 +323,23 @@ export default function Overview() {
                   >
                     {profile?.profile_photo_url ? (
                       <img
-                        src={
-                          profile.profile_photo_url
-                        }
+                        src={profile.profile_photo_url}
                         alt=""
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      profile?.name
-                        ?.trim()
-                        .charAt(0)
-                        .toUpperCase() ??
-                      "N"
+                      (profile?.name?.trim().charAt(0).toUpperCase() ?? "N")
                     )}
                   </motion.div>
                 </div>
 
                 <div className="px-5 pb-6 pt-14 text-center">
                   <h3 className="text-[23px] font-semibold text-[#111827]">
-                    {profile?.name ??
-                      "Creator"}
+                    {profile?.name ?? "Creator"}
                   </h3>
 
                   <p className="mt-1 text-[15px] text-[#8792a6]">
-                    {profile?.category ||
-                      profile?.headline ||
-                      "Creator"}
+                    {profile?.category || profile?.headline || "Creator"}
                   </p>
 
                   <p className="mt-6 text-[13px] leading-5 text-[#7f8a9d]">
@@ -462,8 +373,7 @@ export default function Overview() {
                   </h2>
 
                   <p className="mt-1 text-[13px] text-[#8995aa]">
-                    {profile?.card_status ===
-                    "published"
+                    {profile?.card_status === "published"
                       ? "1 of 1 steps complete"
                       : "Complete your creator card to launch"}
                   </p>
@@ -481,8 +391,7 @@ export default function Overview() {
                 <div className="flex items-center gap-5">
                   <div
                     className={
-                      profile?.card_status ===
-                      "published"
+                      profile?.card_status === "published"
                         ? "flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#16a765] text-white"
                         : "flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#eef4ff] text-[#2864f0]"
                     }
@@ -496,16 +405,14 @@ export default function Overview() {
                     </h3>
 
                     <p className="mt-1 text-[12px] text-[#94a0b3]">
-                      {profile?.card_status ===
-                      "published"
+                      {profile?.card_status === "published"
                         ? "Your positioning and offer are ready."
                         : "Finish your card before sharing it."}
                     </p>
                   </div>
 
                   <span className="rounded-full bg-[#e8f8ef] px-4 py-1.5 text-[11px] font-semibold text-[#15945a]">
-                    {profile?.card_status ===
-                    "published"
+                    {profile?.card_status === "published"
                       ? "Complete"
                       : "Pending"}
                   </span>
@@ -558,44 +465,40 @@ export default function Overview() {
 
               <div className="mt-5 space-y-3">
                 {recommendedCampaigns.length ? (
-                  recommendedCampaigns.map(
-                    (campaign) => (
-                      <Link
-                        key={campaign.id}
-                        to="/dashboard/opportunities"
-                        className="block cursor-pointer rounded-xl border border-[#e4e8ee] p-4 transition hover:-translate-y-0.5 hover:bg-[#fafbfc]"
-                      >
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="min-w-0">
-                            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8b97aa]">
-                              {campaign.brand_name ||
-                                "Brand"}
-                            </p>
+                  recommendedCampaigns.map((campaign) => (
+                    <Link
+                      key={campaign.id}
+                      to="/dashboard/opportunities"
+                      className="block cursor-pointer rounded-xl border border-[#e4e8ee] p-4 transition hover:-translate-y-0.5 hover:bg-[#fafbfc]"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="min-w-0">
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8b97aa]">
+                            {campaign.brand_name || "Brand"}
+                          </p>
 
-                            <h3 className="mt-1 truncate text-sm font-semibold text-[#27344b]">
-                              {campaign.title}
-                            </h3>
-                          </div>
-
-                          <ArrowUpRight className="h-4 w-4 shrink-0 text-[#77859c]" />
+                          <h3 className="mt-1 truncate text-sm font-semibold text-[#27344b]">
+                            {campaign.title}
+                          </h3>
                         </div>
 
-                        <div className="mt-3 flex items-center justify-between gap-3 text-[11px] text-[#8794aa]">
-                          <span>
-                            {formatMoney(
-                              campaign.budget_cents,
-                              campaign.currency,
-                            )}
-                          </span>
+                        <ArrowUpRight className="h-4 w-4 shrink-0 text-[#77859c]" />
+                      </div>
 
-                          <span>
-                            {campaign.min_followers.toLocaleString()}+
-                            followers
-                          </span>
-                        </div>
-                      </Link>
-                    ),
-                  )
+                      <div className="mt-3 flex items-center justify-between gap-3 text-[11px] text-[#8794aa]">
+                        <span>
+                          {formatMoney(
+                            campaign.budget_cents,
+                            campaign.currency,
+                          )}
+                        </span>
+
+                        <span>
+                          {campaign.min_followers.toLocaleString()}+ followers
+                        </span>
+                      </div>
+                    </Link>
+                  ))
                 ) : (
                   <div className="rounded-xl border border-dashed border-[#dfe5ed] px-5 py-10 text-center">
                     <p className="text-sm font-semibold text-[#5d6a80]">
@@ -653,52 +556,42 @@ export default function Overview() {
                 </div>
 
                 {activeCollaborations.length ? (
-                  activeCollaborations.map(
-                    (item) => (
-                      <Link
-                        key={item.id}
-                        to="/dashboard/collaborations"
-                        className="grid cursor-pointer grid-cols-[1.3fr_0.8fr_0.9fr_0.6fr] gap-3 border-b border-[#edf0f4] px-4 py-4 last:border-b-0 transition hover:bg-[#fafbfc]"
-                      >
-                        <div className="min-w-0">
-                          <p className="truncate text-xs font-semibold text-[#334057]">
-                            {item.brand_name}
-                          </p>
-                          <p className="mt-1 truncate text-[10px] text-[#8d99ab]">
-                            {item.campaign_title}
-                          </p>
-                        </div>
+                  activeCollaborations.map((item) => (
+                    <Link
+                      key={item.id}
+                      to="/dashboard/collaborations"
+                      className="grid cursor-pointer grid-cols-[1.3fr_0.8fr_0.9fr_0.6fr] gap-3 border-b border-[#edf0f4] px-4 py-4 last:border-b-0 transition hover:bg-[#fafbfc]"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate text-xs font-semibold text-[#334057]">
+                          {item.brand_name}
+                        </p>
+                        <p className="mt-1 truncate text-[10px] text-[#8d99ab]">
+                          {item.campaign_title}
+                        </p>
+                      </div>
 
-                        <span className="text-[10px] font-semibold text-[#65738a]">
-                          {item.status.replaceAll(
-                            "_",
-                            " ",
-                          )}
-                        </span>
+                      <span className="text-[10px] font-semibold text-[#65738a]">
+                        {item.status.replaceAll("_", " ")}
+                      </span>
 
-                        <span className="truncate text-[10px] text-[#8794aa]">
-                          {item.status ===
-                          "application_accepted"
-                            ? "Submit content"
-                            : item.status ===
-                                "content_submitted"
-                              ? "Await review"
-                              : item.status ===
-                                  "content_approved"
-                                ? "Complete"
-                                : "In progress"}
-                        </span>
+                      <span className="truncate text-[10px] text-[#8794aa]">
+                        {item.status === "application_accepted"
+                          ? "Submit content"
+                          : item.status === "content_submitted"
+                            ? "Await review"
+                            : item.status === "content_approved"
+                              ? "Complete"
+                              : "In progress"}
+                      </span>
 
-                        <span className="text-[10px] text-[#8794aa]">
-                          {item.due_at
-                            ? new Date(
-                                item.due_at,
-                              ).toLocaleDateString()
-                            : "—"}
-                        </span>
-                      </Link>
-                    ),
-                  )
+                      <span className="text-[10px] text-[#8794aa]">
+                        {item.due_at
+                          ? new Date(item.due_at).toLocaleDateString()
+                          : "—"}
+                      </span>
+                    </Link>
+                  ))
                 ) : (
                   <div className="px-4 py-12 text-center">
                     <p className="text-sm text-[#8995aa]">

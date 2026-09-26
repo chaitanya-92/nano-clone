@@ -61,15 +61,10 @@ export default function PublicCreatorCard() {
 
   const industries = (() => {
     try {
-      const value = JSON.parse(
-        card.industries || "[]",
-      );
+      const value = JSON.parse(card.industries || "[]");
 
       return Array.isArray(value)
-        ? value.filter(
-            (item): item is string =>
-              typeof item === "string",
-          )
+        ? value.filter((item): item is string => typeof item === "string")
         : [];
     } catch {
       return [];
@@ -177,27 +172,21 @@ export default function PublicCreatorCard() {
             <div className="mt-10 grid grid-cols-3 border-y border-[#e8ecf2] py-6">
               <div>
                 <p className="text-2xl font-semibold text-[#182239]">
-                  {Number(
-                    card.followers ?? 0,
-                  ).toLocaleString()}
+                  {Number(card.followers ?? 0).toLocaleString()}
                 </p>
                 <p className="mt-1 text-xs text-[#8794aa]">Followers</p>
               </div>
 
               <div className="border-x border-[#e8ecf2]">
                 <p className="text-2xl font-semibold text-[#182239]">
-                  {Number(
-                    card.impressions ?? 0,
-                  ).toLocaleString()}
+                  {Number(card.impressions ?? 0).toLocaleString()}
                 </p>
                 <p className="mt-1 text-xs text-[#8794aa]">Impressions</p>
               </div>
 
               <div>
                 <p className="text-2xl font-semibold text-[#182239]">
-                  {Number(
-                    card.post_count ?? 0,
-                  ).toLocaleString()}
+                  {Number(card.post_count ?? 0).toLocaleString()}
                 </p>
                 <p className="mt-1 text-xs text-[#8794aa]">Posts</p>
               </div>

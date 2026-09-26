@@ -47,38 +47,19 @@ function normalizeProfileUrl(provider: SocialProvider, value: string) {
   return url.toString().replace(/\/$/, "");
 }
 
-async function verifyProfileUrl(
-  provider: SocialProvider,
-  profileUrl: string,
-) {
+async function verifyProfileUrl(provider: SocialProvider, profileUrl: string) {
   const parsed = new URL(profileUrl);
 
-  const hostname =
-    parsed.hostname
-      .toLowerCase()
-      .replace(/^www\./, "");
+  const hostname = parsed.hostname.toLowerCase().replace(/^www\./, "");
 
-  if (
-    provider === "linkedin" &&
-    hostname !== "linkedin.com"
-  ) {
-    throw new Error(
-      "Enter a valid LinkedIn profile URL.",
-    );
+  if (provider === "linkedin" && hostname !== "linkedin.com") {
+    throw new Error("Enter a valid LinkedIn profile URL.");
   }
 
-  if (
-    provider === "x" &&
-    !["x.com", "twitter.com"].includes(
-      hostname,
-    )
-  ) {
-    throw new Error(
-      "Enter a valid X profile URL.",
-    );
+  if (provider === "x" && !["x.com", "twitter.com"].includes(hostname)) {
+    throw new Error("Enter a valid X profile URL.");
   }
 }
-
 
 export function socialAccounts(
   request: IncomingMessage,
@@ -145,17 +126,11 @@ export async function connectSocial(
   let fetchedProfile = null;
 
   try {
-    fetchedProfile =
-      await fetchPublicSocialProfile(
-        provider,
-        profileUrl,
-      );
+    fetchedProfile = await fetchPublicSocialProfile(provider, profileUrl);
   } catch (profileError) {
     console.warn(
       "Social profile refresh unavailable:",
-      profileError instanceof Error
-        ? profileError.message
-        : profileError,
+      profileError instanceof Error ? profileError.message : profileError,
     );
   }
 
@@ -210,8 +185,7 @@ export async function connectSocial(
       provider,
       profileUrl,
       fetchedProfile,
-      refreshAvailable:
-        Boolean(fetchedProfile),
+      refreshAvailable: Boolean(fetchedProfile),
     },
   });
 }
