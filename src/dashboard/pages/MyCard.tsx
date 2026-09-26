@@ -235,6 +235,10 @@ export default function MyCard() {
   };
 
   const togglePublish = async () => {
+    if (!profile) {
+      return;
+    }
+
     try {
       const { data } =
         profile.card_status === "published"
