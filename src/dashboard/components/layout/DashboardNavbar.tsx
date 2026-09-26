@@ -14,6 +14,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Logo } from "@/components/layout/Logo";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -177,21 +178,27 @@ export function DashboardNavbar({
   return (
     <header className="sticky top-0 z-40 h-16 bg-white">
       <div className="flex h-full items-center justify-between px-4 sm:px-6 lg:px-7">
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={onToggleSidebar}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          className="h-9 w-9 cursor-pointer rounded-lg text-[#687166] transition-all duration-200 hover:bg-[#f2f3ee] hover:text-[#20251f]"
-        >
-          {collapsed ? (
-            <PanelLeftOpen className="h-[18px] w-[18px]" strokeWidth={1.8} />
-          ) : (
-            <PanelLeftClose className="h-[18px] w-[18px]" strokeWidth={1.8} />
-          )}
-        </Button>
+        <div className="flex min-w-0 items-center gap-4">
+          <Logo
+            compact={false}
+            className="shrink-0 [&>span:last-child]:text-[1.35rem]"
+          />
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={onToggleSidebar}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className="h-9 w-9 cursor-pointer rounded-lg text-[#687166] transition-all duration-200 hover:bg-[#f2f3ee] hover:text-[#20251f]"
+          >
+            {collapsed ? (
+              <PanelLeftOpen className="h-[18px] w-[18px]" strokeWidth={1.8} />
+            ) : (
+              <PanelLeftClose className="h-[18px] w-[18px]" strokeWidth={1.8} />
+            )}
+          </Button>
+        </div>
         <div className="flex items-center gap-1.5 sm:gap-2.5">
           <Button
             type="button"
