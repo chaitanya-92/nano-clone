@@ -558,7 +558,7 @@ export default function MyCard() {
                   </p>
                 </div>
 
-                <div className="mt-4 flex justify-center")>
+                <div className="mt-4 flex justify-center">
                   <span className="inline-flex items-center gap-2 rounded-full border border-[#dce4ef] bg-white px-5 py-2.5 text-xs font-semibold text-[#52617b]">
                     <ArrowLeft className="h-3.5 w-3.5" />
                     Back to card
