@@ -1,349 +1,900 @@
-import { useRef, useState } from "react";
-import { ArrowRight, BriefcaseBusiness, CalendarDays, Pencil, Send, Share2, Upload, UserRound, X } from "lucide-react";
-import { myCardData } from "../data/dashboardData";
+import {
+  Copy,
+  ExternalLink,
+  ImagePlus,
+  Loader2,
+  Pencil,
+  Save,
+  Share2,
+  Upload,
+} from "lucide-react";
+import { motion } from "framer-motion";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { Link } from "react-router-dom";
+import { toast } from "@/components/ui/toast";
+import { AnimatedNumber } from "@/components/dashboard/AnimatedNumber";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  getCreatorProfile,
+  getPublicCardUrl,
+  updateCreatorProfile,
+  type CreatorProfile,
+} from "@/lib/dashboard";
+
+function fileToDataUrl(
+  file: File,
+): Promise<string> {
+  return new Promise(
+    (resolve, reject) => {
+      const reader =
+        new FileReader();
+
+      reader.onload = () => {
+        if (
+          typeof reader.result !==
+          "string"
+        ) {
+          reject(
+            new Error(
+              "Unable to read the image.",
+            ),
+          );
+          return;
+        }
+
+        resolve(reader.result);
+      };
+
+      reader.onerror = () => {
+        reject(
+          new Error(
+            "Unable to read the image.",
+          ),
+        );
+      };
+
+      reader.readAsDataURL(file);
+    },
+  );
+}
+
+function creatorInitials(
+  name: string | null | undefined,
+) {
+  return (
+    name
+      ?.trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((part) => part[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase() || "N"
+  );
+}
+
+function parseIndustries(
+  value: string | null | undefined,
+) {
+  if (!value) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(value);
+
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    return parsed.filter(
+      (item): item is string =>
+        typeof item === "string",
+    );
+  } catch {
+    return [];
+  }
+}
 
 export default function MyCard() {
-  const [photoOpen, setPhotoOpen] = useState(false);
-  const [photo, setPhoto] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [profile, setProfile] =
+    useState<CreatorProfile | null>(
+      null,
+    );
+  const [open, setOpen] =
+    useState(false);
+  const [draft, setDraft] =
+    useState({
+      headline: "",
+      category: "",
+      bio: "",
+    });
+  const [photoOpen, setPhotoOpen] =
+    useState(false);
+  const [photoFile, setPhotoFile] =
+    useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] =
+    useState("");
+  const [photoSaving, setPhotoSaving] =
+    useState(false);
+  const [saving, setSaving] =
+    useState(false);
+  const [copied, setCopied] =
+    useState(false);
+  const [error, setError] =
+    useState("");
 
-  const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+  useEffect(() => {
+    let cancelled = false;
+
+    void getCreatorProfile()
+      .then(({ data }) => {
+        if (cancelled) {
+          return;
+        }
+
+        setProfile(data);
+        setDraft({
+          headline:
+            data.headline ?? "",
+          category:
+            data.category ?? "",
+          bio: data.bio ?? "",
+        });
+      })
+      .catch((value) => {
+        if (cancelled) {
+          return;
+        }
+
+        setError(
+          value instanceof Error
+            ? value.message
+            : "Unable to load your creator card.",
+        );
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const publicUrl = useMemo(
+    () =>
+      profile?.slug
+        ? getPublicCardUrl(
+            profile.slug,
+          )
+        : "",
+    [profile?.slug],
+  );
+
+  const savePhoto = async () => {
+    if (!photoFile) {
+      return;
+    }
+
+    if (
+      !photoFile.type.startsWith(
+        "image/",
+      )
+    ) {
+      toast.add({
+        title: "Invalid image",
+        description:
+          "Choose a PNG, JPEG or WebP image.",
+        type: "error",
+        timeout: 2500,
+      });
+      return;
+    }
+
+    if (
+      photoFile.size >
+      3 * 1024 * 1024
+    ) {
+      toast.add({
+        title: "Image is too large",
+        description:
+          "Choose an image smaller than 3 MB.",
+        type: "error",
+        timeout: 2500,
+      });
+      return;
+    }
+
+    setPhotoSaving(true);
+    setError("");
+
+    try {
+      const photoData =
+        await fileToDataUrl(
+          photoFile,
+        );
+
+      const { data } =
+        await updateCreatorProfile({
+          profilePhotoUrl:
+            photoData,
+        });
+
+      setProfile(data);
+      setPhotoFile(null);
+      setPhotoPreview("");
+      setPhotoOpen(false);
+
+      toast.add({
+        title:
+          "Profile photo updated",
+        description:
+          "Your creator card now uses the new photo.",
+        type: "success",
+        timeout: 2200,
+      });
+    } catch (value) {
+      setError(
+        value instanceof Error
+          ? value.message
+          : "Unable to update your profile photo.",
+      );
+    } finally {
+      setPhotoSaving(false);
+    }
+  };
+
+  const handlePhotoChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file =
+      event.target.files?.[0] ??
+      null;
 
     if (!file) {
       return;
     }
 
-    if (file.size > 2 * 1024 * 1024) {
+    setPhotoFile(file);
+
+    const reader =
+      new FileReader();
+
+    reader.onload = () => {
+      setPhotoPreview(
+        typeof reader.result ===
+          "string"
+          ? reader.result
+          : "",
+      );
+    };
+
+    reader.readAsDataURL(file);
+  };
+
+  const save = async () => {
+    setSaving(true);
+    setError("");
+
+    try {
+      const { data } =
+        await updateCreatorProfile(
+          draft,
+        );
+
+      setProfile(data);
+      setDraft({
+        headline:
+          data.headline ?? "",
+        category:
+          data.category ?? "",
+        bio: data.bio ?? "",
+      });
+      setOpen(false);
+
+      toast.add({
+        title:
+          "Creator card updated",
+        description:
+          "Your public card has been updated.",
+        type: "success",
+        timeout: 2200,
+      });
+    } catch (value) {
+      setError(
+        value instanceof Error
+          ? value.message
+          : "Unable to save your creator card.",
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const copyLink = async () => {
+    if (!publicUrl) {
       return;
     }
 
-    const imageUrl = URL.createObjectURL(file);
-    setPhoto(imageUrl);
+    try {
+      await navigator.clipboard.writeText(
+        publicUrl,
+      );
+
+      setCopied(true);
+
+      toast.add({
+        title:
+          "Card link copied",
+        description:
+          "Your public creator card link is ready to share.",
+        type: "success",
+        timeout: 2200,
+      });
+
+      window.setTimeout(
+        () => setCopied(false),
+        1600,
+      );
+    } catch {
+      try {
+        const textarea =
+          document.createElement(
+            "textarea",
+          );
+
+        textarea.value = publicUrl;
+        textarea.style.position =
+          "fixed";
+        textarea.style.opacity = "0";
+
+        document.body.appendChild(
+          textarea,
+        );
+
+        textarea.select();
+        document.execCommand(
+          "copy",
+        );
+        textarea.remove();
+
+        setCopied(true);
+
+        toast.add({
+          title:
+            "Card link copied",
+          description:
+            "The public creator card link is ready to share.",
+          type: "success",
+          timeout: 2200,
+        });
+
+        window.setTimeout(
+          () => setCopied(false),
+          1600,
+        );
+      } catch {
+        toast.add({
+          title: "Copy failed",
+          description:
+            "Your browser did not allow clipboard access.",
+          type: "error",
+          timeout: 2600,
+        });
+      }
+    }
   };
 
-  const removePhoto = () => {
-    setPhoto(null);
+  const share = async () => {
+    if (!publicUrl) {
+      return;
+    }
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title:
+            (profile?.name ??
+              "Creator") +
+            " on Naano",
+          url: publicUrl,
+        });
+
+        toast.add({
+          title: "Card shared",
+          description:
+            "Your public creator card was shared.",
+          type: "success",
+          timeout: 2200,
+        });
+
+        return;
+      }
+
+      await copyLink();
+    } catch {
+      return;
+    }
   };
+
+  if (!profile) {
+    return (
+      <div className="mx-auto w-full max-w-[1180px]">
+        {error ? (
+          <div className="rounded-xl border border-[#f1c7c7] bg-[#fff7f7] px-4 py-3 text-sm text-[#9b3e3e]">
+            {error}
+          </div>
+        ) : (
+          <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+            <div className="overflow-hidden rounded-[28px] border border-[#dce4ef] bg-white">
+              <Skeleton className="h-[170px] rounded-none" />
+
+              <div className="space-y-4 px-8 pb-9 pt-20">
+                <Skeleton className="mx-auto h-8 w-48" />
+                <Skeleton className="mx-auto h-4 w-28" />
+                <Skeleton className="mx-auto h-16 w-full max-w-xl" />
+              </div>
+            </div>
+
+            <div className="rounded-[24px] border border-[#dfe5ed] bg-white p-6">
+              <Skeleton className="h-3 w-20" />
+              <Skeleton className="mt-4 h-14 w-full rounded-xl" />
+              <Skeleton className="mt-4 h-10 w-full rounded-lg" />
+              <Skeleton className="mt-2 h-10 w-full rounded-lg" />
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  const industries =
+    parseIndustries(
+      profile.industries,
+    );
 
   return (
-    <>
-      <div className="mx-auto w-full max-w-[1180px] pb-20">
-        <section className="rounded-[28px] border border-[#e0e6ef] bg-[radial-gradient(circle_at_50%_35%,#ffffff_0%,#fdfefe_55%,#f7fbfd_100%)] p-8 shadow-[0_10px_40px_rgba(37,74,120,0.03)]">
-          <div className="flex items-start justify-between gap-6">
-            <div className="max-w-[760px]">
-              <p className="text-[12px] font-semibold tracking-[0.14em] text-[#2864f0]">
-                {myCardData.eyebrow}
-              </p>
+    <div className="mx-auto w-full max-w-[1180px]">
+      <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#2864f0]">
+            Creator card
+          </p>
 
-              <h1 className="mt-4 text-[36px] font-semibold tracking-[-1.8px] text-[#151b2a]">
-                {myCardData.title}
-              </h1>
+          <h1 className="mt-2 text-[38px] font-semibold tracking-[-1.8px] text-[#151b2a]">
+            Your public profile
+          </h1>
 
-              <p className="mt-3 text-[16px] leading-7 text-[#78869e]">
-                {myCardData.description}
-              </p>
-            </div>
+          <p className="mt-2 max-w-[680px] text-[16px] leading-7 text-[#78869e]">
+            Review exactly what brands can
+            discover from your Naano card.
+          </p>
+        </div>
 
-            <div className="flex shrink-0 overflow-hidden rounded-[12px] border border-[#dfe5ed] bg-white shadow-[0_3px_10px_rgba(20,40,80,0.04)]">
-              <Button variant="ghost" className="h-11 rounded-none px-6 text-[14px] font-medium text-[#65738a] hover:bg-[#f7f9fc]">
-                Edit
-              </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() =>
+              setOpen(true)
+            }
+            className="cursor-pointer"
+          >
+            <Pencil className="mr-2 h-4 w-4" />
+            Edit
+          </Button>
 
-              <Button variant="ghost" className="h-11 rounded-none border-l border-[#e5e9ef] px-6 text-[14px] font-medium text-[#65738a] hover:bg-[#f7f9fc]">
-                Preview
-              </Button>
-            </div>
-          </div>
-
-          <div className="mt-10 rounded-[25px] border border-[#d5e5ee] bg-[radial-gradient(circle_at_10%_50%,#eefaff_0%,#ffffff_52%,#ffffff_100%)] p-9">
-            <div className="flex items-start justify-between gap-10">
-              <div className="max-w-[760px]">
-                <div className="flex items-center gap-2 text-[11px] font-semibold tracking-[0.13em] text-[#6e819d]">
-                  <span className="h-2 w-2 rounded-full bg-[#82c9e5]" />
-                  {myCardData.share.eyebrow}
-                </div>
-
-                <h2 className="mt-5 max-w-[700px] text-[31px] font-medium leading-[1.08] tracking-[-1.4px] text-[#151b2a]">
-                  {myCardData.share.title}
-                </h2>
-
-                <p className="mt-4 max-w-[760px] text-[15px] leading-7 text-[#74839b]">
-                  {myCardData.share.description}
-                </p>
-
-                <div className="mt-7 grid grid-cols-2 gap-4">
-                  {myCardData.share.items.map((item, index) => (
-                    <div key={item.title} className="rounded-[18px] bg-white/85 p-6 shadow-[0_5px_20px_rgba(45,80,120,0.03)]">
-                      <div className="flex items-start gap-4">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-[#eef4ff] text-[#2864f0]">
-                          {index === 0 ? <BriefcaseBusiness className="h-[18px] w-[18px]" strokeWidth={1.7} /> : <Send className="h-[18px] w-[18px]" strokeWidth={1.7} />}
-                        </div>
-
-                        <div>
-                          <h3 className="text-[15px] font-medium text-[#252d3d]">
-                            {item.title}
-                          </h3>
-
-                          <p className="mt-1.5 text-[13px] leading-5 text-[#7e8ba0]">
-                            {item.description}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <Button className="mt-7 h-12 rounded-[13px] bg-[#17191d] px-6 text-[14px] font-medium text-white hover:bg-[#292c31]">
-                  <Share2 className="mr-2 h-[16px] w-[16px]" strokeWidth={1.8} />
-                  Copy or share my Deal Link
-                </Button>
-              </div>
-
-              <div className="w-[210px] shrink-0 pt-24">
-                <p className="text-[11px] font-semibold tracking-[0.12em] text-[#8b98aa]">
-                  YOUR SHARE
-                </p>
-
-                <p className="mt-2 text-[38px] font-medium tracking-[-1.5px] text-[#151b2a]">
-                  {myCardData.share.sharePercent}
-                </p>
-
-                <div className="my-5 h-px bg-[#e1e6eb]" />
-
-                <p className="text-[11px] font-semibold tracking-[0.12em] text-[#8b98aa]">
-                  REWARD PERIOD
-                </p>
-
-                <p className="mt-3 text-[18px] font-medium text-[#252d3d]">
-                  {myCardData.share.rewardPeriod}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-10 flex justify-center">
-            <div className="relative w-[520px] overflow-hidden rounded-[34px] border border-[#8bb1ff] bg-white shadow-[0_25px_70px_rgba(45,96,200,0.16)]">
-              <div className="relative h-[130px] bg-gradient-to-br from-[#2159df] via-[#316df0] to-[#6389f4]">
-                <div className="absolute left-7 top-6 flex h-11 w-11 items-center justify-center rounded-[13px] bg-white/90 text-[14px] font-bold text-[#2864f0]">
-                  in
-                </div>
-
-                <div className="absolute left-1/2 top-7 -translate-x-1/2 text-[27px] font-bold tracking-[-1px] text-white">
-                  naano
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setPhotoOpen(true)}
-                  className="absolute -bottom-10 left-1/2 flex h-20 w-20 -translate-x-1/2 items-center justify-center overflow-hidden rounded-full border-[3px] border-[#2864f0] bg-[#5969c9] text-[32px] text-white shadow-lg"
-                >
-                  {photo ? (
-                    <img src={photo} alt="Profile" className="h-full w-full object-cover" />
-                  ) : (
-                    "L"
-                  )}
-                </button>
-
-                <div className="absolute right-7 top-6 flex h-11 w-11 items-center justify-center rounded-[13px] bg-white/90 text-[#2864f0]">
-                  <Share2 className="h-[18px] w-[18px]" strokeWidth={1.8} />
-                </div>
-              </div>
-
-              <div className="px-8 pb-7 pt-16 text-center">
-                <h3 className="text-[29px] font-semibold tracking-[-1px] text-[#171d2b]">
-                  {myCardData.profile.name}
-                </h3>
-
-                <p className="mt-1 text-[16px] text-[#8490a4]">
-                  {myCardData.profile.category}
-                </p>
-
-                <p className="mt-7 text-[15px] text-[#7d899d]">
-                  {myCardData.profile.headline}
-                </p>
-
-                <div className="mt-7 flex justify-center">
-                  <span className="flex items-center gap-2 rounded-full border border-[#e0e5ec] bg-[#fafbfc] px-4 py-2 text-[12px] text-[#78869b]">
-                    <CalendarDays className="h-[14px] w-[14px]" strokeWidth={1.7} />
-                    No post data available
-                  </span>
-                </div>
-
-                <div className="mt-4 flex items-center gap-3 px-4">
-                  <span className="text-[12px] text-[#7d899c]">Data</span>
-                  <div className="h-1.5 flex-1 rounded-full bg-[#e4e8ee]" />
-                  <span className="text-[12px] text-[#7d899c]">Pending</span>
-                </div>
-
-                <div className="mt-7 grid grid-cols-3 border-t border-[#e7eaf0] pt-6">
-                  <div>
-                    <p className="text-[25px] font-medium text-[#172033]">
-                      {myCardData.profile.followers}
-                    </p>
-                    <p className="mt-1 text-[12px] text-[#8a95a8]">
-                      Followers
-                    </p>
-                  </div>
-
-                  <div className="border-x border-[#e7eaf0]">
-                    <p className="text-[25px] font-medium text-[#172033]">
-                      {myCardData.profile.impressions}
-                    </p>
-                    <p className="mt-1 text-[12px] text-[#8a95a8]">
-                      Est. impressions
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-[25px] font-medium text-[#172033]">
-                      {myCardData.profile.cost}
-                    </p>
-                    <p className="mt-1 text-[12px] text-[#8a95a8]">
-                      Chosen cost
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                className="absolute bottom-[-1px] left-1/2 flex h-10 -translate-x-1/2 translate-y-1/2 items-center gap-2 rounded-full border border-[#a7c2ff] bg-white px-6 text-[13px] font-medium text-[#46536a] shadow-sm"
-              >
-                <ArrowRight className="h-4 w-4 rounded-full bg-[#2864f0] p-0.5 text-white" />
-                View profile
-              </button>
-            </div>
-          </div>
-
-          <div className="mt-16 rounded-[24px] border border-[#e0e6ef] bg-white p-7">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-[#eef4ff] text-[#2864f0]">
-                <UserRound className="h-[18px] w-[18px]" strokeWidth={1.7} />
-              </div>
-
-              <div>
-                <h2 className="text-[17px] font-semibold text-[#20283a]">
-                  About
-                </h2>
-
-                <p className="mt-1 text-[14px] text-[#8995a9]">
-                  No LinkedIn bio yet.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-5 rounded-[24px] border border-[#e0e6ef] bg-white p-7">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-[#eef4ff] text-[#2864f0]">
-                <UserRound className="h-[18px] w-[18px]" strokeWidth={1.7} />
-              </div>
-
-              <div>
-                <h2 className="text-[17px] font-semibold text-[#20283a]">
-                  Who you target (est.)
-                </h2>
-
-                <p className="mt-1 text-[13px] text-[#8995a9]">
-                  Estimated from your public posts + bio (dominant themes).
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-5 rounded-[18px] border border-dashed border-[#d5dde8] px-6 py-8 text-center">
-              <p className="text-[15px] font-medium text-[#737f94]">
-                Target pending
-              </p>
-
-              <p className="mt-2 text-[13px] text-[#9aa4b5]">
-                Re-import LinkedIn to estimate your target from public posts.
-              </p>
-            </div>
-          </div>
-        </section>
+          <a
+            href={publicUrl || "#"}
+            target={
+              publicUrl
+                ? "_blank"
+                : undefined
+            }
+            rel="noreferrer"
+            onClick={(event) => {
+              if (!publicUrl) {
+                event.preventDefault();
+              }
+            }}
+            className="inline-flex h-9 cursor-pointer items-center rounded-lg border border-[#dce3ec] px-3 text-xs font-medium text-[#59667e] transition hover:bg-[#f8fafc]"
+          >
+            <ExternalLink className="mr-2 h-4 w-4" />
+            Preview
+          </a>
+        </div>
       </div>
 
-      <Dialog open={photoOpen} onOpenChange={setPhotoOpen}>
-        <DialogContent className="max-w-[560px] overflow-hidden rounded-[18px] p-0">
-          <DialogHeader className="border-b border-[#e5e8ed] px-6 py-5">
-            <DialogTitle className="text-[18px] font-medium text-[#202124]">
-              {myCardData.photoModal.title}
+      {error && (
+        <div className="mt-5 rounded-xl border border-[#f1c7c7] bg-[#fff7f7] px-4 py-3 text-sm text-[#9b3e3e]">
+          {error}
+        </div>
+      )}
+
+      <section className="mt-8 grid gap-6 lg:grid-cols-[1fr_360px]">
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 18,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            duration: 0.5,
+            ease: "easeOut",
+          }}
+          whileHover={{
+            y: -4,
+          }}
+          className="overflow-hidden rounded-[28px] border border-[#dce4ef] bg-white shadow-[0_20px_60px_rgba(34,60,100,0.08)]"
+        >
+          <div className="relative h-[170px] bg-gradient-to-br from-[#2159df] via-[#316df0] to-[#6f91f3]">
+            <div className="absolute left-7 top-6 text-2xl font-bold text-white">
+              naano
+            </div>
+
+            <div className="absolute right-7 top-6 rounded-full bg-white/90 px-4 py-2 text-xs font-semibold text-[#2864f0]">
+              {profile.country ||
+                "Global"}
+            </div>
+
+            <motion.button
+              type="button"
+              onClick={() =>
+                setPhotoOpen(true)
+              }
+              whileHover={{
+                scale: 1.03,
+              }}
+              whileTap={{
+                scale: 0.98,
+              }}
+              className="absolute -bottom-14 left-1/2 flex h-28 w-28 -translate-x-1/2 cursor-pointer items-center justify-center overflow-hidden rounded-full border-4 border-[#316df0] bg-[#6572cc] text-4xl text-white"
+              aria-label="Change profile photo"
+            >
+              {profile.profile_photo_url ? (
+                <img
+                  src={
+                    profile.profile_photo_url
+                  }
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                creatorInitials(
+                  profile.name,
+                )
+              )}
+            </motion.button>
+          </div>
+
+          <div className="px-8 pb-9 pt-20 text-center">
+            <h2 className="text-[32px] font-semibold tracking-[-1.2px] text-[#141a29]">
+              {profile.name ||
+                "Creator"}
+            </h2>
+
+            <p className="mt-2 text-[16px] text-[#7b879d]">
+              {profile.category ||
+                profile.headline ||
+                "Creator"}
+            </p>
+
+            <p className="mx-auto mt-6 max-w-[640px] text-[15px] leading-7 text-[#64728a]">
+              {profile.bio ||
+                profile.headline ||
+                "Complete your card profile."}
+            </p>
+
+            {industries.length > 0 && (
+              <div className="mt-7 flex flex-wrap justify-center gap-2">
+                {industries.map(
+                  (industry) => (
+                    <span
+                      key={industry}
+                      className="rounded-full border border-[#dfe5ed] bg-[#fafbfc] px-3 py-1.5 text-xs font-medium text-[#60708a]"
+                    >
+                      {industry}
+                    </span>
+                  ),
+                )}
+              </div>
+            )}
+
+            <div className="mt-8 grid grid-cols-3 border-y border-[#e8ecf2] py-6">
+              <CardMetric
+                label="Followers"
+                value={profile.followers}
+              />
+
+              <CardMetric
+                label="Impressions"
+                value={
+                  profile.impressions
+                }
+                bordered
+              />
+
+              <CardMetric
+                label="Posts"
+                value={profile.post_count}
+              />
+            </div>
+          </div>
+        </motion.div>
+
+        <aside className="rounded-[24px] border border-[#dfe5ed] bg-white p-6 shadow-[0_4px_16px_rgba(32,52,82,0.035)]">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#8a96aa]">
+            Public link
+          </p>
+
+          <p className="mt-3 break-all rounded-xl border border-[#e4e8ee] bg-[#f8fafc] px-4 py-3 text-sm text-[#52617b]">
+            {publicUrl ||
+              "Publish your card to create a public link."}
+          </p>
+
+          <div className="mt-4 grid gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() =>
+                void copyLink()
+              }
+              disabled={!publicUrl}
+              className="cursor-pointer justify-start"
+            >
+              <Copy className="mr-2 h-4 w-4" />
+              {copied
+                ? "Copied"
+                : "Copy link"}
+            </Button>
+
+            <Button
+              type="button"
+              onClick={() =>
+                void share()
+              }
+              disabled={!publicUrl}
+              className="cursor-pointer justify-start bg-[#2864f0] hover:bg-[#1f58dc]"
+            >
+              <Share2 className="mr-2 h-4 w-4" />
+              Share card
+            </Button>
+
+            <Link
+              to="/dashboard/analytics"
+              className="inline-flex cursor-pointer items-center justify-start rounded-md border border-[#dce3ec] px-4 py-2 text-sm font-medium text-[#59667e]"
+            >
+              View analytics
+            </Link>
+          </div>
+        </aside>
+      </section>
+
+      <Dialog
+        open={photoOpen}
+        onOpenChange={(value) => {
+          setPhotoOpen(value);
+
+          if (!value) {
+            setPhotoFile(null);
+            setPhotoPreview("");
+          }
+        }}
+      >
+        <DialogContent className="max-w-[520px]">
+          <DialogHeader>
+            <DialogTitle>
+              Update profile photo
             </DialogTitle>
           </DialogHeader>
 
-          <div className="px-8 py-7">
-            <div className="flex justify-center">
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="relative flex h-[122px] w-[122px] items-center justify-center overflow-hidden rounded-full bg-[#5969c9] text-[55px] text-white"
-              >
-                {photo ? (
-                  <img src={photo} alt="Profile preview" className="h-full w-full object-cover" />
+          <div className="space-y-5">
+            <div className="flex items-center justify-center">
+              <div className="flex h-36 w-36 items-center justify-center overflow-hidden rounded-full border-4 border-[#dfe6f0] bg-[#6572cc] text-4xl text-white">
+                {photoPreview ? (
+                  <img
+                    src={photoPreview}
+                    alt="Preview"
+                    className="h-full w-full object-cover"
+                  />
+                ) : profile.profile_photo_url ? (
+                  <img
+                    src={
+                      profile.profile_photo_url
+                    }
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
                 ) : (
-                  "L"
+                  creatorInitials(
+                    profile.name,
+                  )
                 )}
-
-                <span className="absolute bottom-2 right-2 flex h-9 w-9 items-center justify-center rounded-full bg-white text-[#4d5c76] shadow-md">
-                  <Pencil className="h-4 w-4" />
-                </span>
-              </button>
+              </div>
             </div>
 
-            <div className="mt-5 flex justify-center gap-3">
-              <Button
-                variant="outline"
-                onClick={() => fileInputRef.current?.click()}
-                className="h-10 rounded-[10px] px-5 text-[13px]"
-              >
-                <Upload className="mr-2 h-4 w-4" />
-                Change
-              </Button>
+            <label
+              htmlFor="profile-photo-upload"
+              className="flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-[#d8e0eb] bg-[#fafbfd] px-6 py-8 text-center transition hover:bg-[#f7f9fc]"
+            >
+              <ImagePlus className="h-7 w-7 text-[#66758d]" />
 
+              <span className="mt-3 text-sm font-semibold text-[#344059]">
+                Choose a new photo
+              </span>
+
+              <span className="mt-1 text-xs text-[#8995aa]">
+                PNG, JPEG or WebP · Max 3 MB
+              </span>
+
+              <input
+                id="profile-photo-upload"
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                onChange={handlePhotoChange}
+                className="sr-only"
+              />
+            </label>
+
+            <div className="flex justify-end">
               <Button
-                variant="ghost"
-                onClick={removePhoto}
-                className="h-10 rounded-[10px] bg-[#fff1f1] px-5 text-[13px] text-[#ef5350] hover:bg-[#ffe7e7] hover:text-[#ef5350]"
+                type="button"
+                onClick={() =>
+                  void savePhoto()
+                }
+                disabled={
+                  photoSaving ||
+                  !photoFile
+                }
+                className="cursor-pointer bg-[#171d2b] hover:bg-[#111827]"
               >
-                <X className="mr-2 h-4 w-4" />
-                Remove photo
+                {photoSaving ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Upload className="mr-2 h-4 w-4" />
+                )}
+                {photoSaving
+                  ? "Uploading…"
+                  : "Save photo"}
               </Button>
             </div>
-
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp,image/gif"
-              onChange={handlePhotoChange}
-              className="hidden"
-            />
-
-            <p className="mt-5 text-center text-[12px] text-[#b0b5bd]">
-              {myCardData.photoModal.description}
-            </p>
-          </div>
-
-          <div className="flex justify-end gap-3 border-t border-[#e5e8ed] px-6 py-4">
-            <Button
-              variant="outline"
-              onClick={() => setPhotoOpen(false)}
-              className="h-10 rounded-[10px] px-6 text-[13px]"
-            >
-              Cancel
-            </Button>
-
-            <Button
-              onClick={() => setPhotoOpen(false)}
-              className="h-10 rounded-[10px] bg-[#292925] px-7 text-[13px] text-white hover:bg-[#171716]"
-            >
-              Save
-            </Button>
           </div>
         </DialogContent>
       </Dialog>
-    </>
+
+      <Dialog
+        open={open}
+        onOpenChange={setOpen}
+      >
+        <DialogContent className="max-w-[620px]">
+          <DialogHeader>
+            <DialogTitle>
+              Edit creator card
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {(
+              [
+                [
+                  "headline",
+                  "Headline",
+                ],
+                [
+                  "category",
+                  "Category",
+                ],
+              ] as const
+            ).map(([key, label]) => (
+              <label
+                key={key}
+                className="block"
+              >
+                <span className="mb-2 block text-xs font-semibold text-[#626a78]">
+                  {label}
+                </span>
+
+                <input
+                  value={draft[key]}
+                  onChange={(event) =>
+                    setDraft({
+                      ...draft,
+                      [key]:
+                        event.target.value,
+                    })
+                  }
+                  className="auth-input"
+                />
+              </label>
+            ))}
+
+            <label className="block">
+              <span className="mb-2 block text-xs font-semibold text-[#626a78]">
+                About
+              </span>
+
+              <textarea
+                value={draft.bio}
+                onChange={(event) =>
+                  setDraft({
+                    ...draft,
+                    bio: event.target.value,
+                  })
+                }
+                rows={6}
+                className="auth-input resize-none"
+              />
+            </label>
+
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                onClick={() =>
+                  void save()
+                }
+                disabled={saving}
+                className="cursor-pointer bg-[#171d2b] hover:bg-[#111827]"
+              >
+                {saving ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="mr-2 h-4 w-4" />
+                )}
+                {saving
+                  ? "Saving…"
+                  : "Save changes"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+function CardMetric({
+  label,
+  value,
+  bordered = false,
+}: {
+  label: string;
+  value:
+    | number
+    | null
+    | undefined;
+  bordered?: boolean;
+}) {
+  return (
+    <div
+      className={
+        bordered
+          ? "border-x border-[#e8ecf2]"
+          : ""
+      }
+    >
+      <p className="text-2xl font-semibold text-[#182239]">
+        <AnimatedNumber
+          value={Number(
+            value ?? 0,
+          )}
+        />
+      </p>
+
+      <p className="mt-1 text-xs text-[#8794aa]">
+        {label}
+      </p>
+    </div>
   );
 }

@@ -1,100 +1,240 @@
-import { useState } from "react";
-import { ChevronDown } from "lucide-react";
-import { collaborationsData } from "../data/dashboardData";
+import { ExternalLink, Loader2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  getCollaborations,
+  updateCollaboration,
+  type Collaboration,
+} from "@/lib/dashboard";
 
-type CollaborationTab = keyof typeof collaborationsData.tables;
+const tabs = [
+  { id: "all", label: "All" },
+  {
+    id: "application_accepted",
+    label: "Accepted",
+  },
+  {
+    id: "content_submitted",
+    label: "Content submitted",
+  },
+  {
+    id: "content_approved",
+    label: "Approved",
+  },
+  {
+    id: "completed",
+    label: "Completed",
+  },
+] as const;
+
+function labelStatus(value: string) {
+  return value
+    .replaceAll("_", " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
 
 export default function Collaborations() {
-  const [activeTab, setActiveTab] = useState<CollaborationTab>("all");
+  const [items, setItems] = useState<Collaboration[]>([]);
+  const [tab, setTab] = useState<(typeof tabs)[number]["id"]>("all");
+  const [loading, setLoading] = useState(true);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [error, setError] = useState("");
 
-  const currentTable = collaborationsData.tables[activeTab];
+  const load = async () => {
+    setLoading(true);
+
+    try {
+      const { data } = await getCollaborations();
+      setItems(data);
+    } catch (value) {
+      setError(
+        value instanceof Error
+          ? value.message
+          : "Unable to load collaborations.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void load();
+  }, []);
+
+  const filtered = useMemo(
+    () => (tab === "all" ? items : items.filter((item) => item.status === tab)),
+    [items, tab],
+  );
+
+  const advance = async (item: Collaboration) => {
+    const transitions: Record<string, string | undefined> = {
+      application_accepted: "content_submitted",
+      content_submitted: "content_approved",
+      content_approved: "completed",
+    };
+
+    const next = transitions[item.status];
+
+    if (!next) {
+      return;
+    }
+
+    setBusyId(item.id);
+
+    try {
+      await updateCollaboration(item.id, {
+        status: next,
+        publishedUrl: item.published_url,
+      });
+
+      await load();
+    } catch (value) {
+      setError(
+        value instanceof Error
+          ? value.message
+          : "Unable to update collaboration.",
+      );
+    } finally {
+      setBusyId(null);
+    }
+  };
 
   return (
-    <div className="min-h-[calc(100vh-72px)] w-full bg-[#f7f9fc] px-8 py-10">
-      <div className="mx-auto max-w-[1380px]">
-        <h1 className="text-[38px] font-semibold tracking-[-1.8px] text-[#141a29]">
-          {collaborationsData.title}
-        </h1>
+    <div className="mx-auto w-full max-w-[1180px]">
+      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#2864f0]">
+        Delivery
+      </p>
 
-        <p className="mt-1 text-[18px] leading-7 text-[#74819a]">
-          {collaborationsData.description}
-        </p>
+      <h1 className="mt-2 text-[38px] font-semibold tracking-[-1.8px] text-[#141a29]">
+        Collaborations
+      </h1>
 
-        <div className="mt-5 flex items-center gap-8 border-b border-[#e3e7ee]">
-          {collaborationsData.tabs.map((tab) => {
-            const isActive = activeTab === tab.id;
+      <p className="mt-1 text-[17px] text-[#74819a]">
+        Track accepted work through each delivery state.
+      </p>
 
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={`relative flex h-11 items-center gap-2 text-[14px] font-medium transition-colors ${
-                  isActive
-                    ? "text-[#2864f0]"
-                    : "text-[#737f95] hover:text-[#293247]"
-                }`}
-              >
-                <span>{tab.label}</span>
-
-                <span
-                  className={`flex h-5 min-w-5 items-center justify-center rounded-full border px-1.5 text-[10px] font-semibold transition-colors ${
-                    isActive
-                      ? "border-[#2864f0] bg-[#2864f0] text-white"
-                      : "border-[#dce2eb] bg-transparent text-[#8792a5]"
-                  }`}
-                >
-                  {tab.count}
-                </span>
-
-                {isActive && (
-                  <span className="absolute bottom-[-1px] left-0 right-0 h-[2px] bg-[#2864f0]" />
-                )}
-              </button>
-            );
-          })}
+      {error && (
+        <div className="mt-5 rounded-xl border border-[#f1c7c7] bg-[#fff7f7] px-4 py-3 text-sm text-[#9b3e3e]">
+          {error}
         </div>
+      )}
 
-        <div className="mt-5 overflow-hidden rounded-[18px] border border-[#e0e6ee] bg-white shadow-[0_5px_18px_rgba(35,55,85,0.04)]">
-          <div className="flex min-h-[64px] items-center border-b border-[#e4e8ee] px-6">
-            <div className="grid flex-1 grid-cols-[1fr_1.35fr_1fr_1.45fr_1.5fr_1.15fr_1fr] items-center gap-5">
-              {collaborationsData.columns.map((column) => (
-                <span
-                  key={column}
-                  className="text-[11px] font-semibold tracking-[0.04em] text-[#7c879d]"
-                >
-                  {column}
-                </span>
-              ))}
-            </div>
-
-            <button
-              type="button"
-              className="ml-6 flex h-9 shrink-0 items-center gap-4 rounded-[10px] border border-[#dbe1e9] bg-white px-4 text-[12px] font-medium text-[#657188] transition-colors hover:bg-[#f8fafc]"
-            >
-              All types (0)
-              <ChevronDown className="h-4 w-4" strokeWidth={1.7} />
-            </button>
-          </div>
-
-          <div className="flex h-[55px] items-center justify-center border-b border-[#e4e8ee] text-[14px] text-[#78859b]">
-            {currentTable.emptyMessage}
-          </div>
-
-          <div className="flex h-[64px] items-center justify-between px-6">
-            <span className="text-[13px] text-[#7d899e]">
-              {currentTable.total}
-            </span>
-
-            <button
-              type="button"
-              className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-[#edf3ff] text-[13px] font-medium text-[#2864f0]"
-            >
-              1
-            </button>
-          </div>
-        </div>
+      <div className="mt-7 flex flex-wrap gap-2 border-b border-[#e3e7ee] pb-3">
+        {tabs.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => setTab(item.id)}
+            className={
+              tab === item.id
+                ? "cursor-pointer rounded-full bg-[#171d2b] px-4 py-2 text-xs font-semibold text-white"
+                : "cursor-pointer rounded-full border border-[#dce3ec] px-4 py-2 text-xs font-semibold text-[#68758b] hover:bg-[#f8fafc]"
+            }
+          >
+            {item.label}
+          </button>
+        ))}
       </div>
+
+      {loading ? (
+        <div className="mt-6 flex items-center justify-center rounded-[22px] border border-[#e0e6ee] bg-white py-24">
+          <Loader2 className="h-5 w-5 animate-spin text-[#71809a]" />
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="mt-6 rounded-[22px] border border-[#e0e6ee] bg-white px-8 py-20 text-center">
+          <h2 className="text-lg font-semibold text-[#27344b]">
+            No collaborations here
+          </h2>
+
+          <p className="mt-2 text-sm text-[#7d899f]">
+            Accepted campaign work will appear here automatically.
+          </p>
+        </div>
+      ) : (
+        <div className="mt-6 space-y-3">
+          {filtered.map((item) => (
+            <article
+              key={item.id}
+              className="rounded-[20px] border border-[#dfe5ed] bg-white p-5"
+            >
+              <div className="flex flex-col gap-5 xl:flex-row xl:items-center">
+                <div className="min-w-0 flex-1">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8b97ab]">
+                    {item.brand_name}
+                  </p>
+
+                  <h2 className="mt-1 text-lg font-semibold text-[#1b2437]">
+                    {item.campaign_title}
+                  </h2>
+
+                  <p className="mt-2 text-sm leading-6 text-[#74819a]">
+                    {item.brief || "No additional brief has been added."}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  <Metric label="Status" value={labelStatus(item.status)} />
+                  <Metric
+                    label="Impressions"
+                    value={item.impressions.toLocaleString()}
+                  />
+                  <Metric
+                    label="Engagements"
+                    value={item.engagements.toLocaleString()}
+                  />
+                  <Metric
+                    label="Earned"
+                    value={"€" + (item.net_amount_cents / 100).toLocaleString()}
+                  />
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  {item.published_url && (
+                    <a
+                      href={item.published_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex cursor-pointer items-center rounded-lg border border-[#dce3ec] px-3 py-2 text-xs font-semibold text-[#59667e]"
+                    >
+                      <ExternalLink className="mr-2 h-3.5 w-3.5" />
+                      Post
+                    </a>
+                  )}
+
+                  {item.status !== "completed" && (
+                    <Button
+                      type="button"
+                      onClick={() => void advance(item)}
+                      disabled={busyId === item.id}
+                      className="cursor-pointer bg-[#171d2b] hover:bg-[#111827]"
+                    >
+                      {busyId === item.id
+                        ? "Saving…"
+                        : item.status === "application_accepted"
+                          ? "Mark submitted"
+                          : item.status === "content_submitted"
+                            ? "Approve"
+                            : "Complete"}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Metric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl bg-[#f7f9fc] px-3 py-2 text-center">
+      <p className="text-[9px] uppercase tracking-[0.08em] text-[#98a2b3]">
+        {label}
+      </p>
+
+      <p className="mt-1 text-xs font-semibold text-[#2a354b]">{value}</p>
     </div>
   );
 }

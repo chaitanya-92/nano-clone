@@ -60,10 +60,7 @@ export function ScrollRestoration() {
     return () => {
       window.clearTimeout(saveTimeout);
 
-      sessionStorage.setItem(
-        key,
-        String(window.scrollY),
-      );
+      sessionStorage.setItem(key, String(window.scrollY));
 
       window.removeEventListener("scroll", savePosition);
     };

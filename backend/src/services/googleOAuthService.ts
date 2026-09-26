@@ -1,21 +1,13 @@
 import { randomBytes } from "node:crypto";
 import type { ServerResponse } from "node:http";
-import {
-  FRONTEND_ORIGIN,
-  OAUTH_STATE_COOKIE,
-} from "../config/env";
+import { FRONTEND_ORIGIN, OAUTH_STATE_COOKIE } from "../config/env";
 import { setCookie } from "../utils/session";
-import {
-  createGoogleUser,
-  findUserByEmail,
-} from "./authService";
+import { db } from "../db/client";
+import { createOAuthUser, findUserByEmail } from "./authService";
 
 function getGoogleConfig() {
-  const {
-    GOOGLE_CLIENT_ID,
-    GOOGLE_CLIENT_SECRET,
-    GOOGLE_CALLBACK_URL,
-  } = process.env;
+  const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_CALLBACK_URL } =
+    process.env;
 
   return {
     clientId: GOOGLE_CLIENT_ID,
@@ -24,12 +16,12 @@ function getGoogleConfig() {
   };
 }
 
-export function startGoogleOAuth(response: ServerResponse) {
-  const {
-    clientId,
-    clientSecret,
-    callbackUrl,
-  } = getGoogleConfig();
+export function startGoogleOAuth(
+  response: ServerResponse,
+  role: "creator" | "brand" = "creator",
+  flow: "login" | "signup" = "login",
+) {
+  const { clientId, clientSecret, callbackUrl } = getGoogleConfig();
 
   if (!clientId || !clientSecret || !callbackUrl) {
     return false;
@@ -37,9 +29,9 @@ export function startGoogleOAuth(response: ServerResponse) {
 
   const state = randomBytes(24).toString("base64url");
 
-  setCookie(response, OAUTH_STATE_COOKIE, state, {
-    maxAge: 600,
-  });
+  setCookie(response, OAUTH_STATE_COOKIE, state, { maxAge: 600 });
+  setCookie(response, "naano_oauth_role", role, { maxAge: 600 });
+  setCookie(response, "naano_oauth_flow", flow, { maxAge: 600 });
 
   const params = new URLSearchParams({
     client_id: clientId,
@@ -51,8 +43,7 @@ export function startGoogleOAuth(response: ServerResponse) {
   });
 
   response.writeHead(302, {
-    Location:
-      `https://accounts.google.com/o/oauth2/v2/auth?${params}`,
+    Location: `https://accounts.google.com/o/oauth2/v2/auth?${params}`,
     "Cache-Control": "no-store",
   });
 
@@ -61,34 +52,29 @@ export function startGoogleOAuth(response: ServerResponse) {
   return true;
 }
 
-export async function handleGoogleCallback(code: string) {
-  const {
-    clientId,
-    clientSecret,
-    callbackUrl,
-  } = getGoogleConfig();
+export async function handleGoogleCallback(
+  code: string,
+  role: "creator" | "brand" = "creator",
+) {
+  const { clientId, clientSecret, callbackUrl } = getGoogleConfig();
 
   if (!clientId || !clientSecret || !callbackUrl) {
     throw new Error("Google OAuth is not configured.");
   }
 
-  const tokenResponse = await fetch(
-    "https://oauth2.googleapis.com/token",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type":
-          "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams({
-        code,
-        client_id: clientId,
-        client_secret: clientSecret,
-        redirect_uri: callbackUrl,
-        grant_type: "authorization_code",
-      }),
+  const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
     },
-  );
+    body: new URLSearchParams({
+      code,
+      client_id: clientId,
+      client_secret: clientSecret,
+      redirect_uri: callbackUrl,
+      grant_type: "authorization_code",
+    }),
+  });
 
   const tokens: any = await tokenResponse.json();
 
@@ -100,40 +86,54 @@ export async function handleGoogleCallback(code: string) {
     "https://openidconnect.googleapis.com/v1/userinfo",
     {
       headers: {
-        Authorization:
-          `Bearer ${tokens.access_token}`,
+        Authorization: `Bearer ${tokens.access_token}`,
       },
     },
   );
 
   const profile: any = await profileResponse.json();
 
-  if (
-    !profileResponse.ok ||
-    !profile.email ||
-    !profile.email_verified
-  ) {
+  if (!profileResponse.ok || !profile.email || !profile.email_verified) {
     throw new Error("Unable to verify Google account.");
   }
 
   const email = String(profile.email).toLowerCase();
 
   let user: any = findUserByEmail(email);
-
   if (!user) {
-    user = createGoogleUser({
+    user = createOAuthUser({
       email,
-      name: String(
-        profile.name || email.split("@")[0],
-      ),
+      name: String(profile.name || email.split("@")[0]),
+      role,
+      provider: "google",
     });
   }
 
-  return user;
+  const profileTable = role === "brand" ? "brand_profiles" : "creator_profiles";
+
+  const onboarding = db
+    .prepare(
+      `SELECT onboarding_status
+       FROM ${profileTable}
+       WHERE user_id = ?
+       LIMIT 1`,
+    )
+    .get(user.id) as { onboarding_status?: string } | undefined;
+
+  const needsOnboarding = onboarding?.onboarding_status !== "completed";
+
+  return {
+    user,
+    needsOnboarding,
+  };
 }
 
 export function getFrontendDashboardUrl() {
   return `${FRONTEND_ORIGIN}/dashboard`;
+}
+
+export function getFrontendOnboardingUrl(role: "creator" | "brand") {
+  return `${FRONTEND_ORIGIN}/register?oauth=google&role=${role}`;
 }
 
 export function getFrontendLoginErrorUrl(error: string) {
