@@ -1,7 +1,7 @@
 import { ArrowRight, Building2, UserRound } from "lucide-react";
 import { Link } from "react-router-dom";
 
-export function RoleChoice({
+export function RegisterRoleChoice({
   onSelect,
 }: {
   onSelect: (role: "creator" | "brand") => void;
