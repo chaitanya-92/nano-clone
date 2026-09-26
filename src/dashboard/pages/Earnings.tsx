@@ -75,7 +75,7 @@ export default function Earnings() {
 
     try {
       await addPayoutMethod({
-        type: "stripe",
+        type: "upi",
         label: value,
       });
 
