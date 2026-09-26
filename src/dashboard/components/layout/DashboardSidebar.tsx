@@ -2,11 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 
 import { dashboardNavigation } from "@/dashboard/constants/navigation";
 
-export function DashboardSidebar({
-  collapsed,
-}: {
-  collapsed: boolean;
-}) {
+export function DashboardSidebar({ collapsed }: { collapsed: boolean }) {
   const location = useLocation();
 
   const activePath =
@@ -46,8 +42,6 @@ export function DashboardSidebar({
               {collapsed ? "n." : "naano."}
             </span>
           </Link>
-
-
         </div>
       </div>
 
