@@ -2,8 +2,9 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { requireAuth } from "../middleware/authMiddleware";
 import { db } from "../db/client";
 import { json } from "../utils/api";
+import { syncSocialAnalytics } from "../services/socialAnalyticsService";
 
-export function analytics(
+export async function analytics(
   request: IncomingMessage,
   response: ServerResponse,
   url: URL,
@@ -15,6 +16,8 @@ export function analytics(
   }
 
   const range = url.searchParams.get("range") ?? "all";
+
+  const syncStatuses = await syncSocialAnalytics(user.id);
 
   const since =
     range === "30d"
