@@ -515,6 +515,7 @@ export default function MyCard() {
         </motion.div>
 
         <aside className="h-full min-h-[620px] rounded-[24px] border border-[#dfe5ed] bg-white p-6 shadow-[0_4px_16px_rgba(32,52,82,0.035)]">
+          <div className="flex h-full flex-col">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#8a96aa]">
             Public link
           </p>
@@ -523,10 +524,13 @@ export default function MyCard() {
             {publicUrl || "Publish your card to create a public link."}
           </p>
 
-          <PublicCardActions
-            url={publicUrl}
-            title={(profile.name || "Creator") + " on Naano"}
-          />
+          <div className="mt-4">
+            <PublicCardActions
+              url={publicUrl}
+              title={(profile.name || "Creator") + " on Naano"}
+            />
+          </div>
+          </div>
         </aside>
       </section>
 
