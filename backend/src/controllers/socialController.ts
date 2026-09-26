@@ -47,63 +47,38 @@ function normalizeProfileUrl(provider: SocialProvider, value: string) {
   return url.toString().replace(/\/$/, "");
 }
 
-async function verifyProfileUrl(provider: SocialProvider, profileUrl: string) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 6000);
+async function verifyProfileUrl(
+  provider: SocialProvider,
+  profileUrl: string,
+) {
+  const parsed = new URL(profileUrl);
 
-  try {
-    const response = await fetch(profileUrl, {
-      method: "GET",
-      headers: {
-        "User-Agent": "Mozilla/5.0 NaanoSocialVerifier/1.0",
-        Accept: "text/html,application/xhtml+xml",
-      },
-      redirect: "follow",
-      signal: controller.signal,
-    });
+  const hostname =
+    parsed.hostname
+      .toLowerCase()
+      .replace(/^www\./, "");
 
-    if (response.status === 404) {
-      throw new Error(
-        "This " +
-          (provider === "linkedin" ? "LinkedIn" : "X") +
-          " profile was not found.",
-      );
-    }
+  if (
+    provider === "linkedin" &&
+    hostname !== "linkedin.com"
+  ) {
+    throw new Error(
+      "Enter a valid LinkedIn profile URL.",
+    );
+  }
 
-    if (response.status >= 500) {
-      throw new Error(
-        "The social profile could not be verified right now. Try again.",
-      );
-    }
-
-    if (response.status === 401 || response.status === 403) {
-      throw new Error(
-        "The social profile could not be verified. Check that the profile URL is public and correct.",
-      );
-    }
-
-    if (!response.ok) {
-      throw new Error(
-        "The social profile could not be verified. Check the profile URL and try again.",
-      );
-    }
-  } catch (verificationError) {
-    if (
-      verificationError instanceof Error &&
-      verificationError.name === "AbortError"
-    ) {
-      throw new Error("The social profile verification timed out. Try again.");
-    }
-
-    if (verificationError instanceof Error) {
-      throw verificationError;
-    }
-
-    throw new Error("The social profile could not be verified. Try again.");
-  } finally {
-    clearTimeout(timeout);
+  if (
+    provider === "x" &&
+    !["x.com", "twitter.com"].includes(
+      hostname,
+    )
+  ) {
+    throw new Error(
+      "Enter a valid X profile URL.",
+    );
   }
 }
+
 
 export function socialAccounts(
   request: IncomingMessage,
@@ -167,18 +142,20 @@ export async function connectSocial(
     );
   }
 
-  let fetchedProfile;
+  let fetchedProfile = null;
 
   try {
-    fetchedProfile = await fetchPublicSocialProfile(provider, profileUrl);
+    fetchedProfile =
+      await fetchPublicSocialProfile(
+        provider,
+        profileUrl,
+      );
   } catch (profileError) {
-    return error(
-      response,
-      422,
-      "PROFILE_FETCH_FAILED",
+    console.warn(
+      "Social profile refresh unavailable:",
       profileError instanceof Error
         ? profileError.message
-        : "The public social profile could not be fetched.",
+        : profileError,
     );
   }
 
@@ -191,9 +168,9 @@ export async function connectSocial(
     id,
     user.id,
     provider,
-    fetchedProfile.username,
+    fetchedProfile?.username ?? null,
     profileUrl,
-    fetchedProfile.profileImageUrl,
+    fetchedProfile?.profileImageUrl ?? null,
     "connected",
     t,
     t,
@@ -205,10 +182,10 @@ export async function connectSocial(
       "UPDATE creator_profiles SET linkedin_url=?,name=COALESCE(NULLIF(?,''),name),headline=COALESCE(NULLIF(?,''),headline),profile_photo_url=COALESCE(NULLIF(?,''),profile_photo_url),followers=COALESCE(?,followers),updated_at=? WHERE user_id=?",
     ).run(
       profileUrl,
-      fetchedProfile.name,
-      fetchedProfile.headline,
-      fetchedProfile.profileImageUrl,
-      fetchedProfile.followers,
+      fetchedProfile?.name ?? null,
+      fetchedProfile?.headline ?? null,
+      fetchedProfile?.profileImageUrl ?? null,
+      fetchedProfile?.followers ?? null,
       t,
       user.id,
     );
@@ -219,10 +196,10 @@ export async function connectSocial(
       "UPDATE creator_profiles SET x_profile_url=?,name=COALESCE(NULLIF(?,''),name),bio=COALESCE(NULLIF(?,''),bio),profile_photo_url=COALESCE(NULLIF(?,''),profile_photo_url),followers=COALESCE(?,followers),updated_at=? WHERE user_id=?",
     ).run(
       profileUrl,
-      fetchedProfile.name,
-      fetchedProfile.bio,
-      fetchedProfile.profileImageUrl,
-      fetchedProfile.followers,
+      fetchedProfile?.name ?? null,
+      fetchedProfile?.bio ?? null,
+      fetchedProfile?.profileImageUrl ?? null,
+      fetchedProfile?.followers ?? null,
       t,
       user.id,
     );
@@ -233,6 +210,8 @@ export async function connectSocial(
       provider,
       profileUrl,
       fetchedProfile,
+      refreshAvailable:
+        Boolean(fetchedProfile),
     },
   });
 }

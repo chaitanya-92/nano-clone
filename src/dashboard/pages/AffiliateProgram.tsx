@@ -1,6 +1,7 @@
 import { Copy, Link2, Loader2, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/toast";
 import {
   createReferral,
   getAffiliate,
@@ -55,11 +56,34 @@ export default function AffiliateProgram() {
   };
 
   const copy = async (code: string) => {
-    await navigator.clipboard.writeText(referralUrl(code));
+    try {
+      await navigator.clipboard.writeText(
+        referralUrl(code),
+      );
 
-    setCopied(code);
+      setCopied(code);
 
-    window.setTimeout(() => setCopied(null), 1600);
+      toast.add({
+        title: "Referral link copied",
+        description:
+          "Your referral link is ready to share.",
+        type: "success",
+        timeout: 2200,
+      });
+
+      window.setTimeout(
+        () => setCopied(null),
+        1600,
+      );
+    } catch {
+      toast.add({
+        title: "Copy failed",
+        description:
+          "Your browser did not allow clipboard access.",
+        type: "error",
+        timeout: 2600,
+      });
+    }
   };
 
   return (
@@ -141,7 +165,9 @@ export default function AffiliateProgram() {
                             className="cursor-pointer"
                           >
                             <Copy className="mr-2 h-3.5 w-3.5" />
-                            {copied === code ? "Copied" : "Copy"}
+                            {copied === code
+                              ? "Copied"
+                              : "Copy"}
                           </Button>
                         </div>
 

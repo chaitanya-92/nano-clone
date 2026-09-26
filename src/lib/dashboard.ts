@@ -384,11 +384,7 @@ export function deleteAccount() {
   });
 }
 
-
-export function connectSocial(
-  provider: "linkedin" | "x",
-  profileUrl: string,
-) {
+export function connectSocial(provider: "linkedin" | "x", profileUrl: string) {
   return request<{
     data: {
       provider: string;
@@ -407,6 +403,47 @@ export function connectSocial(
     body: JSON.stringify({
       provider,
       profileUrl,
+    }),
+  });
+}
+
+export interface AssistantContext {
+  profile: {
+    name: string;
+    headline: string;
+    country: string;
+    followers: number;
+    posts: number;
+    impressions: number;
+    engagements: number;
+    cardStatus: string;
+    hasLinkedIn: boolean;
+    hasX: boolean;
+  };
+  activity: {
+    applications: number;
+    collaborations: number;
+    availableEarningsCents: number;
+    openCampaigns: number;
+  };
+}
+
+export function getAssistantContext() {
+  return request<{
+    data: AssistantContext;
+  }>("/api/assistant/context");
+}
+
+export function sendAssistantMessage(message: string) {
+  return request<{
+    data: {
+      answer: string;
+      context: AssistantContext;
+    };
+  }>("/api/assistant/message", {
+    method: "POST",
+    body: JSON.stringify({
+      message,
     }),
   });
 }
