@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
 import { useAppSelector } from "@/store/hooks";
 import { RegisterRoleChoice } from "./register/RegisterRoleChoice";
 import { RegistrationWizard } from "./register/RegistrationWizard";
 
 export default function Register() {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { isAuthenticated, isLoading, user } = useAppSelector(
     (state) => state.auth,
