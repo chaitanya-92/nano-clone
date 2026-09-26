@@ -28,15 +28,11 @@ async function copyWithFallback(value: string) {
   textarea.focus();
   textarea.select();
 
-  let copied = false;
-
   try {
-    copied = document.execCommand("copy");
+    return document.execCommand("copy");
   } finally {
     textarea.remove();
   }
-
-  return copied;
 }
 
 export async function copyText(value: string) {
