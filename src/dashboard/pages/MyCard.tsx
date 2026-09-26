@@ -395,7 +395,7 @@ export default function MyCard() {
           className="overflow-visible"
         >
           <div
-            className="group [perspective:1400px]"
+            className="group cursor-pointer [perspective:1400px] transition-transform duration-300 hover:-translate-y-1"
             onClick={() => setCardFlipped((current) => !current)}
             onKeyDown={(event) => {
               if (event.key === "Enter" || event.key === " ") {
@@ -480,7 +480,7 @@ export default function MyCard() {
                   </div>
 
                   <div className="mt-7 flex justify-center">
-                    <span className="inline-flex items-center gap-2 rounded-full border border-[#dce4ef] bg-white px-5 py-2.5 text-xs font-semibold text-[#52617b] shadow-[0_4px_12px_rgba(30,55,100,0.06)] transition-transform duration-200 group-hover:-translate-y-0.5">
+                    <span className="inline-flex items-center gap-2 rounded-full border border-[#dce4ef] bg-white px-5 py-2.5 text-xs font-semibold text-[#52617b] opacity-0 shadow-[0_4px_12px_rgba(30,55,100,0.06)] transition-all duration-200 group-hover:-translate-y-0.5 group-hover:opacity-100">
                       More details
                       <ArrowUpRight className="h-3.5 w-3.5" />
                     </span>
