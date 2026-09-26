@@ -1,80 +1,14 @@
-import {
-  BriefcaseBusiness,
-  ChartNoAxesCombined,
-  CircleDollarSign,
-  Handshake,
-  LayoutDashboard,
-  MessageCircle,
-  Percent,
-  Users,
-  WalletCards,
-} from "lucide-react";
-import {
-  Link,
-  useLocation,
-} from "react-router-dom";
-
-const navigation = [
-  {
-    label: "Overview",
-    href: "/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    label: "My card",
-    href: "/dashboard/my-card",
-    icon: WalletCards,
-  },
-  {
-    label: "Opportunities",
-    href: "/dashboard/opportunities",
-    icon: BriefcaseBusiness,
-  },
-  {
-    label: "Collaborations",
-    href: "/dashboard/collaborations",
-    icon: Handshake,
-  },
-  {
-    label: "Analytics",
-    href: "/dashboard/analytics",
-    icon: ChartNoAxesCombined,
-  },
-  {
-    label: "Community",
-    href: "/dashboard/community",
-    icon: Users,
-  },
-  {
-    label: "Earnings",
-    href: "/dashboard/earnings",
-    icon: CircleDollarSign,
-  },
-  {
-    label: "Affiliate program",
-    href: "/dashboard/affiliate",
-    icon: Percent,
-  },
-  {
-    label: "Messages",
-    href: "/dashboard/messages",
-    icon: MessageCircle,
-  },
-];
+import { Link, useLocation } from "react-router-dom";
+import { dashboardNavigation } from "@/dashboard/constants/navigation";
 
 export function DashboardSidebar() {
   const location = useLocation();
 
   const activePath =
-    navigation
+    dashboardNavigation
       .filter((item) => {
-        if (
-          item.href === "/dashboard"
-        ) {
-          return (
-            location.pathname ===
-            "/dashboard"
-          );
+        if (item.href === "/dashboard") {
+          return location.pathname === "/dashboard";
         }
 
         return location.pathname.startsWith(
@@ -88,21 +22,12 @@ export function DashboardSidebar() {
       )[0]?.href ?? "";
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-40 flex w-[232px] flex-col overflow-hidden border-r border-[#e7ebf0] bg-white">
-      <div className="flex h-[72px] items-center border-b border-[#e7ebf0] px-4">
-        <Link
-          to="/dashboard"
-          aria-label="Naano dashboard"
-          className="flex h-10 min-w-0 flex-1 cursor-pointer items-center rounded-xl px-2"
-        >
-          <span className="text-[22px] font-bold tracking-[-1.4px] text-[#111318]">
-            naano.
-          </span>
-        </Link>
-      </div>
-
-      <nav className="flex flex-1 flex-col gap-2 px-3 py-6">
-        {navigation.map((item) => {
+    <aside className="fixed bottom-0 left-0 top-16 z-30 hidden w-20 bg-white lg:flex lg:flex-col">
+      <nav
+        aria-label="Dashboard navigation"
+        className="flex flex-1 flex-col items-center gap-2 px-3 py-5"
+      >
+        {dashboardNavigation.map((item) => {
           const Icon = item.icon;
           const active =
             activePath === item.href;
@@ -112,36 +37,21 @@ export function DashboardSidebar() {
               key={item.href}
               to={item.href}
               aria-current={
-                active
-                  ? "page"
-                  : undefined
+                active ? "page" : undefined
               }
-              className="group relative flex h-11 cursor-pointer items-center rounded-xl px-3 text-[#617089]"
+              aria-label={item.label}
+              title={item.label}
+              className={[
+                "group flex h-11 w-11 cursor-pointer items-center justify-center rounded-2xl transition-all duration-200",
+                active
+                  ? "bg-[#eef4ff] text-[#2864f0] shadow-[0_8px_24px_rgba(40,100,240,0.10)]"
+                  : "text-[#67758b] hover:bg-[#f6f8fb] hover:text-[#202938]",
+              ].join(" ")}
             >
-              {active && (
-                <span className="absolute inset-0 rounded-xl bg-[#eef4ff]" />
-              )}
-
-              {!active && (
-                <span className="absolute inset-0 rounded-xl bg-[#f8fafc] opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
-              )}
-
-              <span className="relative z-10 flex shrink-0 items-center justify-center">
-                <Icon
-                  className="h-5 w-5"
-                  strokeWidth={1.8}
-                />
-              </span>
-
-              <span
-                className={
-                  active
-                    ? "relative z-10 ml-3 truncate text-[13px] font-semibold text-[#2864f0]"
-                    : "relative z-10 ml-3 truncate text-[13px] font-medium text-[#516078]"
-                }
-              >
-                {item.label}
-              </span>
+              <Icon
+                className="h-[19px] w-[19px]"
+                strokeWidth={1.8}
+              />
             </Link>
           );
         })}
