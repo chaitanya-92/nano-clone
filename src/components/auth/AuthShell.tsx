@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { authContent } from "@/data/data";
 import { Logo } from "@/components/layout/Logo";
 
 interface AuthShellProps {
