@@ -190,7 +190,7 @@ export function DashboardNavbar({
 
     dispatch(signOut());
 
-    navigate("/login", {
+    navigate("/", {
       replace: true,
     });
   };
