@@ -1,33 +1,13 @@
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+
 import { dashboardNavigation } from "@/dashboard/constants/navigation";
 
 const STORAGE_KEY = "naano-dashboard-sidebar-collapsed";
 
-export function DashboardSidebar() {
+export function DashboardSidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
   const location = useLocation();
-  const [collapsed, setCollapsed] = useState(false);
 
-  useEffect(() => {
-    try {
-      setCollapsed(window.localStorage.getItem(STORAGE_KEY) === "true");
-    } catch {
-      // Ignore unavailable localStorage.
-    }
-  }, []);
-
-  const toggle = () => {
-    setCollapsed((value) => {
-      const next = !value;
-      try {
-        window.localStorage.setItem(STORAGE_KEY, String(next));
-      } catch {
-        // Ignore unavailable localStorage.
-      }
-      return next;
-    });
-  };
 
   const activePath =
     dashboardNavigation
@@ -50,7 +30,7 @@ export function DashboardSidebar() {
       <div className="flex h-16 items-center justify-end px-3">
         <button
           type="button"
-          onClick={toggle}
+          onClick={onToggle}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl text-[#69758a] transition hover:bg-[#f5f7fa] hover:text-[#202938]"
