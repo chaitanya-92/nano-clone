@@ -1,17 +1,14 @@
 import {
-  Copy,
   ExternalLink,
   ImagePlus,
   Loader2,
   Pencil,
   Save,
-  Share2,
   Upload,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import {
   useEffect,
-  useMemo,
   useState,
 } from "react";
 import { Link } from "react-router-dom";
@@ -31,6 +28,7 @@ import {
   updateCreatorProfile,
   type CreatorProfile,
 } from "@/lib/dashboard";
+import { PublicCardActions } from "@/dashboard/components/shared/PublicCardActions";
 
 function fileToDataUrl(
   file: File,
@@ -130,8 +128,6 @@ export default function MyCard() {
     useState(false);
   const [saving, setSaving] =
     useState(false);
-  const [copied, setCopied] =
-    useState(false);
   const [error, setError] =
     useState("");
 
@@ -170,15 +166,10 @@ export default function MyCard() {
     };
   }, []);
 
-  const publicUrl = useMemo(
-    () =>
-      profile?.slug
-        ? getPublicCardUrl(
-            profile.slug,
-          )
-        : "",
-    [profile?.slug],
-  );
+  const publicUrl =
+    profile?.slug
+      ? getPublicCardUrl(profile.slug)
+      : "";
 
   const savePhoto = async () => {
     if (!photoFile) {
@@ -317,112 +308,6 @@ export default function MyCard() {
       );
     } finally {
       setSaving(false);
-    }
-  };
-
-  const copyLink = async () => {
-    if (!publicUrl) {
-      return;
-    }
-
-    try {
-      await navigator.clipboard.writeText(
-        publicUrl,
-      );
-
-      setCopied(true);
-
-      toast.add({
-        title:
-          "Card link copied",
-        description:
-          "Your public creator card link is ready to share.",
-        type: "success",
-        timeout: 2200,
-      });
-
-      window.setTimeout(
-        () => setCopied(false),
-        1600,
-      );
-    } catch {
-      try {
-        const textarea =
-          document.createElement(
-            "textarea",
-          );
-
-        textarea.value = publicUrl;
-        textarea.style.position =
-          "fixed";
-        textarea.style.opacity = "0";
-
-        document.body.appendChild(
-          textarea,
-        );
-
-        textarea.select();
-        document.execCommand(
-          "copy",
-        );
-        textarea.remove();
-
-        setCopied(true);
-
-        toast.add({
-          title:
-            "Card link copied",
-          description:
-            "The public creator card link is ready to share.",
-          type: "success",
-          timeout: 2200,
-        });
-
-        window.setTimeout(
-          () => setCopied(false),
-          1600,
-        );
-      } catch {
-        toast.add({
-          title: "Copy failed",
-          description:
-            "Your browser did not allow clipboard access.",
-          type: "error",
-          timeout: 2600,
-        });
-      }
-    }
-  };
-
-  const share = async () => {
-    if (!publicUrl) {
-      return;
-    }
-
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title:
-            (profile?.name ??
-              "Creator") +
-            " on Naano",
-          url: publicUrl,
-        });
-
-        toast.add({
-          title: "Card shared",
-          description:
-            "Your public creator card was shared.",
-          type: "success",
-          timeout: 2200,
-        });
-
-        return;
-      }
-
-      await copyLink();
-    } catch {
-      return;
     }
   };
 
@@ -644,41 +529,15 @@ export default function MyCard() {
               "Publish your card to create a public link."}
           </p>
 
-          <div className="mt-4 grid gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() =>
-                void copyLink()
-              }
-              disabled={!publicUrl}
-              className="cursor-pointer justify-start"
-            >
-              <Copy className="mr-2 h-4 w-4" />
-              {copied
-                ? "Copied"
-                : "Copy link"}
-            </Button>
+          <PublicCardActions
+            url={publicUrl}
+            title={
+              (profile.name ||
+                "Creator") +
+              " on Naano"
+            }
+          />
 
-            <Button
-              type="button"
-              onClick={() =>
-                void share()
-              }
-              disabled={!publicUrl}
-              className="cursor-pointer justify-start bg-[#2864f0] hover:bg-[#1f58dc]"
-            >
-              <Share2 className="mr-2 h-4 w-4" />
-              Share card
-            </Button>
-
-            <Link
-              to="/dashboard/analytics"
-              className="inline-flex cursor-pointer items-center justify-start rounded-md border border-[#dce3ec] px-4 py-2 text-sm font-medium text-[#59667e]"
-            >
-              View analytics
-            </Link>
-          </div>
         </aside>
       </section>
 
