@@ -36,10 +36,7 @@ import {
 } from "@/lib/dashboard";
 import { getCurrentUser, logout } from "@/lib/auth";
 import { signOut } from "@/features/authSlice";
-import {
-  useAppDispatch,
-  useAppSelector,
-} from "@/store/hooks";
+import { useAppDispatch } from "@/store/hooks";
 
 type Tab =
   | "profile"
