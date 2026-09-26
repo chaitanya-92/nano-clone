@@ -48,6 +48,7 @@ const mimeTypes: Record<string, string> = {
 const allowedOrigins = Array.from(
   new Set([
     process.env.FRONTEND_ORIGIN ?? FRONTEND_ORIGIN,
+    "https://jocular-longma-0f9c9d.netlify.app",
     "https://nano-clone.vercel.app",
     "http://localhost:5173",
   ]),
@@ -156,6 +157,6 @@ const server = createServer(async (request, response) => {
   }
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, "0.0.0.0", () => {
   console.log(`Naano backend running on ${APP_ORIGIN}`);
 });
