@@ -110,11 +110,23 @@ export default function MyCard() {
           return;
         }
 
-        setProfile(data);
+        let nextProfile = data;
+
+        // Creator cards should open in the published state.
+        if (data.card_status !== "published") {
+          try {
+            const published = await publishCreatorCard();
+            nextProfile = published.data;
+          } catch {
+            // Keep the loaded profile if automatic publishing is unavailable.
+          }
+        }
+
+        setProfile(nextProfile);
         setDraft({
-          headline: data.headline ?? "",
-          category: data.category ?? "",
-          bio: data.bio ?? "",
+          headline: nextProfile.headline ?? "",
+          category: nextProfile.category ?? "",
+          bio: nextProfile.bio ?? "",
         });
       })
       .catch((value) => {
@@ -412,7 +424,7 @@ export default function MyCard() {
                     }}
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.98 }}
-                    className="absolute -bottom-14 left-1/2 flex h-28 w-28 -translate-x-1/2 cursor-pointer items-center justify-center overflow-hidden rounded-full border-4 border-[#316df0] bg-[#6572cc] text-4xl text-white"
+                    className="group/photo absolute -bottom-14 left-1/2 flex h-28 w-28 -translate-x-1/2 cursor-pointer items-center justify-center overflow-hidden rounded-full border-4 border-[#316df0] bg-[#6572cc] text-4xl text-white shadow-[0_8px_24px_rgba(28,76,180,0.18)]"
                     aria-label="Change profile photo"
                   >
                     {profile.profile_photo_url ? (
@@ -420,6 +432,13 @@ export default function MyCard() {
                     ) : (
                       creatorInitials(profile.name)
                     )}
+
+                    <span className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-[#111827]/55 text-white opacity-0 backdrop-blur-[2px] transition-opacity duration-200 group-hover/photo:opacity-100">
+                      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/95 text-[#263247] shadow-lg">
+                        <Upload className="h-4 w-4" />
+                      </span>
+                      <span className="text-[10px] font-semibold tracking-wide">Change photo</span>
+                    </span>
                   </motion.button>
                 </div>
 
