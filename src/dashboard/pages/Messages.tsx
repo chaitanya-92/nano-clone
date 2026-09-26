@@ -176,11 +176,11 @@ export default function Messages() {
     <div className="mx-auto w-full max-w-[1180px]">
       <div className="grid overflow-hidden rounded-[22px] border border-[#dfe5ed] bg-white lg:grid-cols-[260px_minmax(0,1fr)]">
         <aside className="border-b border-[#e7ebf0] bg-white lg:border-b-0 lg:border-r">
-          <div className="border-b border-[#e7ebf0] p-5">
+          <div className="border-b border-[#e7ebf0] p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#2864f0]">
               Inbox
             </p>
-            <h1 className="mt-2 text-[28px] font-semibold tracking-[-1.2px] text-[#141a29]">
+            <h1 className="mt-1 text-[24px] font-semibold tracking-[-1px] text-[#141a29]">
               Messages
             </h1>
           </div>
@@ -205,13 +205,13 @@ export default function Messages() {
             </button>
           </div>
 
-          <div className="px-5 py-6">
+          <div className="px-4 py-5">
             <p className="text-xs leading-6 text-[#8b97aa]">
               Your assistant uses live workspace data. Brand conversations will
               also appear here when created.
             </p>
 
-            <div className="mt-6 rounded-xl border border-[#e5e9ef] bg-[#fafbfd] p-4">
+            <div className="mt-5 rounded-xl border border-[#e5e9ef] bg-[#fafbfd] p-3.5">
               <div className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-[#71809a]" />
                 <p className="text-xs font-semibold text-[#53617a]">
@@ -227,10 +227,10 @@ export default function Messages() {
         </aside>
 
         <section className="min-w-0">
-          <div className="flex h-[78px] items-center justify-between border-b border-[#e7ebf0] px-6">
+          <div className="flex h-[64px] shrink-0 items-center justify-between border-b border-[#e7ebf0] px-5">
             <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#dfe5ed] bg-white">
-                <Sparkles className="h-5 w-5 text-[#2864f0]" />
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#dfe5ed] bg-white">
+                <Sparkles className="h-4 w-4 text-[#2864f0]" />
               </span>
 
               <div>
@@ -250,7 +250,7 @@ export default function Messages() {
             </div>
           </div>
 
-          <div className="h-[calc(100vh-280px)] min-h-[600px]">
+          <div className="min-h-0 flex-1">
             <MessageScrollerProvider
               autoScroll
               defaultScrollPosition="end"
@@ -263,7 +263,7 @@ export default function Messages() {
                 >
                   <MessageScrollerContent className="px-5 py-6 sm:px-7">
                     <MessageScrollerItem messageId="assistant-overview">
-                      <div className="mb-5 rounded-[20px] border border-[#dbe6fa] bg-[#f7faff] p-5">
+                      <div className="mb-4 rounded-[18px] border border-[#dbe6fa] bg-[#f7faff] p-4">
                         <div className="flex items-start gap-3">
                           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-[#2864f0] shadow-sm">
                             <Sparkles className="h-4 w-4" />
@@ -285,7 +285,7 @@ export default function Messages() {
                           </div>
                         </div>
 
-                        <div className="mt-5 grid gap-2 sm:grid-cols-2">
+                        <div className="mt-4 grid gap-2 sm:grid-cols-2">
                           {quickActions.map((action) => {
                             const Icon = action.icon;
 
@@ -295,9 +295,9 @@ export default function Messages() {
                                 type="button"
                                 onClick={() => void ask(action.prompt)}
                                 disabled={loading || sending}
-                                className="group flex cursor-pointer items-center gap-3 rounded-xl border border-[#dbe3ee] bg-white px-3 py-3 text-left transition hover:border-[#cbd6e6] hover:shadow-[0_5px_18px_rgba(30,50,80,0.05)] disabled:cursor-not-allowed disabled:opacity-60"
+                                className="group flex cursor-pointer items-center gap-2.5 rounded-xl border border-[#dbe3ee] bg-white px-3 py-2.5 text-left transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-px hover:border-[#cbd6e6] hover:shadow-[0_5px_18px_rgba(30,50,80,0.05)] disabled:cursor-not-allowed disabled:opacity-60"
                               >
-                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#e0e6ef] bg-[#f8fafc] text-[#63728a]">
+                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#e0e6ef] bg-[#f8fafc] text-[#63728a]">
                                   <Icon className="h-4 w-4" />
                                 </span>
 
@@ -319,7 +319,7 @@ export default function Messages() {
                     </MessageScrollerItem>
 
                     <MessageScrollerItem messageId="performance-snapshot">
-                      <div className="mb-6 rounded-[18px] border border-[#e4e9f1] bg-[#fbfcfe] p-4">
+                      <div className="mb-4 rounded-[18px] border border-[#e4e9f1] bg-[#fbfcfe] p-3.5">
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8491a8]">
@@ -336,11 +336,11 @@ export default function Messages() {
                           <BarChart3 className="h-4 w-4 text-[#73839c]" />
                         </div>
 
-                        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
                           {snapshot.map((item) => (
                             <div
                               key={item.label}
-                              className="rounded-xl bg-white px-3 py-3"
+                              className="rounded-xl bg-white px-3 py-2.5"
                             >
                               <p className="text-[9px] uppercase tracking-[0.08em] text-[#9aa5b5]">
                                 {item.label}
@@ -436,20 +436,20 @@ export default function Messages() {
               event.preventDefault();
               void ask(draft);
             }}
-            className="flex items-center gap-3 border-t border-[#e7ebf0] bg-white p-4 sm:p-5"
+            className="flex shrink-0 items-center gap-2.5 border-t border-[#e7ebf0] bg-white p-3.5 sm:p-4"
           >
             <input
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
               disabled={loading || sending}
               placeholder="Ask Naano a question…"
-              className="auth-input h-12 flex-1 rounded-xl"
+              className="auth-input h-11 flex-1 rounded-xl"
             />
 
             <Button
               type="submit"
               disabled={loading || sending || !draft.trim()}
-              className="h-12 w-12 cursor-pointer rounded-xl bg-[#2864f0] p-0 hover:bg-[#1f58dc]"
+              className="h-11 w-11 cursor-pointer rounded-xl bg-[#2864f0] p-0 hover:bg-[#1f58dc]"
               aria-label="Send message"
             >
               <Send className="h-4 w-4" />
