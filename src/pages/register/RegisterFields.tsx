@@ -5,6 +5,12 @@ import { FieldError } from "@/auth/components/FieldError";
 import { checkEmail, requestEmailOtp, verifyEmailOtp } from "@/lib/auth";
 import type { RegistrationValues } from "./registerTypes";
 
+type StringRegistrationKey = {
+  [K in keyof RegistrationValues]-?: RegistrationValues[K] extends string
+    ? K
+    : never;
+}[keyof RegistrationValues];
+
 export function Input({
   name,
   label,
@@ -13,7 +19,7 @@ export function Input({
   formik,
   disabled = false,
 }: {
-  name: string;
+  name: StringRegistrationKey;
   label: string;
   placeholder?: string;
   type?: string;
