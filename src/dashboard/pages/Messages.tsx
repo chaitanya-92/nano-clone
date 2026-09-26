@@ -83,7 +83,6 @@ function createUserMessage(body: string): ChatMessage {
   };
 }
 
-
 export default function Messages() {
   const [context, setContext] = useState<AssistantContext | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);

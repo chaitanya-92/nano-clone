@@ -47,8 +47,6 @@ export function Input({
   );
 }
 
-
-
 export function EmailField({
   formik,
   status,
@@ -274,5 +272,3 @@ export function EmailField({
     </div>
   );
 }
-
-

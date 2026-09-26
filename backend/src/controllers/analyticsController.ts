@@ -144,9 +144,10 @@ export async function analytics(
     )
     .get(...queryArgs) as AnalyticsProfileTotals;
 
-  const platforms = (db
-    .prepare(
-      `SELECT
+  const platforms = (
+    db
+      .prepare(
+        `SELECT
         provider,
         status,
         followers_count,
@@ -158,8 +159,9 @@ export async function analytics(
        FROM social_accounts
        WHERE user_id = ?
        ORDER BY provider`,
-    )
-    .all(user.id) as SocialAccountRow[]).map((account) => ({
+      )
+      .all(user.id) as SocialAccountRow[]
+  ).map((account) => ({
     provider: account.provider,
     status: account.status,
     followers_count: normalizeNumber(account.followers_count),

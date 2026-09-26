@@ -75,7 +75,9 @@ export function NaanoAssistant() {
                 <Sparkles className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-[#202124]">Conversation</p>
+                <p className="text-sm font-semibold text-[#202124]">
+                  Conversation
+                </p>
                 <p className="text-[11px] text-[#989da3]">Naano assistant</p>
               </div>
             </div>

@@ -32,10 +32,18 @@ export const creatorSocialSchema = Yup.object({
     .url("Enter a valid X URL.")
     .matches(/^https?:\/\/(www\.)?(x|twitter)\.com\//i, "Use an X profile URL.")
     .nullable(),
-}).test("social", "Add at least one social profile.", (v: {
-  linkedinUrl?: string | null;
-  xProfileUrl?: string | null;
-} | undefined) => Boolean(v?.linkedinUrl || v?.xProfileUrl));
+}).test(
+  "social",
+  "Add at least one social profile.",
+  (
+    v:
+      | {
+          linkedinUrl?: string | null;
+          xProfileUrl?: string | null;
+        }
+      | undefined,
+  ) => Boolean(v?.linkedinUrl || v?.xProfileUrl),
+);
 export const creatorDetailsSchema = Yup.object({
   country: Yup.string().required("Select your country."),
   industries: Yup.array()

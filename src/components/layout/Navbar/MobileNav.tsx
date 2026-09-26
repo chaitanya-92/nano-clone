@@ -123,7 +123,7 @@ export function MobileNav() {
               {!showDashboard ? (
                 <SheetClose
                   onClick={() => navigate("/login")}
-                className="
+                  className="
                   inline-flex
                   h-11
                   w-full
@@ -142,7 +142,7 @@ export function MobileNav() {
                   transition-none
                   hover:bg-white
                 "
-              >
+                >
                   {navigationActions.signIn.label}
                 </SheetClose>
               ) : null}
@@ -150,7 +150,7 @@ export function MobileNav() {
               {!showDashboard ? (
                 <SheetClose
                   onClick={() => navigate("/register")}
-                className="
+                  className="
                   inline-flex
                   h-11
                   w-full
@@ -167,7 +167,7 @@ export function MobileNav() {
                   transition-none
                   hover:bg-black
                 "
-              >
+                >
                   {navigationActions.signUp.label}
                 </SheetClose>
               ) : (

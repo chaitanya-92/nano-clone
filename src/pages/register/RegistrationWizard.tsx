@@ -12,9 +12,7 @@ import {
   creatorSocialSchema,
   professionalSchema,
 } from "@/auth/schemas";
-import {
-  register,
-  } from "@/lib/auth";
+import { register } from "@/lib/auth";
 import {
   saveBrandOnboarding,
   saveCreatorCard,
@@ -228,7 +226,9 @@ export function RegistrationWizard({
               await saveBrandOnboarding({
                 ...formik.values,
                 step: step + 1,
-                icps: formik.values.icps.filter((item: RegistrationValues["icps"][number]) => item.title),
+                icps: formik.values.icps.filter(
+                  (item: RegistrationValues["icps"][number]) => item.title,
+                ),
               });
             if (step < steps.length - 1) setStep((value) => value + 1);
             else navigate("/dashboard", { replace: true });

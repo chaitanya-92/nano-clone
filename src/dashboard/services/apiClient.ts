@@ -1,10 +1,15 @@
 const DEFAULT_API_URL = "http://localhost:8787";
-const API_URL = (import.meta.env.VITE_API_URL ?? DEFAULT_API_URL).replace(/\/$/, "");
+const API_URL = (import.meta.env.VITE_API_URL ?? DEFAULT_API_URL).replace(
+  /\/$/,
+  "",
+);
 
 interface ApiErrorBody {
-  error?: {
-    message?: string;
-  } | string;
+  error?:
+    | {
+        message?: string;
+      }
+    | string;
 }
 
 export class ApiError extends Error {

@@ -41,7 +41,9 @@ export function DesktopNav() {
           {navItems.map((item) => (
             <NavigationMenuItem key={item.label}>
               <NavigationMenuLink
-                render={<button type="button" onClick={() => navigate(item.href)} />}
+                render={
+                  <button type="button" onClick={() => navigate(item.href)} />
+                }
                 onClick={(event) => event.preventDefault()}
                 className="
                     inline-flex
@@ -155,7 +157,7 @@ export function DesktopNav() {
           <Button
             variant="outline"
             render={<Link to="/login" />}
-          className="
+            className="
             h-10
             rounded-full
             border-black/[0.06]
@@ -170,7 +172,7 @@ export function DesktopNav() {
             hover:text-black
             focus-visible:ring-0
           "
-        >
+          >
             {navigationActions.signIn.label}
           </Button>
         ) : null}
@@ -178,7 +180,7 @@ export function DesktopNav() {
         {!showDashboard ? (
           <Button
             render={<Link to="/register" />}
-          className="
+            className="
             h-10
             rounded-full
             bg-black
@@ -192,7 +194,7 @@ export function DesktopNav() {
             hover:text-white
             focus-visible:ring-0
           "
-        >
+          >
             {navigationActions.signUp.label}
           </Button>
         ) : (
