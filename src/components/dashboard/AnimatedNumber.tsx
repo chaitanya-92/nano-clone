@@ -12,10 +12,8 @@ export function AnimatedNumber({
   duration = 700,
   className,
 }: AnimatedNumberProps) {
-  const prefersReducedMotion =
-    useReducedMotion();
-  const [displayValue, setDisplayValue] =
-    useState(value);
+  const prefersReducedMotion = useReducedMotion();
+  const [displayValue, setDisplayValue] = useState(value);
 
   useEffect(() => {
     if (prefersReducedMotion) {
@@ -24,8 +22,7 @@ export function AnimatedNumber({
     }
 
     const startValue = displayValue;
-    const difference =
-      value - startValue;
+    const difference = value - startValue;
 
     if (difference === 0) {
       return;
@@ -39,41 +36,22 @@ export function AnimatedNumber({
         startTime = time;
       }
 
-      const progress = Math.min(
-        (time - startTime) / duration,
-        1,
-      );
-      const eased =
-        1 - Math.pow(1 - progress, 3);
+      const progress = Math.min((time - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
 
-      setDisplayValue(
-        Math.round(
-          startValue +
-            difference * eased,
-        ),
-      );
+      setDisplayValue(Math.round(startValue + difference * eased));
 
       if (progress < 1) {
-        frame =
-          requestAnimationFrame(animate);
+        frame = requestAnimationFrame(animate);
       }
     };
 
-    frame =
-      requestAnimationFrame(animate);
+    frame = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(frame);
     };
-  }, [
-    value,
-    duration,
-    prefersReducedMotion,
-  ]);
+  }, [value, duration, prefersReducedMotion]);
 
-  return (
-    <span className={className}>
-      {displayValue.toLocaleString()}
-    </span>
-  );
+  return <span className={className}>{displayValue.toLocaleString()}</span>;
 }

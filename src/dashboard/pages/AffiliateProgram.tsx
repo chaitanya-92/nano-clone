@@ -57,29 +57,22 @@ export default function AffiliateProgram() {
 
   const copy = async (code: string) => {
     try {
-      await navigator.clipboard.writeText(
-        referralUrl(code),
-      );
+      await navigator.clipboard.writeText(referralUrl(code));
 
       setCopied(code);
 
       toast.add({
         title: "Referral link copied",
-        description:
-          "Your referral link is ready to share.",
+        description: "Your referral link is ready to share.",
         type: "success",
         timeout: 2200,
       });
 
-      window.setTimeout(
-        () => setCopied(null),
-        1600,
-      );
+      window.setTimeout(() => setCopied(null), 1600);
     } catch {
       toast.add({
         title: "Copy failed",
-        description:
-          "Your browser did not allow clipboard access.",
+        description: "Your browser did not allow clipboard access.",
         type: "error",
         timeout: 2600,
       });
@@ -165,9 +158,7 @@ export default function AffiliateProgram() {
                             className="cursor-pointer"
                           >
                             <Copy className="mr-2 h-3.5 w-3.5" />
-                            {copied === code
-                              ? "Copied"
-                              : "Copy"}
+                            {copied === code ? "Copied" : "Copy"}
                           </Button>
                         </div>
 
