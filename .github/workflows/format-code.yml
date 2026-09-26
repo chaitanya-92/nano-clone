@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - building/auth-onboarding
+      - dashboard-refractor
 
 permissions:
   contents: write
@@ -16,7 +17,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: building/auth-onboarding
+          ref: ${{ github.ref_name }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -36,4 +37,4 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add src backend/src *.ts *.js
           git commit -m "refactor: code: format project files [skip ci]"
-          git push origin building/auth-onboarding
+          git push origin ${{ github.ref_name }}
