@@ -1,8 +1,76 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { requireAuth } from "../middleware/authMiddleware";
 import { db } from "../db/client";
-import { json } from "../utils/api";
+import { requireAuth } from "../middleware/authMiddleware";
 import { syncSocialAnalytics } from "../services/socialAnalyticsService";
+import { json } from "../utils/api";
+
+type AnalyticsRange = "all" | "30d" | "90d";
+
+interface AnalyticsSummaryRow {
+  posts: number;
+  impressions: number;
+  reach: number;
+  likes: number;
+  comments: number;
+  reposts: number;
+  engagements: number;
+}
+
+interface AnalyticsProfileTotals {
+  impressions: number;
+  engagement_count: number;
+  post_count: number;
+}
+
+interface AnalyticsPostRow {
+  id: string;
+  platform: string;
+  url: string | null;
+  text: string;
+  published_at: string;
+  impressions: number;
+  reach: number;
+  likes: number;
+  comments: number;
+  reposts: number;
+  engagements: number;
+}
+
+interface CreatorFollowersRow {
+  followers: number;
+}
+
+interface SocialAccountRow {
+  provider: "linkedin" | "x";
+  status: string;
+  followers_count: number | null;
+  impressions: number | null;
+  engagements: number | null;
+  posts_count: number | null;
+  last_synced_at: string | null;
+  sync_error: string | null;
+}
+
+const RANGE_DAYS: Record<Exclude<AnalyticsRange, "all">, number> = {
+  "30d": 30,
+  "90d": 90,
+};
+
+function parseRange(value: string | null): AnalyticsRange {
+  return value === "30d" || value === "90d" ? value : "all";
+}
+
+function getSince(range: AnalyticsRange) {
+  const days = range === "all" ? null : RANGE_DAYS[range];
+
+  return days === null
+    ? null
+    : new Date(Date.now() - days * 86_400_000).toISOString();
+}
+
+function normalizeNumber(value: number | null | undefined) {
+  return Number(value ?? 0);
+}
 
 export async function analytics(
   request: IncomingMessage,
@@ -15,20 +83,11 @@ export async function analytics(
     return;
   }
 
-  const range = url.searchParams.get("range") ?? "all";
-
+  const range = parseRange(url.searchParams.get("range"));
   const syncStatuses = await syncSocialAnalytics(user.id);
-
-  const since =
-    range === "30d"
-      ? new Date(Date.now() - 30 * 86400000).toISOString()
-      : range === "90d"
-        ? new Date(Date.now() - 90 * 86400000).toISOString()
-        : null;
-
-  const where = since ? "AND published_at >= ?" : "";
-
-  const args = since ? [user.id, since] : [user.id];
+  const since = getSince(range);
+  const whereClause = since ? "AND published_at >= ?" : "";
+  const queryArgs = since ? [user.id, since] : [user.id];
 
   const summary = db
     .prepare(
@@ -42,43 +101,36 @@ export async function analytics(
         COALESCE(SUM(engagements), 0) AS engagements
       FROM analytics_posts
       WHERE creator_id = ?
-      ${where}`,
+      ${whereClause}`,
     )
-    .get(...args);
+    .get(...queryArgs) as AnalyticsSummaryRow;
 
   const posts = db
     .prepare(
-      `SELECT *
+      `SELECT
+        id,
+        platform,
+        url,
+        text,
+        published_at,
+        impressions,
+        reach,
+        likes,
+        comments,
+        reposts,
+        engagements
        FROM analytics_posts
        WHERE creator_id = ?
-       ${where}
+       ${whereClause}
        ORDER BY published_at DESC`,
     )
-    .all(...args);
+    .all(...queryArgs) as AnalyticsPostRow[];
 
   const profile = (db
     .prepare("SELECT followers FROM creator_profiles WHERE user_id = ?")
-    .get(user.id) as
-    | {
-        followers: number;
-      }
-    | undefined) ?? {
+    .get(user.id) as CreatorFollowersRow | undefined) ?? {
     followers: 0,
   };
-
-  const platforms = db
-    .prepare(
-      `SELECT provider,status,followers_count,impressions,engagements,posts_count,last_synced_at,sync_error
-       FROM social_accounts WHERE user_id=? ORDER BY provider`,
-    )
-    .all(user.id)
-    .map((item: any) => ({
-      ...item,
-      followers_count: Number(item.followers_count ?? 0),
-      impressions: Number(item.impressions ?? 0),
-      engagements: Number(item.engagements ?? 0),
-      posts_count: Number(item.posts_count ?? 0),
-    }));
 
   const profileTotals = db
     .prepare(
@@ -88,40 +140,62 @@ export async function analytics(
         COUNT(*) AS post_count
        FROM analytics_posts
        WHERE creator_id = ?
-       ${where}`,
+       ${whereClause}`,
     )
-    .get(...args) as {
-    impressions: number;
-    engagement_count: number;
-    post_count: number;
-  };
+    .get(...queryArgs) as AnalyticsProfileTotals;
+
+  const platforms = (db
+    .prepare(
+      `SELECT
+        provider,
+        status,
+        followers_count,
+        impressions,
+        engagements,
+        posts_count,
+        last_synced_at,
+        sync_error
+       FROM social_accounts
+       WHERE user_id = ?
+       ORDER BY provider`,
+    )
+    .all(user.id) as SocialAccountRow[]).map((account) => ({
+    provider: account.provider,
+    status: account.status,
+    followers_count: normalizeNumber(account.followers_count),
+    impressions: normalizeNumber(account.impressions),
+    engagements: normalizeNumber(account.engagements),
+    posts_count: normalizeNumber(account.posts_count),
+    last_synced_at: account.last_synced_at,
+    sync_error: account.sync_error,
+  }));
 
   return json(response, 200, {
     data: {
       range,
       profile: {
-        followers: Number(profile.followers ?? 0),
-        impressions: Number(profileTotals.impressions ?? 0),
-        engagement_count: Number(profileTotals.engagement_count ?? 0),
-        post_count: Number(profileTotals.post_count ?? 0),
+        followers: normalizeNumber(profile.followers),
+        impressions: normalizeNumber(profileTotals.impressions),
+        engagement_count: normalizeNumber(profileTotals.engagement_count),
+        post_count: normalizeNumber(profileTotals.post_count),
       },
       summary: {
-        posts: Number((summary as any)?.posts ?? 0),
-        impressions: Number((summary as any)?.impressions ?? 0),
-        reach: Number((summary as any)?.reach ?? 0),
-        likes: Number((summary as any)?.likes ?? 0),
-        comments: Number((summary as any)?.comments ?? 0),
-        reposts: Number((summary as any)?.reposts ?? 0),
-        engagements: Number((summary as any)?.engagements ?? 0),
+        posts: normalizeNumber(summary.posts),
+        impressions: normalizeNumber(summary.impressions),
+        reach: normalizeNumber(summary.reach),
+        likes: normalizeNumber(summary.likes),
+        comments: normalizeNumber(summary.comments),
+        reposts: normalizeNumber(summary.reposts),
+        engagements: normalizeNumber(summary.engagements),
       },
-      posts: (posts as any[]).map((post) => ({
+      posts: posts.map((post) => ({
         ...post,
-        impressions: Number(post.impressions ?? 0),
-        reach: Number(post.reach ?? 0),
-        likes: Number(post.likes ?? 0),
-        comments: Number(post.comments ?? 0),
-        reposts: Number(post.reposts ?? 0),
-        engagements: Number(post.engagements ?? 0),
+        impressions: normalizeNumber(post.impressions),
+        reach: normalizeNumber(post.reach),
+        likes: normalizeNumber(post.likes),
+        comments: normalizeNumber(post.comments),
+        reposts: normalizeNumber(post.reposts),
+        engagements: normalizeNumber(post.engagements),
       })),
       syncStatuses,
       platforms,
