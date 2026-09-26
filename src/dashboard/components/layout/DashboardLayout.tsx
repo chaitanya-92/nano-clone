@@ -1,17 +1,47 @@
+import { useEffect, useState } from "react";
 import "@/dashboard/dashboard.css";
 import { Outlet } from "react-router-dom";
 import { DashboardNavbar } from "./DashboardNavbar";
 import { DashboardSidebar } from "./DashboardSidebar";
 
+const STORAGE_KEY = "naano-dashboard-sidebar-collapsed";
+
 export function DashboardLayout() {
+  const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    try {
+      setCollapsed(window.localStorage.getItem(STORAGE_KEY) === "true");
+    } catch {
+      // Ignore unavailable localStorage.
+    }
+  }, []);
+
+  const toggleSidebar = () => {
+    setCollapsed((value) => {
+      const next = !value;
+      try {
+        window.localStorage.setItem(STORAGE_KEY, String(next));
+      } catch {
+        // Ignore unavailable localStorage.
+      }
+      return next;
+    });
+  };
+
   return (
     <div className="dashboard-shell h-screen overflow-hidden bg-[#f6f8fb]">
       <DashboardNavbar />
 
       <div className="h-[calc(100vh-64px)]">
-        <DashboardSidebar />
+        <DashboardSidebar collapsed={collapsed} onToggle={toggleSidebar} />
 
-        <main className="dashboard-scroll-area h-full overflow-y-auto overscroll-contain lg:ml-20">
+        <main
+          className={[
+            "dashboard-scroll-area h-full overflow-y-auto overscroll-contain transition-[margin] duration-300 ease-[cubic-bezier(.22,1,.36,1)]",
+            collapsed ? "lg:ml-[76px]" : "lg:ml-[224px]",
+          ].join(" ")}
+        >
           <div className="px-5 py-6 sm:px-7 sm:py-8 lg:px-9">
             <Outlet />
           </div>
