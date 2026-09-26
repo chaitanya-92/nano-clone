@@ -131,6 +131,9 @@ async function syncX(userId: string, account: any) {
        comments=excluded.comments,reposts=excluded.reposts,engagements=excluded.engagements`,
   );
 
+  const totalImpressions = rows.reduce((sum, row) => sum + row.impressions, 0);
+  const totalEngagements = rows.reduce((sum, row) => sum + row.engagements, 0);
+
   const write = db.transaction(() => {
     for (const post of posts) {
       const metrics = post.public_metrics ?? {};
