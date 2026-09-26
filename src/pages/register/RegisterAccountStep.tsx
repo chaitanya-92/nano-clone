@@ -1,10 +1,8 @@
 import { Eye, EyeOff } from "lucide-react";
-import { FormikProps } from "formik";
 import GoogleIcon from "@/components/ui/icons/GoogleIcon";
 import { FieldError } from "@/auth/components/FieldError";
 import { EmailField, Input } from "./RegisterFields";
 import { useRegistrationForm } from "./registerContext";
-import type { RegistrationValues } from "./registerTypes";
 
 export function RegisterAccountStep() {
   const {
@@ -178,6 +176,5 @@ export function RegisterAccountStep() {
       />
     </label>
   </div>
-)}
   );
 }
