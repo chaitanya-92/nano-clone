@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Logo } from "@/components/layout/Logo";
 import { Button } from "@/components/ui/button";
@@ -103,7 +102,25 @@ export function DashboardNavbar({
 
         setBalance(dashboardResult.data.earnings?.available ?? 0);
         setCurrency(dashboardResult.data.profile?.currency ?? "EUR");
-        setProfilePhotoUrl(profileResult.data.profile_photo_url ?? null);
+        const nextProfilePhotoUrl = profileResult.data.profile_photo_url ?? null;
+
+        if (nextProfilePhotoUrl) {
+          const image = new Image();
+          image.onload = () => {
+            if (!cancelled) {
+              setProfilePhotoUrl(nextProfilePhotoUrl);
+            }
+          };
+          image.onerror = () => {
+            if (!cancelled) {
+              setProfilePhotoUrl(null);
+            }
+          };
+          image.src = nextProfilePhotoUrl;
+        } else {
+          setProfilePhotoUrl(null);
+        }
+
         setNotifications(notificationsResult.data);
       })
       .catch(() => {
@@ -305,11 +322,7 @@ export function DashboardNavbar({
                 />
               }
             >
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="flex items-center"
-              >
+              <div className="flex h-10 items-center">
                 <Avatar className="h-10 w-10">
                   {profilePhotoUrl ? (
                     <img
@@ -328,7 +341,7 @@ export function DashboardNavbar({
                   className="ml-1.5 hidden h-4 w-4 text-[#718098] sm:block"
                   strokeWidth={1.8}
                 />
-              </motion.div>
+              </div>
             </DropdownMenuTrigger>
 
             <DropdownMenuContent
