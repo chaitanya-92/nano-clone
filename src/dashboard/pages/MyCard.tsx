@@ -319,12 +319,12 @@ export default function MyCard() {
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
           <Button
             type="button"
             variant="outline"
             onClick={() => setOpen(true)}
-            className="cursor-pointer"
+            className="h-10 min-w-[84px] cursor-pointer"
           >
             <Pencil className="mr-2 h-4 w-4" />
             Edit
@@ -333,7 +333,7 @@ export default function MyCard() {
           <Button
             type="button"
             onClick={() => void togglePublish()}
-            className="cursor-pointer bg-[#2864f0] text-white hover:bg-[#2056d4]"
+            className="h-10 min-w-[132px] cursor-pointer bg-[#2864f0] text-white hover:bg-[#2056d4]"
           >
             <Globe className="mr-2 h-4 w-4" />
             {profile.card_status === "published" ? "Unpublish" : "Publish card"}
@@ -348,7 +348,7 @@ export default function MyCard() {
                 event.preventDefault();
               }
             }}
-            className="inline-flex h-9 cursor-pointer items-center rounded-lg border border-[#dce3ec] px-3 text-xs font-medium text-[#59667e] transition hover:bg-[#f8fafc]"
+            className="inline-flex h-10 min-w-[92px] cursor-pointer items-center justify-center rounded-lg border border-[#dce3ec] px-3 text-sm font-medium text-[#59667e] transition hover:bg-[#f8fafc]"
           >
             <ExternalLink className="mr-2 h-4 w-4" />
             Preview
