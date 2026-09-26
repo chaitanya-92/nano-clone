@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "@/dashboard/dashboard.css";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { DashboardNavbar } from "./DashboardNavbar";
 import { DashboardSidebar } from "./DashboardSidebar";
 
 const STORAGE_KEY = "naano-dashboard-sidebar-collapsed";
 
 export function DashboardLayout() {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);\n  const location = useLocation();\n  const mainRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     try {
@@ -17,7 +17,7 @@ export function DashboardLayout() {
     }
   }, []);
 
-  const toggleSidebar = () => {
+  useEffect(() => {\n    mainRef.current?.scrollTo({ top: 0, left: 0, behavior: "auto" });\n  }, [location.pathname, location.search]);\n\n  const toggleSidebar = () => {
     setCollapsed((value) => {
       const next = !value;
       try {
@@ -44,7 +44,7 @@ export function DashboardLayout() {
           onToggleSidebar={toggleSidebar}
         />
 
-        <main className="dashboard-panel dashboard-scroll-area mx-3 mb-3 h-[calc(100vh-76px)] overflow-y-auto overflow-x-hidden overscroll-contain rounded-[34px] border border-[#e3e5df] lg:mx-4 bg-[#f6f8fb] lg:mx-4">
+        <main ref={mainRef} className="dashboard-panel dashboard-scroll-area mx-3 mb-3 h-[calc(100vh-76px)] overflow-y-auto overflow-x-hidden overscroll-contain rounded-[34px] border border-[#e3e5df] bg-[#f6f8fb] lg:mx-4">
           <div className="min-h-full px-5 py-5 sm:px-7 sm:py-6 lg:px-9">
             <Outlet />
           </div>
