@@ -1,6 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { randomUUID } from "node:crypto";
 import { requireAuth } from "../middleware/authMiddleware";
+import { readJson } from "../utils/api";
 import { db } from "../db/client";
 import { error, json, now, stringValue } from "../utils/api";
 import { fetchPublicSocialProfile } from "../services/socialProfileService";
@@ -81,9 +82,7 @@ export async function connectSocial(
 ) {
   const user = requireAuth(request, response);
   if (!user) return;
-  const body = await import("../utils/api").then((module) =>
-    module.readJson(request),
-  );
+  const body = await readJson(request);
 
   const provider = stringValue(body.provider) as SocialProvider;
 
