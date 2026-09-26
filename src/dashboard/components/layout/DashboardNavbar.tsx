@@ -175,7 +175,7 @@ export function DashboardNavbar({
   };
 
   return (
-    <header className="sticky top-0 z-40 h-16 bg-white border-b border-[#edf0f5]">
+    <header className="sticky top-0 z-40 h-16 bg-white">
       <div className="flex h-full items-center justify-between px-4 sm:px-6 lg:px-7">
         <Button
           type="button"
