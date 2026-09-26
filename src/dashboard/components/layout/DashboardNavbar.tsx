@@ -177,34 +177,52 @@ export function DashboardNavbar({
   return (
     <header className="relative z-40 h-16 bg-white">
       <div className="flex h-full items-center justify-between px-4 sm:px-6 lg:px-7">
-        <div className="flex items-center gap-3">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={onToggleSidebar}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className="h-9 w-9 cursor-pointer rounded-lg text-[#687166] transition-all duration-200 hover:bg-[#f2f3ee] hover:text-[#20251f]"
-          >
-            {collapsed ? (
-              <PanelLeftOpen className="h-[19px] w-[19px]" strokeWidth={1.8} />
-            ) : (
-              <PanelLeftClose className="h-[19px] w-[19px]" strokeWidth={1.8} />
-            )}
-          </Button>
-
+        <div className="flex items-center gap-2.5">
           <button
             type="button"
             onClick={() => navigate("/dashboard")}
             aria-label="Open Naano dashboard"
-            className="cursor-pointer rounded-xl px-2 py-1 text-left outline-none transition-opacity hover:opacity-75"
+            className="cursor-pointer rounded-xl px-1 py-1 text-left outline-none transition-opacity hover:opacity-75"
           >
-            <span className="text-[23px] font-bold tracking-[-1.5px] text-[#111318]">
+            <span className="text-[23px] font-bold tracking-[-1.5px] text-[#171b18]">
               naano.
             </span>
           </button>
-        </div>
+
+          {collapsed && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={onToggleSidebar}
+              aria-label="Expand sidebar"
+              title="Expand sidebar"
+              className="h-8 w-8 cursor-pointer rounded-lg text-[#687166] transition-all duration-200 hover:bg-[#f2f3ee] hover:text-[#20251f]"
+            >
+              <PanelLeftOpen className="h-[17px] w-[17px]" strokeWidth={1.8} />
+            </Button>
+          )}
+
+          {!collapsed && (
+            <>
+              <span className="h-5 w-px bg-[#dfe2da]" />
+              <span className="text-[14px] font-medium text-[#66705f]">
+                Candidate
+              </span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={onToggleSidebar}
+                aria-label="Collapse sidebar"
+                title="Collapse sidebar"
+                className="ml-0.5 h-8 w-8 cursor-pointer rounded-lg text-[#687166] transition-all duration-200 hover:bg-[#f2f3ee] hover:text-[#20251f]"
+              >
+                <PanelLeftClose className="h-[17px] w-[17px]" strokeWidth={1.8} />
+              </Button>
+            </>
+          )}
+        </div>/div>
 
         <div className="flex items-center gap-1.5 sm:gap-2.5">
           <Button
