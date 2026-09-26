@@ -106,6 +106,11 @@ async function syncX(userId: string, account: any) {
   }
 
   const timestamp = new Date().toISOString();
+  const totalImpressions = posts.reduce((sum, post) => sum + metricNumber(post.public_metrics?.impression_count), 0);
+  const totalEngagements = posts.reduce((sum, post) => {
+    const m = post.public_metrics ?? {};
+    return sum + metricNumber(m.like_count) + metricNumber(m.reply_count) + metricNumber(m.retweet_count) + metricNumber(m.quote_count) + metricNumber(m.bookmark_count);
+  }, 0);
   const upsert = db.prepare(
     `INSERT INTO analytics_posts
       (id,creator_id,platform,external_id,url,text,published_at,impressions,reach,likes,comments,reposts,engagements,created_at)
@@ -160,8 +165,8 @@ async function syncX(userId: string, account: any) {
     );
 
     db.prepare(
-      "UPDATE social_accounts SET last_synced_at=?,sync_error=NULL,updated_at=? WHERE id=? AND user_id=?",
-    ).run(timestamp, timestamp, account.id, userId);
+      "UPDATE social_accounts SET followers_count=?,impressions=?,engagements=?,posts_count=?,last_synced_at=?,sync_error=NULL,updated_at=? WHERE id=? AND user_id=?",
+    ).run(followers, totalImpressions, totalEngagements, posts.length, timestamp, timestamp, account.id, userId);
   });
 
   write();
@@ -245,6 +250,8 @@ async function syncLinkedIn(userId: string, account: any) {
     : [];
 
   const timestamp = new Date().toISOString();
+  const totalImpressions = rows.reduce((sum, row) => sum + row.impressions, 0);
+  const totalEngagements = rows.reduce((sum, row) => sum + row.engagements, 0);
   const upsert = db.prepare(
     `INSERT INTO analytics_posts
       (id,creator_id,platform,external_id,url,text,published_at,impressions,reach,likes,comments,reposts,engagements,created_at)
@@ -307,8 +314,8 @@ async function syncLinkedIn(userId: string, account: any) {
     ).run(account.profile_url, followers, timestamp, userId);
 
     db.prepare(
-      "UPDATE social_accounts SET last_synced_at=?,sync_error=NULL,updated_at=? WHERE id=? AND user_id=?",
-    ).run(timestamp, timestamp, account.id, userId);
+      "UPDATE social_accounts SET followers_count=?,impressions=?,engagements=?,posts_count=?,last_synced_at=?,sync_error=NULL,updated_at=? WHERE id=? AND user_id=?",
+    ).run(followers, totalImpressions, totalEngagements, rows.length, timestamp, timestamp, account.id, userId);
   });
 
   write();
