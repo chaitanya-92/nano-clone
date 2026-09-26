@@ -416,7 +416,7 @@ export default function MyCard() {
             <motion.div
               animate={{ rotateY: cardFlipped ? 180 : 0 }}
               transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-              className="relative min-h-[560px] w-full [transform-style:preserve-3d]"
+              className="relative h-[580px] w-full [transform-style:preserve-3d]"
             >
               <div className="absolute inset-0 overflow-hidden rounded-[28px] border border-[#dce4ef] bg-white shadow-[0_20px_60px_rgba(34,60,100,0.08)] transition-shadow duration-300 group-hover:shadow-[0_24px_70px_rgba(34,60,100,0.13)] [backface-visibility:hidden]">
                 <div className="relative h-[170px] bg-gradient-to-br from-[#2159df] via-[#316df0] to-[#6f91f3]">
@@ -462,7 +462,7 @@ export default function MyCard() {
                   </motion.button>
                 </div>
 
-                <div className="px-8 pb-7 pt-18 text-center">
+                <div className="px-8 pb-7 pt-16 text-center">
                   <h2 className="text-[32px] font-semibold tracking-[-1.2px] text-[#141a29]">
                     {profile.name || "Creator"}
                   </h2>
