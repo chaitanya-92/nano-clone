@@ -11,7 +11,9 @@ import { AuthShell } from "@/components/auth/AuthShell";
 import { AuthSocialButton } from "@/components/auth/AuthSocialButton";
 import GoogleIcon from "@/components/ui/icons/GoogleIcon";
 
-const API_URL = (import.meta.env.VITE_API_URL ?? "https://nano-clone-lo9q.onrender.com").replace(/\/$/, "");
+const API_URL = (
+  import.meta.env.VITE_API_URL ?? "https://nano-clone-lo9q.onrender.com"
+).replace(/\/$/, "");
 import { authContent } from "@/data/data";
 import { signIn } from "@/features/authSlice";
 import { login } from "@/lib/auth";
