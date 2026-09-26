@@ -1,16 +1,8 @@
-import {
-  Check,
-  Copy,
-  ExternalLink,
-  Share2,
-} from "lucide-react";
+import { Check, Copy, ExternalLink, Share2 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
-import {
-  copyText,
-  shareContent,
-} from "@/dashboard/utils/share";
+import { copyText, shareContent } from "@/dashboard/utils/share";
 
 interface PublicCardActionsProps {
   url: string;
@@ -86,10 +78,7 @@ export function PublicCardActions({
         timeout: 2200,
       });
     } catch (error) {
-      if (
-        error instanceof DOMException &&
-        error.name === "AbortError"
-      ) {
+      if (error instanceof DOMException && error.name === "AbortError") {
         return;
       }
 
@@ -105,7 +94,8 @@ export function PublicCardActions({
   };
 
   const size = compact ? "sm" : "default";
-  const baseClass = "cursor-pointer border-[#dce3ec] bg-white text-[#52617b] hover:bg-[#f7f9fc] hover:text-[#263247]";
+  const baseClass =
+    "cursor-pointer border-[#dce3ec] bg-white text-[#52617b] hover:bg-[#f7f9fc] hover:text-[#263247]";
 
   return (
     <div className={compact ? "grid gap-2" : "grid gap-2.5 sm:grid-cols-2"}>
@@ -140,13 +130,7 @@ export function PublicCardActions({
         type="button"
         variant="outline"
         size={size}
-        render={
-          <a
-            href={url || undefined}
-            target="_blank"
-            rel="noreferrer"
-          />
-        }
+        render={<a href={url || undefined} target="_blank" rel="noreferrer" />}
         disabled={!url}
         className={compact ? baseClass : `${baseClass} sm:col-span-2`}
       >

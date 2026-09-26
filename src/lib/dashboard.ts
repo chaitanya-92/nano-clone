@@ -212,7 +212,6 @@ export function getSocialAccounts() {
   }>("/api/social-accounts");
 }
 
-
 export function updateCreatorProfile(payload: Record<string, unknown>) {
   return request<{ data: CreatorProfile }>("/api/creator/profile", {
     method: "PATCH",
@@ -441,31 +440,20 @@ export function sendAssistantMessage(message: string) {
   });
 }
 
-
 export function getNotifications() {
   return request<{
     data: Notification[];
   }>("/api/notifications");
 }
 
-export function markNotification(
-  id: string,
-) {
-  return request<{ ok: true }>(
-    "/api/notifications/" +
-      id +
-      "/read",
-    {
-      method: "PATCH",
-    },
-  );
+export function markNotification(id: string) {
+  return request<{ ok: true }>("/api/notifications/" + id + "/read", {
+    method: "PATCH",
+  });
 }
 
 export function markAllNotifications() {
-  return request<{ ok: true }>(
-    "/api/notifications/read-all",
-    {
-      method: "PATCH",
-    },
-  );
+  return request<{ ok: true }>("/api/notifications/read-all", {
+    method: "PATCH",
+  });
 }

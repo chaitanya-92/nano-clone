@@ -11,15 +11,10 @@ export function DashboardSidebar() {
           return location.pathname === "/dashboard";
         }
 
-        return location.pathname.startsWith(
-          item.href,
-        );
+        return location.pathname.startsWith(item.href);
       })
-      .sort(
-        (first, second) =>
-          second.href.length -
-          first.href.length,
-      )[0]?.href ?? "";
+      .sort((first, second) => second.href.length - first.href.length)[0]
+      ?.href ?? "";
 
   return (
     <aside className="fixed bottom-0 left-0 top-16 z-30 hidden w-20 bg-white lg:flex lg:flex-col">
@@ -29,16 +24,13 @@ export function DashboardSidebar() {
       >
         {dashboardNavigation.map((item) => {
           const Icon = item.icon;
-          const active =
-            activePath === item.href;
+          const active = activePath === item.href;
 
           return (
             <Link
               key={item.href}
               to={item.href}
-              aria-current={
-                active ? "page" : undefined
-              }
+              aria-current={active ? "page" : undefined}
               aria-label={item.label}
               title={item.label}
               className={[
@@ -48,10 +40,7 @@ export function DashboardSidebar() {
                   : "text-[#67758b] hover:bg-[#f6f8fb] hover:text-[#202938]",
               ].join(" ")}
             >
-              <Icon
-                className="h-[19px] w-[19px]"
-                strokeWidth={1.8}
-              />
+              <Icon className="h-[19px] w-[19px]" strokeWidth={1.8} />
             </Link>
           );
         })}
