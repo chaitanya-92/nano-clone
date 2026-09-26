@@ -179,10 +179,6 @@ export function DashboardNavbar({
     <header className="sticky top-0 z-40 h-16 bg-white">
       <div className="flex h-full items-center justify-between px-4 sm:px-6 lg:px-7">
         <div className="flex min-w-0 items-center gap-4">
-          <Logo
-            compact={false}
-            className="shrink-0 [&>span:last-child]:text-[1.35rem]"
-          />
           <Button
             type="button"
             variant="ghost"
