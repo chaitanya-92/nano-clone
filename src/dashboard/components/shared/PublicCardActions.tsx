@@ -127,10 +127,10 @@ export function PublicCardActions({
 
   const size = compact ? "sm" : "lg";
   const baseClass =
-    "h-10 w-full cursor-pointer border-[#dce3ec] bg-white text-[#52617b] hover:bg-[#f7f9fc] hover:text-[#263247]";
+    "h-11 w-full cursor-pointer rounded-xl border-[#dce3ec] bg-white px-3 text-[13px] font-medium text-[#52617b] shadow-[0_1px_2px_rgba(20,30,50,0.02)] hover:bg-[#f7f9fc] hover:text-[#263247]";
 
   return (
-    <div className={compact ? "grid w-full gap-2" : "grid w-full grid-cols-2 gap-2.5"}>
+    <div className={compact ? "grid w-full gap-2" : "grid w-full grid-cols-2 gap-2"}>
       <Button
         type="button"
         variant="outline"
@@ -150,7 +150,7 @@ export function PublicCardActions({
         type="button"
         size={size}
         onClick={() => void handleShare()}
-        className="h-10 w-full cursor-pointer bg-[#171d2b] text-white hover:bg-[#111827]"
+        className="h-11 w-full cursor-pointer rounded-xl bg-[#171d2b] px-3 text-[13px] font-medium text-white shadow-[0_2px_5px_rgba(23,29,43,0.12)] hover:bg-[#111827]"
       >
         <Share2 className="mr-2 h-4 w-4" />
         {sharing ? "Sharing…" : "Share card"}
