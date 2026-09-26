@@ -1,9 +1,5 @@
 import { useState, type ChangeEvent } from "react";
-import {
-  Formik,
-  Form,
-  type FormikProps,
-} from "formik";
+import { Formik, Form, type FormikProps } from "formik";
 import * as Yup from "yup";
 import {
   ArrowRight,
