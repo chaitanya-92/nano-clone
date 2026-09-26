@@ -29,7 +29,10 @@ export default function Earnings() {
   const [methods, setMethods] = useState<PayoutMethod[]>([]);
   const [amount, setAmount] = useState("");
   const [label, setLabel] = useState("");
-  const [showMethod, setShowMethod] = useState(false);
+  const [showMethod, setShowMethod] =
+    useState(false);
+  const [selectedMethodId, setSelectedMethodId] =
+    useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -45,6 +48,12 @@ export default function Earnings() {
 
       setData(earningsResult.data);
       setMethods(methodsResult.data);
+      setSelectedMethodId(
+        (current) =>
+          current ??
+          methodsResult.data[0]?.id ??
+          null,
+      );
     } catch (value) {
       setError(
         value instanceof Error ? value.message : "Unable to load earnings.",
@@ -87,7 +96,11 @@ export default function Earnings() {
   };
 
   const withdraw = async () => {
-    const method = methods[0];
+    const method =
+      methods.find(
+        (item) =>
+          item.id === selectedMethodId,
+      ) ?? methods[0];
     const value = Number.parseFloat(amount);
 
     if (!method) {
