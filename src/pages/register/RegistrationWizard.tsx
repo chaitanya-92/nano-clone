@@ -104,8 +104,8 @@ export function RegistrationWizard({
       initialValues={{
         ...initialValues,
         role,
-        name: googleOnboarding ? (user?.name ?? "") : initialValues.name,
-        email: googleOnboarding ? (user?.email ?? "") : initialValues.email,
+        name: googleOnboarding ? (userName ?? "") : initialValues.name,
+        email: googleOnboarding ? (userEmail ?? "") : initialValues.email,
       }}
       onSubmit={() =>
         navigate("/dashboard", {
@@ -302,12 +302,7 @@ export function RegistrationWizard({
                     return;
                   }
 
-                  setRole(null);
-                  setStep(0);
-                  setError("");
-                  setAnalysis(null);
-                  setEmailStatus("idle");
-                  setEmailVerified(false);
+                  onExit();
                 }}
                 statusLabel={
                   role === "creator"
