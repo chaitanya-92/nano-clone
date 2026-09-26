@@ -34,6 +34,7 @@ export default function Earnings() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [showWithdrawalSuccess, setShowWithdrawalSuccess] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -114,6 +115,7 @@ export default function Earnings() {
       });
 
       setAmount("");
+      setShowWithdrawalSuccess(true);
       await load();
     } catch (value) {
       setError(
@@ -234,7 +236,7 @@ export default function Earnings() {
                     className="cursor-pointer"
                   >
                     <Plus className="mr-2 h-4 w-4" />
-                    Add
+                    Add UPI ID
                   </Button>
                 </div>
 
@@ -243,7 +245,7 @@ export default function Earnings() {
                     <input
                       value={label}
                       onChange={(event) => setLabel(event.target.value)}
-                      placeholder="Primary Stripe account"
+                      placeholder="Enter UPI ID (e.g. name@upi)"
                       className="auth-input"
                     />
 
@@ -253,7 +255,7 @@ export default function Earnings() {
                       disabled={busy}
                       className="cursor-pointer bg-[#171d2b] hover:bg-[#111827]"
                     >
-                      {busy ? "Saving…" : "Save method"}
+                      {busy ? "Saving…" : "Save UPI ID"}
                     </Button>
                   </div>
                 )}
@@ -314,6 +316,43 @@ export default function Earnings() {
           </section>
         </>
       )}
+      {showWithdrawalSuccess && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 backdrop-blur-[2px]">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="withdrawal-success-title"
+            className="w-full max-w-[430px] rounded-[24px] bg-white p-7 shadow-2xl"
+          >
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#eef4ff] text-[#2864f0]">
+              <ArrowUpRight className="h-6 w-6" />
+            </div>
+
+            <div className="mt-5 text-center">
+              <h2
+                id="withdrawal-success-title"
+                className="text-[24px] font-semibold tracking-[-0.6px] text-[#172033]"
+              >
+                Withdrawal on the way
+              </h2>
+
+              <p className="mt-2 text-sm leading-6 text-[#74819a]">
+                Your withdrawal request has been submitted successfully. We’ll
+                process it and send the funds to your saved UPI ID.
+              </p>
+            </div>
+
+            <Button
+              type="button"
+              onClick={() => setShowWithdrawalSuccess(false)}
+              className="mt-6 w-full cursor-pointer bg-[#2864f0] hover:bg-[#1f58dc]"
+            >
+              Done
+            </Button>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
