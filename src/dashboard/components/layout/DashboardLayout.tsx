@@ -31,17 +31,17 @@ export function DashboardLayout() {
 
   return (
     <div className="dashboard-shell h-screen overflow-hidden bg-[#f6f8fb]">
-      <DashboardNavbar collapsed={collapsed} onToggleSidebar={toggleSidebar} />
+      <DashboardSidebar collapsed={collapsed} onToggle={toggleSidebar} />
 
-      <div className="h-[calc(100vh-64px)]">
-        <DashboardSidebar collapsed={collapsed} onToggle={toggleSidebar} />
+      <div
+        className={[
+          "h-full transition-[margin] duration-300 ease-[cubic-bezier(.22,1,.36,1)]",
+          collapsed ? "lg:ml-[76px]" : "lg:ml-[224px]",
+        ].join(" ")}
+      >
+        <DashboardNavbar />
 
-        <main
-          className={[
-            "dashboard-scroll-area h-full overflow-y-auto overscroll-contain transition-[margin] duration-300 ease-[cubic-bezier(.22,1,.36,1)]",
-            collapsed ? "lg:ml-[76px]" : "lg:ml-[224px]",
-          ].join(" ")}
-        >
+        <main className="dashboard-scroll-area h-[calc(100vh-64px)] overflow-y-auto overscroll-contain">
           <div className="px-5 py-6 sm:px-7 sm:py-8 lg:px-9">
             <Outlet />
           </div>
