@@ -75,7 +75,7 @@ export default function Login() {
 
         <div className="mt-7 space-y-3">
           <a
-            href={`${import.meta.env.VITE_API_URL ?? "http://localhost:8787"}/api/auth/google?flow=login`}
+            href={`${import.meta.env.VITE_API_URL ?? "https://nano-clone-lo9q.onrender.com"}/api/auth/google?flow=login`}
             className="block"
           >
             <AuthSocialButton icon={<GoogleIcon className="h-5 w-5" />}>
