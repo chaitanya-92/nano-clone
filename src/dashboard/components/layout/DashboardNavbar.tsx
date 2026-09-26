@@ -4,7 +4,6 @@ import {
   ChevronDown,
   Globe2,
   LogOut,
-  PanelLeft,
   Settings,
   Sparkles,
   WalletCards,
@@ -43,15 +42,7 @@ import {
   useAppSelector,
 } from "@/store/hooks";
 
-interface DashboardNavbarProps {
-  collapsed: boolean;
-  onToggleSidebar: () => void;
-}
-
-export function DashboardNavbar({
-  collapsed,
-  onToggleSidebar,
-}: DashboardNavbarProps) {
+export function DashboardNavbar() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const user = useAppSelector(
@@ -225,35 +216,6 @@ export function DashboardNavbar({
   return (
     <header className="sticky top-0 z-30 h-[72px] border-b border-[#e8ebf0] bg-white/95 backdrop-blur">
       <div className="flex h-full items-center justify-between gap-4 px-5 md:px-6">
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={onToggleSidebar}
-          aria-label={
-            collapsed
-              ? "Expand sidebar"
-              : "Collapse sidebar"
-          }
-          className="h-10 w-10 cursor-pointer rounded-xl text-[#526078] hover:bg-[#f5f7fa] hover:text-[#202124]"
-        >
-          <motion.span
-            animate={{
-              rotate: collapsed ? 0 : 180,
-            }}
-            transition={{
-              duration: 0.24,
-              ease: "easeOut",
-            }}
-            className="flex items-center justify-center"
-          >
-            <PanelLeft
-              className="h-[18px] w-[18px]"
-              strokeWidth={1.8}
-            />
-          </motion.span>
-        </Button>
-
         <div className="ml-auto flex items-center gap-1">
           <motion.div
             whileHover={{ y: -1 }}
