@@ -169,8 +169,6 @@ export function DashboardNavbar() {
   return (
     <header className="sticky top-0 z-40 h-16 bg-white border-b border-[#edf0f5]">
       <div className="flex h-full items-center justify-end px-4 sm:px-6 lg:px-7">
-
-
         <div className="flex items-center gap-1.5 sm:gap-2.5">
           <Button
             type="button"
