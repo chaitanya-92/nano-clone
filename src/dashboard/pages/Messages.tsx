@@ -318,42 +318,6 @@ export default function Messages() {
                       </div>
                     </MessageScrollerItem>
 
-                    <MessageScrollerItem messageId="performance-snapshot">
-                      <div className="mb-4 rounded-[18px] border border-[#e4e9f1] bg-[#fbfcfe] p-3.5">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8491a8]">
-                              Performance snapshot
-                            </p>
-
-                            <p className="mt-1 text-sm font-semibold text-[#263247]">
-                              {context
-                                ? "Your profile is ready to review."
-                                : "Loading your profile data…"}
-                            </p>
-                          </div>
-
-                          <BarChart3 className="h-4 w-4 text-[#73839c]" />
-                        </div>
-
-                        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                          {snapshot.map((item) => (
-                            <div
-                              key={item.label}
-                              className="rounded-xl bg-white px-3 py-2.5"
-                            >
-                              <p className="text-[9px] uppercase tracking-[0.08em] text-[#9aa5b5]">
-                                {item.label}
-                              </p>
-                              <p className="mt-1 text-sm font-semibold text-[#334057]">
-                                {formatMetric(item.value)}
-                              </p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </MessageScrollerItem>
-
                     {messages.map((message) => (
                       <MessageScrollerItem
                         key={message.id}
