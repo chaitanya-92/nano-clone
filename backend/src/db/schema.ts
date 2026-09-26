@@ -9,8 +9,23 @@ export function initializeDatabase() {
       name TEXT NOT NULL,
       role TEXT NOT NULL CHECK(role IN ('creator', 'brand')),
       provider TEXT NOT NULL DEFAULT 'password',
+      email_verified INTEGER NOT NULL DEFAULT 0,
       created_at TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS email_verifications (
+      id TEXT PRIMARY KEY,
+      email TEXT NOT NULL,
+      code_hash TEXT NOT NULL,
+      verification_token_hash TEXT,
+      attempts INTEGER NOT NULL DEFAULT 0,
+      expires_at INTEGER NOT NULL,
+      verified_at INTEGER,
+      created_at TEXT NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS email_verifications_email_idx ON email_verifications(email);
+    CREATE INDEX IF NOT EXISTS email_verifications_expires_at_idx ON email_verifications(expires_at);
 
     CREATE TABLE IF NOT EXISTS sessions (
       id TEXT PRIMARY KEY,
@@ -51,6 +66,39 @@ export function initializeDatabase() {
       self_billing_mandate_accepted INTEGER NOT NULL DEFAULT 0,
       certification_accepted INTEGER NOT NULL DEFAULT 0,
       professional_info_status TEXT NOT NULL DEFAULT 'incomplete',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS social_accounts (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      provider TEXT NOT NULL CHECK(provider IN ('linkedin','x')),
+      provider_user_id TEXT,
+      username TEXT,
+      profile_url TEXT,
+      profile_image_url TEXT,
+      status TEXT NOT NULL DEFAULT 'pending',
+      verified_at TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      UNIQUE(user_id, provider)
+    );
+
+    CREATE TABLE IF NOT EXISTS website_analyses (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      website TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pending',
+      company_name TEXT NOT NULL DEFAULT '',
+      description TEXT NOT NULL DEFAULT '',
+      value_proposition TEXT NOT NULL DEFAULT '',
+      industries TEXT NOT NULL DEFAULT '[]',
+      audience_signals TEXT NOT NULL DEFAULT '[]',
+      social_links TEXT NOT NULL DEFAULT '[]',
+      raw_title TEXT NOT NULL DEFAULT '',
+      raw_description TEXT NOT NULL DEFAULT '',
+      error_message TEXT,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
@@ -156,6 +204,22 @@ export function initializeDatabase() {
       created_at TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS campaign_metrics (
+      id TEXT PRIMARY KEY,
+      collaboration_id TEXT NOT NULL REFERENCES collaborations(id) ON DELETE CASCADE,
+      impressions INTEGER NOT NULL DEFAULT 0,
+      reach INTEGER NOT NULL DEFAULT 0,
+      engagements INTEGER NOT NULL DEFAULT 0,
+      likes INTEGER NOT NULL DEFAULT 0,
+      comments INTEGER NOT NULL DEFAULT 0,
+      reposts INTEGER NOT NULL DEFAULT 0,
+      recorded_at TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS campaign_metrics_collaboration_id_idx
+      ON campaign_metrics(collaboration_id);
+
     CREATE TABLE IF NOT EXISTS earnings (
       id TEXT PRIMARY KEY,
       user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -247,6 +311,20 @@ export function initializeDatabase() {
     );
 
     CREATE INDEX IF NOT EXISTS sessions_user_id_idx ON sessions(user_id);
+    CREATE INDEX IF NOT EXISTS social_accounts_user_id_idx ON social_accounts(user_id);
+    CREATE INDEX IF NOT EXISTS website_analyses_user_id_idx ON website_analyses(user_id);
     CREATE INDEX IF NOT EXISTS sessions_expires_at_idx ON sessions(expires_at);
   `);
+  migrateDatabase();
+}
+
+export function migrateDatabase() {
+  try {
+    db.exec(
+      "ALTER TABLE users ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 0",
+    );
+  } catch (error: any) {
+    if (!String(error?.message ?? "").includes("duplicate column name"))
+      throw error;
+  }
 }

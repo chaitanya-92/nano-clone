@@ -9,11 +9,16 @@ import Earnings from "./pages/Earnings";
 import Community from "./pages/Community";
 import AffiliateProgram from "./pages/AffiliateProgram";
 import Messages from "./pages/Messages";
+import Settings from "./pages/Settings";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 
 export const dashboardRoutes: RouteObject = {
   path: "/dashboard",
-  element: <RequireAuth><DashboardLayout /></RequireAuth>,
+  element: (
+    <RequireAuth>
+      <DashboardLayout />
+    </RequireAuth>
+  ),
   children: [
     {
       index: true,
@@ -36,21 +41,24 @@ export const dashboardRoutes: RouteObject = {
       element: <Analytics />,
     },
     {
-        path: "earnings",
-        element: <Earnings />,
+      path: "earnings",
+      element: <Earnings />,
     },
     {
-        path: "community",
-        element: <Community />,
+      path: "community",
+      element: <Community />,
     },
     {
-        path: "affiliate",
-        element: <AffiliateProgram />,
+      path: "affiliate",
+      element: <AffiliateProgram />,
     },
     {
-        path: "messages",
-        element: <Messages />,
+      path: "messages",
+      element: <Messages />,
     },
-
+    {
+      path: "settings",
+      element: <Settings />,
+    },
   ],
 };

@@ -1,343 +1,462 @@
-import { useState } from "react";
 import {
-  ArrowUpRight,
+  ArrowRight,
   BarChart3,
   Bug,
   CheckCircle2,
-  CircleHelp,
   Lightbulb,
-  Search,
+  Loader2,
+  MessageCircle,
   Send,
+  Sparkles,
+  Users,
 } from "lucide-react";
-import { messagesPageData } from "@/dashboard/data/dashboardData";
+import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import {
+  MessageScroller,
+  MessageScrollerButton,
+  MessageScrollerContent,
+  MessageScrollerItem,
+  MessageScrollerProvider,
+  MessageScrollerViewport,
+} from "@/components/ui/message-scroller";
+import {
+  getAssistantContext,
+  sendAssistantMessage,
+  type AssistantContext,
+} from "@/lib/dashboard";
 
-const optionIcons = {
-  performance: BarChart3,
-  "product-help": CircleHelp,
-  bug: Bug,
-  idea: Lightbulb,
-} as const;
+type ChatMessage = {
+  id: string;
+  role: "user" | "assistant";
+  body: string;
+  createdAt: string;
+};
 
-function NaanoMark({ className }: { className?: string }) {
-  return (
-    <div className={cn("relative h-10 w-10 rounded-xl bg-white shadow-sm ring-1 ring-[#dfe5ef]", className)}>
-      <div className="absolute left-[9px] top-[12px] h-[9px] w-[20px] rounded-[5px] bg-[#090b0f]" />
-      <div className="absolute left-[15px] top-[19px] h-[9px] w-[20px] rounded-[5px] bg-[#090b0f]" />
-      <div className="absolute right-[7px] bottom-[8px] h-[5px] w-[5px] rounded-full bg-[#1f5eff]" />
-    </div>
-  );
-}
+const quickActions = [
+  {
+    id: "performance",
+    label: "Understand my performance",
+    description: "Review your live analytics",
+    icon: BarChart3,
+    prompt: "Help me understand my current performance.",
+  },
+  {
+    id: "product",
+    label: "Get product help",
+    description: "Get an answer about Naano",
+    icon: MessageCircle,
+    prompt: "What can you help me with in Naano?",
+  },
+  {
+    id: "bug",
+    label: "Report a bug",
+    description: "Describe a problem for support",
+    icon: Bug,
+    prompt: "I want to report a bug. What information should I provide?",
+  },
+  {
+    id: "idea",
+    label: "Suggest an idea",
+    description: "Share product feedback",
+    icon: Lightbulb,
+    prompt: "I want to suggest an idea for Naano. What should I include?",
+  },
+] as const;
 
-function AssistantHero() {
-  return (
-    <section className="rounded-[22px] border border-[#d8e2f1] bg-[radial-gradient(circle_at_80%_10%,#e6efff,transparent_40%),linear-gradient(135deg,#ffffff,#edf5ff)] p-5 shadow-[0_8px_30px_rgba(53,86,140,0.06)]">
-      <div className="relative overflow-hidden rounded-[18px]">
-        <div className="absolute -right-10 -top-16 h-44 w-44 rounded-full bg-[#dce9ff]/70 blur-2xl" />
-        <div className="absolute -bottom-16 left-1/3 h-36 w-56 rounded-full bg-white/90 blur-2xl" />
-
-        <div className="relative flex min-h-[170px] items-center justify-between gap-6 px-2 py-3">
-          <div className="max-w-[540px]">
-            <div className="mb-3 flex items-center gap-2 text-[11px] font-bold tracking-[0.16em] text-[#526986]">
-              <span className="text-[#526986]">✦</span>
-              {messagesPageData.assistant.eyebrow}
-            </div>
-
-            <h1 className="text-[27px] font-semibold tracking-[-1.2px] text-[#101828]">
-              {messagesPageData.assistant.title}
-            </h1>
-
-            <p className="mt-2 max-w-[500px] text-[14px] leading-6 text-[#64748b]">
-              {messagesPageData.assistant.description}
-            </p>
-          </div>
-
-          <div className="relative hidden shrink-0 md:block">
-            <div className="flex h-[116px] w-[116px] items-center justify-center rounded-full border border-white/90 bg-white/35 shadow-[0_0_0_10px_rgba(255,255,255,0.28)]">
-              <div className="flex h-[78px] w-[78px] items-center justify-center rounded-full border border-[#c9d7ef] bg-white/75">
-                <NaanoMark className="h-14 w-14 rounded-full" />
-              </div>
-            </div>
-
-            <div className="absolute -right-1 top-2 h-3 w-3 rounded-full border-2 border-white bg-[#16a66a]" />
-
-            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-[#d8e4ee] bg-white px-3 py-1.5 text-[10px] font-semibold text-[#60718a] shadow-sm">
-              <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-[#18ae6d]" />
-              {messagesPageData.assistant.availability}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-        {messagesPageData.assistant.options.map((option) => {
-          const Icon = optionIcons[option.id];
-
-          return (
-            <button
-              key={option.id}
-              type="button"
-              className="group flex min-h-[70px] items-center gap-3 rounded-[16px] border border-[#dbe3ef] bg-white px-4 text-left transition-colors hover:bg-[#f7faff]"
-            >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[11px] border border-[#dce3ec] bg-[#f7f9fc] text-[#5d6b80]">
-                <Icon className="h-[19px] w-[19px]" strokeWidth={1.7} />
-              </span>
-
-              <span className="min-w-0 flex-1">
-                <span className="block text-[13px] font-semibold leading-4 text-[#26344d]">
-                  {option.title}
-                </span>
-                <span className="mt-1 block text-[10px] font-medium text-[#8190a8]">
-                  {option.description}
-                </span>
-              </span>
-
-              <ArrowUpRight className="h-4 w-4 shrink-0 text-[#9aa8ba] transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </button>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
-function PerformanceSnapshot() {
-  const data = messagesPageData.performance;
-
-  return (
-    <section className="rounded-[17px] border border-[#dce3ed] bg-white px-4 py-3.5">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-[10px] font-bold tracking-[0.14em] text-[#60718b]">
-          <BarChart3 className="h-4 w-4 text-[#2864f0]" strokeWidth={1.7} />
-          {data.eyebrow}
-        </div>
-
-        <span className="text-[9px] font-medium text-[#a1adbd]">
-          {data.label}
-        </span>
-      </div>
-
-      <h2 className="mt-2 text-[13px] font-semibold text-[#27344b]">
-        {data.title}
-      </h2>
-
-      <p className="mt-1 text-[11px] leading-4 text-[#718098]">
-        {data.description}
-      </p>
-
-      <span className="mt-3 inline-flex rounded-full bg-[#f2f5f9] px-2.5 py-1 text-[9px] font-semibold text-[#5c6a80]">
-        {data.metric}
-      </span>
-    </section>
-  );
-}
-
-function ConversationArea() {
-  const [message, setMessage] = useState("");
-  const [sentMessage, setSentMessage] = useState("");
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    const trimmed = message.trim();
-
-    if (!trimmed) return;
-
-    setSentMessage(trimmed);
-    setMessage("");
+function createAssistantMessage(body: string): ChatMessage {
+  return {
+    id: "assistant-" + Date.now() + "-" + Math.random().toString(36).slice(2),
+    role: "assistant",
+    body,
+    createdAt: new Date().toISOString(),
   };
-
-  return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4 pt-3">
-        <div className="flex items-end gap-2">
-          <NaanoMark className="h-8 w-8 shrink-0 rounded-lg" />
-
-          <div className="max-w-[560px] rounded-[16px] rounded-bl-md bg-[#f0f2f5] px-4 py-3 text-[13px] leading-5 text-[#27344b]">
-            {messagesPageData.assistant.welcomeMessage}
-          </div>
-        </div>
-
-        <div className="ml-10 mt-1 text-[9px] text-[#8d99ab]">Naano</div>
-
-        {sentMessage && (
-          <div className="mt-5 flex justify-end">
-            <div className="max-w-[70%] rounded-[16px] rounded-br-md bg-[#2864f0] px-4 py-3 text-[13px] leading-5 text-white">
-              {sentMessage}
-            </div>
-          </div>
-        )}
-      </div>
-
-      <form onSubmit={handleSubmit} className="border-t border-[#e2e6ed] bg-[#f8f9fb] p-4">
-        <div className="flex items-center gap-2">
-          <Input
-            value={message}
-            onChange={(event) => setMessage(event.target.value)}
-            placeholder={messagesPageData.inputPlaceholder}
-            className="h-12 rounded-[14px] border-[#d8e1ec] bg-white px-4 text-[14px] shadow-none placeholder:text-[#aab5c7] focus-visible:ring-[#b8cdfd]"
-          />
-
-          <Button
-            type="submit"
-            size="icon"
-            className="h-12 w-12 shrink-0 rounded-[14px] bg-[#2864f0] hover:bg-[#1f58db]"
-          >
-            <Send className="h-[19px] w-[19px]" strokeWidth={1.8} />
-          </Button>
-        </div>
-      </form>
-    </div>
-  );
 }
 
-function RequestStatus() {
-  const data = messagesPageData.requestStatus;
-
-  return (
-    <aside className="hidden w-[300px] shrink-0 border-l border-[#e1e6ee] bg-white xl:block">
-      <div className="px-5 py-6">
-        <h2 className="text-[13px] font-semibold text-[#27344b]">
-          {data.title}
-        </h2>
-
-        <div className="mt-5 rounded-[12px] bg-[#f9fafc] px-3 py-3">
-          <div className="flex items-start gap-2">
-            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#18a76a]" />
-
-            <div>
-              <p className="text-[11px] font-semibold text-[#5b687d]">
-                {data.status}
-              </p>
-              <p className="mt-1 text-[10px] leading-4 text-[#68758a]">
-                {data.description}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="my-5 h-px bg-[#e5e8ed]" />
-
-        {data.sections.map((section, index) => (
-          <div key={section.title} className={cn(index > 0 && "mt-5")}>
-            <h3 className="text-[11px] font-semibold text-[#455269]">
-              {section.title}
-            </h3>
-
-            <p className="mt-2 text-[10px] leading-4 text-[#7b889d]">
-              {section.description}
-            </p>
-
-            {index < data.sections.length - 1 && (
-              <div className="mt-5 h-px bg-[#e5e8ed]" />
-            )}
-          </div>
-        ))}
-      </div>
-    </aside>
-  );
+function createUserMessage(body: string): ChatMessage {
+  return {
+    id: "user-" + Date.now() + "-" + Math.random().toString(36).slice(2),
+    role: "user",
+    body,
+    createdAt: new Date().toISOString(),
+  };
 }
 
-function ConversationList() {
-  return (
-    <aside className="hidden w-[365px] shrink-0 border-r border-[#e1e6ee] bg-white lg:block">
-      <div className="px-7 pt-8">
-        <h1 className="text-[27px] font-semibold tracking-[-1px] text-[#141a26]">
-          {messagesPageData.title}
-        </h1>
-
-        <div className="relative mt-6">
-          <Search className="absolute left-4 top-1/2 h-[17px] w-[17px] -translate-y-1/2 text-[#9aa7ba]" />
-
-          <Input
-            placeholder={messagesPageData.searchPlaceholder}
-            className="h-12 rounded-[14px] border-[#d8e1ec] pl-11 text-[14px] shadow-none placeholder:text-[#a5afbf] focus-visible:ring-[#b8cdfd]"
-          />
-        </div>
-      </div>
-
-      <div className="mt-3 border-t border-[#edf0f4]">
-        {messagesPageData.conversations.map((conversation) => (
-          <button
-            key={conversation.id}
-            type="button"
-            className="flex w-full items-center gap-4 border-b border-[#edf0f4] bg-[#f4f6fc] px-7 py-4 text-left"
-          >
-            <NaanoMark className="h-9 w-9 shrink-0 rounded-lg" />
-
-            <span className="min-w-0 flex-1">
-              <span className="flex items-center justify-between gap-3">
-                <span className="text-[14px] font-semibold text-[#68758b]">
-                  {conversation.name}
-                </span>
-
-                <span className="text-[10px] font-medium text-[#9ba6b6]">
-                  {conversation.status}
-                </span>
-              </span>
-
-              <span className="mt-1 block truncate text-[11px] text-[#77849a]">
-                {conversation.description}
-              </span>
-            </span>
-          </button>
-        ))}
-      </div>
-
-      <div className="px-7 pt-8">
-        <p className="max-w-[260px] text-[14px] leading-6 text-[#7b879d]">
-          {messagesPageData.emptyState}
-        </p>
-      </div>
-    </aside>
-  );
+function formatMetric(value: number) {
+  return value.toLocaleString();
 }
 
 export default function Messages() {
+  const [context, setContext] = useState<AssistantContext | null>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [draft, setDraft] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    void getAssistantContext()
+      .then(({ data }) => {
+        setContext(data);
+        setMessages([
+          createAssistantMessage(
+            "Hi, I’m the Naano assistant. Ask me a question or choose an option above — the team can step in when needed.",
+          ),
+        ]);
+      })
+      .catch((value) =>
+        setError(
+          value instanceof Error
+            ? value.message
+            : "Unable to load the assistant.",
+        ),
+      )
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  const snapshot = useMemo(
+    () => [
+      {
+        label: "Followers",
+        value: context?.profile.followers ?? 0,
+      },
+      {
+        label: "Posts",
+        value: context?.profile.posts ?? 0,
+      },
+      {
+        label: "Impressions",
+        value: context?.profile.impressions ?? 0,
+      },
+      {
+        label: "Engagements",
+        value: context?.profile.engagements ?? 0,
+      },
+    ],
+    [context],
+  );
+
+  const ask = async (prompt: string) => {
+    const value = prompt.trim();
+
+    if (!value || sending) {
+      return;
+    }
+
+    setSending(true);
+    setError("");
+
+    setMessages((current) => [...current, createUserMessage(value)]);
+    setDraft("");
+
+    try {
+      const { data } = await sendAssistantMessage(value);
+
+      setMessages((current) => [
+        ...current,
+        createAssistantMessage(data.answer),
+      ]);
+
+      setContext(data.context);
+    } catch (value) {
+      setError(
+        value instanceof Error
+          ? value.message
+          : "Unable to get an assistant response.",
+      );
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
-    <div className="flex h-[calc(100vh-72px)] min-h-[650px] overflow-hidden bg-[#f7f9fc]">
-      <ConversationList />
+    <div className="mx-auto w-full max-w-[1180px]">
+      <div className="grid overflow-hidden rounded-[22px] border border-[#dfe5ed] bg-white lg:grid-cols-[260px_minmax(0,1fr)]">
+        <aside className="border-b border-[#e7ebf0] bg-white lg:border-b-0 lg:border-r">
+          <div className="border-b border-[#e7ebf0] p-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#2864f0]">
+              Inbox
+            </p>
+            <h1 className="mt-2 text-[28px] font-semibold tracking-[-1.2px] text-[#141a29]">
+              Messages
+            </h1>
+          </div>
 
-      <section className="flex min-w-0 flex-1 flex-col bg-[#f7f9fc]">
-        <header className="flex h-[80px] shrink-0 items-center border-b border-[#e1e6ee] bg-white px-5">
-          <div className="flex items-center gap-3">
-            <NaanoMark />
+          <div className="p-3">
+            <button
+              type="button"
+              className="flex w-full cursor-pointer items-center gap-3 rounded-xl bg-[#f1f5fb] px-3 py-3 text-left"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white shadow-sm">
+                <Sparkles className="h-4 w-4 text-[#2864f0]" />
+              </span>
+              <span className="min-w-0">
+                <span className="block truncate text-sm font-semibold text-[#344059]">
+                  NaanoBot
+                </span>
+                <span className="block truncate text-xs text-[#8b97aa]">
+                  Workspace assistant
+                </span>
+              </span>
+              <span className="ml-auto h-2 w-2 rounded-full bg-[#20a965]" />
+            </button>
+          </div>
 
-            <div>
-              <h2 className="text-[15px] font-semibold text-[#27344b]">
-                {messagesPageData.assistant.name}
-              </h2>
+          <div className="px-5 py-6">
+            <p className="text-xs leading-6 text-[#8b97aa]">
+              Your assistant uses live workspace data. Brand conversations will
+              also appear here when created.
+            </p>
 
-              <p className="mt-0.5 text-[10px] text-[#8490a4]">
-                <span className="mr-1 inline-block h-1.5 w-1.5 rounded-full bg-[#bdebd5]" />
-                {messagesPageData.assistant.status}
+            <div className="mt-6 rounded-xl border border-[#e5e9ef] bg-[#fafbfd] p-4">
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-[#71809a]" />
+                <p className="text-xs font-semibold text-[#53617a]">
+                  Collaboration inbox
+                </p>
+              </div>
+
+              <p className="mt-2 text-xs leading-5 text-[#8995aa]">
+                {context?.activity.collaborations ?? 0} active collaboration(s).
               </p>
             </div>
           </div>
-        </header>
+        </aside>
 
-        <div className="min-h-0 flex-1 overflow-hidden">
-          <div className="h-full overflow-y-auto px-4 py-5 lg:px-5">
-            <div className="mx-auto max-w-[820px]">
-              <AssistantHero />
+        <section className="min-w-0">
+          <div className="flex h-[78px] items-center justify-between border-b border-[#e7ebf0] px-6">
+            <div className="flex items-center gap-3">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#dfe5ed] bg-white">
+                <Sparkles className="h-5 w-5 text-[#2864f0]" />
+              </span>
 
-              <div className="mt-3">
-                <PerformanceSnapshot />
-              </div>
+              <div>
+                <h2 className="text-sm font-semibold text-[#263247]">
+                  Naano help center
+                </h2>
 
-              <div className="mt-4 overflow-hidden rounded-[18px] border border-[#e0e5ed] bg-white">
-                <div className="flex h-[340px] min-h-[340px] flex-col">
-                  <ConversationArea />
-                </div>
+                <p className="text-xs text-[#8b97aa]">
+                  Live workspace assistant
+                </p>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
 
-      <RequestStatus />
+            <div className="hidden items-center gap-2 text-xs text-[#7e8ba1] sm:flex">
+              <CheckCircle2 className="h-4 w-4 text-[#20a965]" />
+              Assistant available
+            </div>
+          </div>
+
+          <div className="h-[calc(100vh-280px)] min-h-[600px]">
+            <MessageScrollerProvider
+              autoScroll
+              defaultScrollPosition="end"
+              scrollPreviousItemPeek={56}
+            >
+              <MessageScroller>
+                <MessageScrollerViewport
+                  aria-label="Naano assistant messages"
+                  className="bg-white"
+                >
+                  <MessageScrollerContent className="px-5 py-6 sm:px-7">
+                    <MessageScrollerItem messageId="assistant-overview">
+                      <div className="mb-5 rounded-[20px] border border-[#dbe6fa] bg-[#f7faff] p-5">
+                        <div className="flex items-start gap-3">
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-[#2864f0] shadow-sm">
+                            <Sparkles className="h-4 w-4" />
+                          </div>
+
+                          <div>
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#5c7090]">
+                              Your Naano space
+                            </p>
+
+                            <h3 className="mt-1 text-xl font-semibold tracking-[-0.7px] text-[#172033]">
+                              How can we help?
+                            </h3>
+
+                            <p className="mt-2 max-w-[620px] text-sm leading-6 text-[#6e7d95]">
+                              Ask about your workspace, performance,
+                              opportunities or product questions.
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="mt-5 grid gap-2 sm:grid-cols-2">
+                          {quickActions.map((action) => {
+                            const Icon = action.icon;
+
+                            return (
+                              <button
+                                key={action.id}
+                                type="button"
+                                onClick={() => void ask(action.prompt)}
+                                disabled={loading || sending}
+                                className="group flex cursor-pointer items-center gap-3 rounded-xl border border-[#dbe3ee] bg-white px-3 py-3 text-left transition hover:border-[#cbd6e6] hover:shadow-[0_5px_18px_rgba(30,50,80,0.05)] disabled:cursor-not-allowed disabled:opacity-60"
+                              >
+                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#e0e6ef] bg-[#f8fafc] text-[#63728a]">
+                                  <Icon className="h-4 w-4" />
+                                </span>
+
+                                <span className="min-w-0 flex-1">
+                                  <span className="block text-xs font-semibold text-[#324057]">
+                                    {action.label}
+                                  </span>
+                                  <span className="mt-0.5 block text-[10px] text-[#8b97aa]">
+                                    {action.description}
+                                  </span>
+                                </span>
+
+                                <ArrowRight className="h-4 w-4 text-[#9aa6b7]" />
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </MessageScrollerItem>
+
+                    <MessageScrollerItem messageId="performance-snapshot">
+                      <div className="mb-6 rounded-[18px] border border-[#e4e9f1] bg-[#fbfcfe] p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8491a8]">
+                              Performance snapshot
+                            </p>
+
+                            <p className="mt-1 text-sm font-semibold text-[#263247]">
+                              {context
+                                ? "Your profile is ready to review."
+                                : "Loading your profile data…"}
+                            </p>
+                          </div>
+
+                          <BarChart3 className="h-4 w-4 text-[#73839c]" />
+                        </div>
+
+                        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                          {snapshot.map((item) => (
+                            <div
+                              key={item.label}
+                              className="rounded-xl bg-white px-3 py-3"
+                            >
+                              <p className="text-[9px] uppercase tracking-[0.08em] text-[#9aa5b5]">
+                                {item.label}
+                              </p>
+                              <p className="mt-1 text-sm font-semibold text-[#334057]">
+                                {formatMetric(item.value)}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </MessageScrollerItem>
+
+                    {messages.map((message) => (
+                      <MessageScrollerItem
+                        key={message.id}
+                        messageId={message.id}
+                        scrollAnchor={message.role === "user"}
+                        className="mb-3"
+                      >
+                        <motion.div
+                          initial={{
+                            opacity: 0,
+                            y: message.role === "user" ? 12 : 5,
+                          }}
+                          animate={{
+                            opacity: 1,
+                            y: 0,
+                          }}
+                          transition={{
+                            duration: 0.25,
+                            ease: "easeOut",
+                          }}
+                          className={
+                            message.role === "user"
+                              ? "ml-auto max-w-[760px] rounded-[18px] bg-[#eef3fb] px-4 py-3 text-sm leading-6 text-[#263247]"
+                              : "max-w-[760px] rounded-[18px] border border-[#e4e9f1] bg-white px-4 py-3 text-sm leading-6 text-[#36445a]"
+                          }
+                        >
+                          <div className="mb-1 flex items-center justify-between gap-3">
+                            <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#8491a8]">
+                              {message.role === "user" ? "You" : "Naano"}
+                            </span>
+
+                            <span className="text-[10px] text-[#a0a9b7]">
+                              {new Date(message.createdAt).toLocaleTimeString(
+                                [],
+                                {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                },
+                              )}
+                            </span>
+                          </div>
+
+                          {message.body}
+                        </motion.div>
+                      </MessageScrollerItem>
+                    ))}
+
+                    {sending && (
+                      <MessageScrollerItem
+                        messageId="assistant-thinking"
+                        className="mb-3"
+                      >
+                        <div className="flex max-w-[760px] items-center gap-2 rounded-[18px] border border-[#e4e9f1] bg-white px-4 py-3">
+                          <Sparkles className="h-4 w-4 text-[#2864f0]" />
+                          <span className="text-xs text-[#7c8aa0]">
+                            Naano is checking your workspace…
+                          </span>
+                          <Loader2 className="ml-auto h-4 w-4 animate-spin text-[#7c8aa0]" />
+                        </div>
+                      </MessageScrollerItem>
+                    )}
+
+                    <div className="h-2 shrink-0" />
+                  </MessageScrollerContent>
+                </MessageScrollerViewport>
+
+                <MessageScrollerButton />
+              </MessageScroller>
+            </MessageScrollerProvider>
+          </div>
+
+          {error && (
+            <div className="mx-5 mb-3 rounded-xl border border-[#f1c7c7] bg-[#fff7f7] px-4 py-3 text-xs text-[#9b3e3e] sm:mx-7">
+              {error}
+            </div>
+          )}
+
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              void ask(draft);
+            }}
+            className="flex items-center gap-3 border-t border-[#e7ebf0] bg-white p-4 sm:p-5"
+          >
+            <input
+              value={draft}
+              onChange={(event) => setDraft(event.target.value)}
+              disabled={loading || sending}
+              placeholder="Ask Naano a question…"
+              className="auth-input h-12 flex-1 rounded-xl"
+            />
+
+            <Button
+              type="submit"
+              disabled={loading || sending || !draft.trim()}
+              className="h-12 w-12 cursor-pointer rounded-xl bg-[#2864f0] p-0 hover:bg-[#1f58dc]"
+              aria-label="Send message"
+            >
+              <Send className="h-4 w-4" />
+            </Button>
+          </form>
+        </section>
+      </div>
     </div>
   );
 }

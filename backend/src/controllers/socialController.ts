@@ -1,0 +1,217 @@
+import type { IncomingMessage, ServerResponse } from "node:http";
+import { randomUUID } from "node:crypto";
+import { requireAuth } from "../middleware/authMiddleware";
+import { db } from "../db/client";
+import { error, json, now, stringValue } from "../utils/api";
+import { fetchPublicSocialProfile } from "../services/socialProfileService";
+type SocialProvider = "linkedin" | "x";
+
+function normalizeProfileUrl(provider: SocialProvider, value: string) {
+  let url: URL;
+
+  try {
+    url = new URL(value);
+  } catch {
+    throw new Error("Enter a valid profile URL.");
+  }
+
+  if (url.protocol !== "https:") {
+    throw new Error("Profile URL must use HTTPS.");
+  }
+
+  const hostname = url.hostname.toLowerCase().replace(/^www\./, "");
+
+  if (provider === "linkedin") {
+    if (hostname !== "linkedin.com") {
+      throw new Error("Enter a valid LinkedIn profile URL.");
+    }
+
+    if (!/^\/in\/[A-Za-z0-9][A-Za-z0-9._-]*\/?$/.test(url.pathname)) {
+      throw new Error("Enter a valid LinkedIn profile URL.");
+    }
+  }
+
+  if (provider === "x") {
+    if (hostname !== "x.com" && hostname !== "twitter.com") {
+      throw new Error("Enter a valid X profile URL.");
+    }
+
+    if (!/^\/[A-Za-z0-9_]{1,15}\/?$/.test(url.pathname)) {
+      throw new Error("Enter a valid X profile URL.");
+    }
+  }
+
+  url.search = "";
+  url.hash = "";
+
+  return url.toString().replace(/\/$/, "");
+}
+
+async function verifyProfileUrl(
+  provider: SocialProvider,
+  profileUrl: string,
+) {
+  const parsed = new URL(profileUrl);
+
+  const hostname =
+    parsed.hostname
+      .toLowerCase()
+      .replace(/^www\./, "");
+
+  if (
+    provider === "linkedin" &&
+    hostname !== "linkedin.com"
+  ) {
+    throw new Error(
+      "Enter a valid LinkedIn profile URL.",
+    );
+  }
+
+  if (
+    provider === "x" &&
+    !["x.com", "twitter.com"].includes(
+      hostname,
+    )
+  ) {
+    throw new Error(
+      "Enter a valid X profile URL.",
+    );
+  }
+}
+
+
+export function socialAccounts(
+  request: IncomingMessage,
+  response: ServerResponse,
+) {
+  const user = requireAuth(request, response);
+  if (!user) return;
+  return json(response, 200, {
+    data: db
+      .prepare(
+        "SELECT id,provider,username,profile_url,profile_image_url,status,verified_at,created_at,updated_at FROM social_accounts WHERE user_id=? ORDER BY provider",
+      )
+      .all(user.id),
+  });
+}
+export async function connectSocial(
+  request: IncomingMessage,
+  response: ServerResponse,
+) {
+  const user = requireAuth(request, response);
+  if (!user) return;
+  const body = await import("../utils/api").then((module) =>
+    module.readJson(request),
+  );
+
+  const provider = stringValue(body.provider) as SocialProvider;
+
+  if (provider !== "linkedin" && provider !== "x") {
+    return error(
+      response,
+      422,
+      "INVALID_PROVIDER",
+      "Provider must be linkedin or x.",
+    );
+  }
+
+  const rawProfileUrl = stringValue(body.profileUrl);
+
+  if (!rawProfileUrl) {
+    return error(
+      response,
+      422,
+      "PROFILE_URL_REQUIRED",
+      "Profile URL is required.",
+    );
+  }
+
+  let profileUrl: string;
+
+  try {
+    profileUrl = normalizeProfileUrl(provider, rawProfileUrl);
+    await verifyProfileUrl(provider, profileUrl);
+  } catch (verificationError) {
+    return error(
+      response,
+      422,
+      "PROFILE_NOT_VERIFIED",
+      verificationError instanceof Error
+        ? verificationError.message
+        : "The social profile could not be verified.",
+    );
+  }
+
+  let fetchedProfile = null;
+
+  try {
+    fetchedProfile =
+      await fetchPublicSocialProfile(
+        provider,
+        profileUrl,
+      );
+  } catch (profileError) {
+    console.warn(
+      "Social profile refresh unavailable:",
+      profileError instanceof Error
+        ? profileError.message
+        : profileError,
+    );
+  }
+
+  const t = now();
+  const id = randomUUID();
+
+  db.prepare(
+    "INSERT INTO social_accounts (id,user_id,provider,username,profile_url,profile_image_url,status,verified_at,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?) ON CONFLICT(user_id,provider) DO UPDATE SET username=excluded.username,profile_url=excluded.profile_url,profile_image_url=excluded.profile_image_url,status='connected',verified_at=excluded.verified_at,updated_at=excluded.updated_at",
+  ).run(
+    id,
+    user.id,
+    provider,
+    fetchedProfile?.username ?? null,
+    profileUrl,
+    fetchedProfile?.profileImageUrl ?? null,
+    "connected",
+    t,
+    t,
+    t,
+  );
+
+  if (provider === "linkedin") {
+    db.prepare(
+      "UPDATE creator_profiles SET linkedin_url=?,name=COALESCE(NULLIF(?,''),name),headline=COALESCE(NULLIF(?,''),headline),profile_photo_url=COALESCE(NULLIF(?,''),profile_photo_url),followers=COALESCE(?,followers),updated_at=? WHERE user_id=?",
+    ).run(
+      profileUrl,
+      fetchedProfile?.name ?? null,
+      fetchedProfile?.headline ?? null,
+      fetchedProfile?.profileImageUrl ?? null,
+      fetchedProfile?.followers ?? null,
+      t,
+      user.id,
+    );
+  }
+
+  if (provider === "x") {
+    db.prepare(
+      "UPDATE creator_profiles SET x_profile_url=?,name=COALESCE(NULLIF(?,''),name),bio=COALESCE(NULLIF(?,''),bio),profile_photo_url=COALESCE(NULLIF(?,''),profile_photo_url),followers=COALESCE(?,followers),updated_at=? WHERE user_id=?",
+    ).run(
+      profileUrl,
+      fetchedProfile?.name ?? null,
+      fetchedProfile?.bio ?? null,
+      fetchedProfile?.profileImageUrl ?? null,
+      fetchedProfile?.followers ?? null,
+      t,
+      user.id,
+    );
+  }
+
+  return json(response, 200, {
+    data: {
+      provider,
+      profileUrl,
+      fetchedProfile,
+      refreshAvailable:
+        Boolean(fetchedProfile),
+    },
+  });
+}
