@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { getAnalytics, type AnalyticsResponse } from "@/lib/dashboard";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useSearchParams } from "react-router-dom";
 
 const metrics = [
@@ -100,17 +101,23 @@ export default function Analytics() {
         </div>
 
         <div className="flex items-center gap-2">
-          <select
+          <Select
             value={range}
-            onChange={(event) =>
-              updateRange(event.target.value as "all" | "30d" | "90d")
-            }
-            className="h-11 cursor-pointer rounded-xl border border-[#dce3ec] bg-white px-4 text-sm font-medium text-[#59667e] outline-none"
+            onValueChange={(value) => {
+              if (value === "all" || value === "30d" || value === "90d") {
+                updateRange(value);
+              }
+            }}
           >
-            <option value="all">All time</option>
-            <option value="30d">Last 30 days</option>
-            <option value="90d">Last 90 days</option>
-          </select>
+            <SelectTrigger className="w-[158px]" aria-label="Analytics date range">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All time</SelectItem>
+              <SelectItem value="30d">Last 30 days</SelectItem>
+              <SelectItem value="90d">Last 90 days</SelectItem>
+            </SelectContent>
+          </Select>
 
           <button
             type="button"
