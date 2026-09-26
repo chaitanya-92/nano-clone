@@ -39,7 +39,7 @@ export function DashboardSidebar({ collapsed }: { collapsed: boolean }) {
                 collapsed ? "text-[21px]" : "text-[23px]",
               ].join(" ")}
             >
-              {collapsed ? "n." : "naano."}
+              NAANO
             </span>
           </Link>
         </div>
