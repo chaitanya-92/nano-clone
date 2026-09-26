@@ -66,6 +66,5 @@ export function RegisterBrandCompanyStep() {
       </div>
     )}
   </div>
-)}
   );
 }
