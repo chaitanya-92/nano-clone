@@ -175,9 +175,9 @@ export function DashboardNavbar({
   };
 
   return (
-    <header className="relative z-40 h-16 bg-white">
+    <header className="sticky top-0 z-50 h-16 bg-white">
       <div className="flex h-full items-center justify-between px-4 sm:px-6 lg:px-7">
-        <div className="flex items-center gap-1.5">
+        <div className="flex h-10 w-[116px] shrink-0 items-center gap-1.5">
           <button
             type="button"
             onClick={() => navigate("/dashboard")}
