@@ -218,11 +218,15 @@ export function updateCreatorProfile(payload: Record<string, unknown>) {
 }
 
 export function publishCreatorCard() {
-  return request<{ data: CreatorProfile }>("/api/creator/card/publish", { method: "POST" });
+  return request<{ data: CreatorProfile }>("/api/creator/card/publish", {
+    method: "POST",
+  });
 }
 
 export function unpublishCreatorCard() {
-  return request<{ data: CreatorProfile }>("/api/creator/card/publish", { method: "DELETE" });
+  return request<{ data: CreatorProfile }>("/api/creator/card/publish", {
+    method: "DELETE",
+  });
 }
 
 export function getCampaigns() {
