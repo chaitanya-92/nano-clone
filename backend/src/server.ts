@@ -117,8 +117,7 @@ const server = createServer(async (request, response) => {
 
   try {
     const requestOrigin =
-      APP_ORIGIN ||
-      `http://${request.headers.host ?? `localhost:${PORT}`}`;
+      APP_ORIGIN || `http://${request.headers.host ?? `localhost:${PORT}`}`;
     const url = new URL(request.url ?? "/", requestOrigin);
 
     if (url.pathname.startsWith("/api/")) {

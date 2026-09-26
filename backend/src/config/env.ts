@@ -14,17 +14,14 @@ export const FRONTEND_ORIGIN =
 
 export const NODE_ENV = getEnv("NODE_ENV") ?? "development";
 export const IS_PRODUCTION = NODE_ENV === "production";
-export const DATABASE_PATH =
-  getEnv("DATABASE_PATH") ?? "./data/naano.sqlite";
+export const DATABASE_PATH = getEnv("DATABASE_PATH") ?? "./data/naano.sqlite";
 
 export const GOOGLE_CLIENT_ID = getEnv("GOOGLE_CLIENT_ID") ?? "";
 export const GOOGLE_CLIENT_SECRET = getEnv("GOOGLE_CLIENT_SECRET") ?? "";
 export const GOOGLE_CALLBACK_URL =
-  getEnv("GOOGLE_CALLBACK_URL") ??
-  `${APP_ORIGIN}/api/auth/google/callback`;
+  getEnv("GOOGLE_CALLBACK_URL") ?? `${APP_ORIGIN}/api/auth/google/callback`;
 
-export const LINKEDIN_API_VERSION =
-  getEnv("LINKEDIN_API_VERSION") ?? "202609";
+export const LINKEDIN_API_VERSION = getEnv("LINKEDIN_API_VERSION") ?? "202609";
 export const X_BEARER_TOKEN = getEnv("X_BEARER_TOKEN") ?? "";
 
 export const COOKIE_NAME = "naano_session";

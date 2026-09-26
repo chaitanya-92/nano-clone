@@ -112,8 +112,7 @@ export async function handleGoogleCallback(
     });
   }
 
-  const profileTable =
-    role === "brand" ? "brand_profiles" : "creator_profiles";
+  const profileTable = role === "brand" ? "brand_profiles" : "creator_profiles";
 
   const onboarding = db
     .prepare(
