@@ -44,7 +44,7 @@ export function DashboardSidebar({
               to={item.href}
               aria-current={active ? "page" : undefined}
               className={[
-                "group relative flex h-11 cursor-pointer items-center overflow-hidden rounded-xl",
+                "group relative flex h-11 cursor-pointer items-center rounded-xl",
                 "transition-[background-color,color,padding] duration-200",
                 collapsed ? "justify-center px-0" : "gap-3 px-3",
                 active
@@ -69,7 +69,7 @@ export function DashboardSidebar({
               </span>
 
               {collapsed && (
-                <span className="pointer-events-none absolute left-[68px] z-50 rounded-lg bg-[#171d2b] px-2.5 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
+                <span className="pointer-events-none absolute left-[64px] z-[100] whitespace-nowrap rounded-lg border border-[#e5e7eb] bg-white px-3 py-2 text-xs font-medium text-[#202938] opacity-0 shadow-[0_8px_24px_rgba(20,30,50,0.14)] translate-x-[-4px] transition-all duration-150 group-hover:translate-x-0 group-hover:opacity-100">
                   {item.label}
                 </span>
               )}
