@@ -44,7 +44,9 @@ export const GOOGLE_CLIENT_SECRET = getEnv("GOOGLE_CLIENT_SECRET") ?? "";
 const configuredGoogleCallback = getEnv("GOOGLE_CALLBACK_URL");
 export const GOOGLE_CALLBACK_URL =
   configuredGoogleCallback &&
-  isValidHttpOrigin(configuredGoogleCallback.replace(/\/api\/auth\/google\/callback\/?$/, ""))
+  isValidHttpOrigin(
+    configuredGoogleCallback.replace(/\/api\/auth\/google\/callback\/?$/, ""),
+  )
     ? configuredGoogleCallback
     : `${APP_ORIGIN}/api/auth/google/callback`;
 
