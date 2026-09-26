@@ -1,26 +1,71 @@
+import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { dashboardNavigation } from "@/dashboard/constants/navigation";
+
+const STORAGE_KEY = "naano-dashboard-sidebar-collapsed";
 
 export function DashboardSidebar() {
   const location = useLocation();
+  const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    try {
+      setCollapsed(window.localStorage.getItem(STORAGE_KEY) === "true");
+    } catch {
+      // Ignore unavailable localStorage.
+    }
+  }, []);
+
+  const toggle = () => {
+    setCollapsed((value) => {
+      const next = !value;
+      try {
+        window.localStorage.setItem(STORAGE_KEY, String(next));
+      } catch {
+        // Ignore unavailable localStorage.
+      }
+      return next;
+    });
+  };
 
   const activePath =
     dashboardNavigation
-      .filter((item) => {
-        if (item.href === "/dashboard") {
-          return location.pathname === "/dashboard";
-        }
-
-        return location.pathname.startsWith(item.href);
-      })
-      .sort((first, second) => second.href.length - first.href.length)[0]
-      ?.href ?? "";
+      .filter((item) =>
+        item.href === "/dashboard"
+          ? location.pathname === "/dashboard"
+          : location.pathname.startsWith(item.href),
+      )
+      .sort((a, b) => b.href.length - a.href.length)[0]?.href ?? "";
 
   return (
-    <aside className="fixed bottom-0 left-0 top-16 z-30 hidden w-20 bg-white lg:flex lg:flex-col">
+    <aside
+      className={[
+        "fixed bottom-0 left-0 top-16 z-30 hidden bg-white lg:flex lg:flex-col",
+        "border-r border-[#edf0f5] shadow-[4px_0_18px_rgba(24,35,57,0.025)]",
+        "transition-[width] duration-300 ease-[cubic-bezier(.22,1,.36,1)]",
+        collapsed ? "w-[76px]" : "w-[224px]",
+      ].join(" ")}
+    >
+      <div className="flex h-16 items-center justify-end px-3">
+        <button
+          type="button"
+          onClick={toggle}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl text-[#69758a] transition hover:bg-[#f5f7fa] hover:text-[#202938]"
+        >
+          {collapsed ? (
+            <PanelLeftOpen className="h-[19px] w-[19px]" strokeWidth={1.8} />
+          ) : (
+            <PanelLeftClose className="h-[19px] w-[19px]" strokeWidth={1.8} />
+          )}
+        </button>
+      </div>
+
       <nav
         aria-label="Dashboard navigation"
-        className="flex flex-1 flex-col items-center gap-2 px-3 py-5"
+        className="flex flex-1 flex-col gap-1.5 px-3 py-2"
       >
         {dashboardNavigation.map((item) => {
           const Icon = item.icon;
@@ -31,16 +76,36 @@ export function DashboardSidebar() {
               key={item.href}
               to={item.href}
               aria-current={active ? "page" : undefined}
-              aria-label={item.label}
-              title={item.label}
               className={[
-                "group flex h-11 w-11 cursor-pointer items-center justify-center rounded-2xl transition-all duration-200",
+                "group relative flex h-11 cursor-pointer items-center overflow-hidden rounded-xl",
+                "transition-[background-color,color,padding] duration-200",
+                collapsed ? "justify-center px-0" : "gap-3 px-3",
                 active
-                  ? "bg-[#eef4ff] text-[#2864f0] shadow-[0_8px_24px_rgba(40,100,240,0.10)]"
+                  ? "bg-[#eef4ff] text-[#2864f0]"
                   : "text-[#67758b] hover:bg-[#f6f8fb] hover:text-[#202938]",
               ].join(" ")}
             >
-              <Icon className="h-[19px] w-[19px]" strokeWidth={1.8} />
+              <Icon
+                className="h-[19px] w-[19px] shrink-0 transition-transform duration-300 group-hover:scale-105"
+                strokeWidth={1.8}
+              />
+
+              <span
+                className={[
+                  "whitespace-nowrap text-[13px] font-medium transition-all duration-200",
+                  collapsed
+                    ? "pointer-events-none w-0 translate-x-[-8px] opacity-0"
+                    : "w-auto translate-x-0 opacity-100",
+                ].join(" ")}
+              >
+                {item.label}
+              </span>
+
+              {collapsed && (
+                <span className="pointer-events-none absolute left-[68px] z-50 rounded-lg bg-[#171d2b] px-2.5 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
+                  {item.label}
+                </span>
+              )}
             </Link>
           );
         })}
