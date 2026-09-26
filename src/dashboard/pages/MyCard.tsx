@@ -1,10 +1,13 @@
 import {
+  ArrowLeft,
+  ArrowUpRight,
   ExternalLink,
   ImagePlus,
   Loader2,
   Pencil,
   Save,
   Globe,
+  Share2,
   Upload,
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -28,6 +31,7 @@ import {
   type CreatorProfile,
 } from "@/lib/dashboard";
 import { PublicCardActions } from "@/dashboard/components/shared/PublicCardActions";
+import { Logo } from "@/components/layout/Logo";
 
 function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -95,6 +99,7 @@ export default function MyCard() {
   const [photoSaving, setPhotoSaving] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [cardFlipped, setCardFlipped] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -364,93 +369,148 @@ export default function MyCard() {
 
       <section className="mt-8 grid gap-6 lg:grid-cols-[1fr_360px]">
         <motion.div
-          initial={{
-            opacity: 0,
-            y: 18,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            duration: 0.5,
-            ease: "easeOut",
-          }}
-          whileHover={{
-            y: -4,
-          }}
-          className="overflow-hidden rounded-[28px] border border-[#dce4ef] bg-white shadow-[0_20px_60px_rgba(34,60,100,0.08)]"
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="overflow-visible"
         >
-          <div className="relative h-[170px] bg-gradient-to-br from-[#2159df] via-[#316df0] to-[#6f91f3]">
-            <div className="absolute left-7 top-6 text-2xl font-bold text-white">
-              naano
-            </div>
-
-            <div className="absolute right-7 top-6 rounded-full bg-white/90 px-4 py-2 text-xs font-semibold text-[#2864f0]">
-              {profile.country || "Global"}
-            </div>
-
-            <motion.button
-              type="button"
-              onClick={() => setPhotoOpen(true)}
-              whileHover={{
-                scale: 1.03,
-              }}
-              whileTap={{
-                scale: 0.98,
-              }}
-              className="absolute -bottom-14 left-1/2 flex h-28 w-28 -translate-x-1/2 cursor-pointer items-center justify-center overflow-hidden rounded-full border-4 border-[#316df0] bg-[#6572cc] text-4xl text-white"
-              aria-label="Change profile photo"
+          <div
+            className="group [perspective:1400px]"
+            onClick={() => setCardFlipped((current) => !current)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                setCardFlipped((current) => !current);
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label={cardFlipped ? "Show creator card" : "Show creator details"}
+          >
+            <motion.div
+              animate={{ rotateY: cardFlipped ? 180 : 0 }}
+              transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+              className="relative min-h-[590px] w-full [transform-style:preserve-3d]"
             >
-              {profile.profile_photo_url ? (
-                <img
-                  src={profile.profile_photo_url}
-                  alt=""
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                creatorInitials(profile.name)
-              )}
-            </motion.button>
-          </div>
+              <div className="absolute inset-0 overflow-hidden rounded-[28px] border border-[#dce4ef] bg-white shadow-[0_20px_60px_rgba(34,60,100,0.08)] [backface-visibility:hidden]">
+                <div className="relative h-[170px] bg-gradient-to-br from-[#2159df] via-[#316df0] to-[#6f91f3]">
+                  <Logo
+                    compact={false}
+                    href="/dashboard"
+                    className="absolute left-7 top-6 text-white [filter:brightness(0)_invert(1)] [&>span:last-child]:text-[1.5rem]"
+                  />
 
-          <div className="px-8 pb-9 pt-20 text-center">
-            <h2 className="text-[32px] font-semibold tracking-[-1.2px] text-[#141a29]">
-              {profile.name || "Creator"}
-            </h2>
+                  <div className="absolute right-7 top-6 rounded-full bg-white/90 px-4 py-2 text-xs font-semibold text-[#2864f0]">
+                    {profile.country || "Global"}
+                  </div>
 
-            <p className="mt-2 text-[16px] text-[#7b879d]">
-              {profile.category || profile.headline || "Creator"}
-            </p>
-
-            <p className="mx-auto mt-6 max-w-[640px] text-[15px] leading-7 text-[#64728a]">
-              {profile.bio || profile.headline || "Complete your card profile."}
-            </p>
-
-            {industries.length > 0 && (
-              <div className="mt-7 flex flex-wrap justify-center gap-2">
-                {industries.map((industry) => (
-                  <span
-                    key={industry}
-                    className="rounded-full border border-[#dfe5ed] bg-[#fafbfc] px-3 py-1.5 text-xs font-medium text-[#60708a]"
+                  <motion.button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setPhotoOpen(true);
+                    }}
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="absolute -bottom-14 left-1/2 flex h-28 w-28 -translate-x-1/2 cursor-pointer items-center justify-center overflow-hidden rounded-full border-4 border-[#316df0] bg-[#6572cc] text-4xl text-white"
+                    aria-label="Change profile photo"
                   >
-                    {industry}
-                  </span>
-                ))}
+                    {profile.profile_photo_url ? (
+                      <img src={profile.profile_photo_url} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      creatorInitials(profile.name)
+                    )}
+                  </motion.button>
+                </div>
+
+                <div className="px-8 pb-9 pt-20 text-center">
+                  <h2 className="text-[32px] font-semibold tracking-[-1.2px] text-[#141a29]">
+                    {profile.name || "Creator"}
+                  </h2>
+
+                  <p className="mt-2 text-[16px] text-[#7b879d]">
+                    {profile.category || profile.headline || "Creator"}
+                  </p>
+
+                  <p className="mx-auto mt-6 max-w-[640px] text-[15px] leading-7 text-[#64728a]">
+                    {profile.bio || profile.headline || "Complete your card profile."}
+                  </p>
+
+                  {industries.length > 0 && (
+                    <div className="mt-7 flex flex-wrap justify-center gap-2">
+                      {industries.map((industry) => (
+                        <span key={industry} className="rounded-full border border-[#dfe5ed] bg-[#fafbfc] px-3 py-1.5 text-xs font-medium text-[#60708a]">
+                          {industry}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="mt-8 grid grid-cols-3 border-y border-[#e8ecf2] py-6">
+                    <CardMetric label="Followers" value={profile.followers} />
+                    <CardMetric label="Impressions" value={profile.impressions} bordered />
+                    <CardMetric label="Posts" value={profile.post_count} />
+                  </div>
+
+                  <div className="mt-7 flex justify-center">
+                    <span className="inline-flex items-center gap-2 rounded-full border border-[#dce4ef] bg-white px-5 py-2.5 text-xs font-semibold text-[#52617b] shadow-[0_4px_12px_rgba(30,55,100,0.06)] transition-transform duration-200 group-hover:-translate-y-0.5">
+                      More details
+                      <ArrowUpRight className="h-3.5 w-3.5" />
+                    </span>
+                  </div>
+                </div>
               </div>
-            )}
 
-            <div className="mt-8 grid grid-cols-3 border-y border-[#e8ecf2] py-6">
-              <CardMetric label="Followers" value={profile.followers} />
+              <div className="absolute inset-0 overflow-hidden rounded-[28px] border border-[#dce4ef] bg-white p-8 shadow-[0_20px_60px_rgba(34,60,100,0.08)] [backface-visibility:hidden] [transform:rotateY(180deg)]">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#2864f0]">
+                      Creator insights
+                    </p>
+                    <h2 className="mt-2 text-[30px] font-semibold tracking-[-1px] text-[#141a29]">
+                      Performance & ICP
+                    </h2>
+                    <p className="mt-2 text-sm text-[#7b879d]">
+                      A quick view of your audience and public profile signals.
+                    </p>
+                  </div>
 
-              <CardMetric
-                label="Impressions"
-                value={profile.impressions}
-                bordered
-              />
+                  <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#eef4ff] text-[#2864f0]">
+                    <Share2 className="h-5 w-5" />
+                  </span>
+                </div>
 
-              <CardMetric label="Posts" value={profile.post_count} />
-            </div>
+                <div className="mt-8 grid grid-cols-2 gap-4">
+                  {[
+                    ["Followers", profile.followers],
+                    ["Impressions", profile.impressions],
+                    ["Posts", profile.post_count],
+                    ["Industries", industries.length],
+                  ].map(([label, value]) => (
+                    <div key={String(label)} className="rounded-2xl border border-[#e2e8f0] bg-[#fbfcfe] p-5 text-center">
+                      <p className="text-xs font-medium text-[#8794aa]">{label}</p>
+                      <p className="mt-3 text-2xl font-semibold text-[#172033]">
+                        {Number(value) ? Number(value).toLocaleString() : "—"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-5 rounded-2xl border border-[#e2e8f0] bg-white p-5">
+                  <p className="text-sm font-semibold text-[#27344b]">About</p>
+                  <p className="mt-2 text-sm leading-6 text-[#7d899f]">
+                    {profile.bio || profile.headline || "No creator bio available yet."}
+                  </p>
+                </div>
+
+                <div className="mt-6 flex justify-center">
+                  <span className="inline-flex items-center gap-2 rounded-full border border-[#dce4ef] bg-white px-5 py-2.5 text-xs font-semibold text-[#52617b]">
+                    <ArrowLeft className="h-3.5 w-3.5" />
+                    Back to card
+                  </span>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </motion.div>
 
