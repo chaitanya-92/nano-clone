@@ -26,15 +26,31 @@ const defaultAppOrigin = IS_PRODUCTION
 
 const defaultFrontendOrigin = "https://jocular-longma-0f9c9d.netlify.app";
 
-export const APP_ORIGIN = normalizeOrigin(
-  getEnv("APP_ORIGIN") ?? getEnv("RENDER_EXTERNAL_URL"),
-  defaultAppOrigin,
-);
+const configuredAppOrigin = getEnv("APP_ORIGIN") ?? getEnv("RENDER_EXTERNAL_URL");
+const productionAppOrigin =
+  configuredAppOrigin && isValidHttpOrigin(configuredAppOrigin)
+    ? new URL(configuredAppOrigin)
+    : null;
 
-export const FRONTEND_ORIGIN = normalizeOrigin(
-  getEnv("FRONTEND_ORIGIN"),
-  defaultFrontendOrigin,
-);
+export const APP_ORIGIN =
+  IS_PRODUCTION && productionAppOrigin
+    ? productionAppOrigin.hostname.endsWith(".onrender.com")
+      ? productionAppOrigin.origin
+      : defaultAppOrigin
+    : normalizeOrigin(configuredAppOrigin, defaultAppOrigin);
+
+const configuredFrontendOrigin = getEnv("FRONTEND_ORIGIN");
+const productionFrontendOrigin =
+  configuredFrontendOrigin && isValidHttpOrigin(configuredFrontendOrigin)
+    ? new URL(configuredFrontendOrigin)
+    : null;
+
+export const FRONTEND_ORIGIN =
+  IS_PRODUCTION && productionFrontendOrigin
+    ? productionFrontendOrigin.hostname.endsWith(".netlify.app")
+      ? productionFrontendOrigin.origin
+      : defaultFrontendOrigin
+    : normalizeOrigin(configuredFrontendOrigin, defaultFrontendOrigin);
 
 export const DATABASE_PATH = getEnv("DATABASE_PATH") ?? "./data/naano.sqlite";
 
