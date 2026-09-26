@@ -40,6 +40,5 @@ export function RegisterBrandReviewStep() {
       refined later.
     </p>
   </div>
-)}
   );
 }
