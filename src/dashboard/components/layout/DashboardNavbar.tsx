@@ -60,6 +60,8 @@ export function DashboardNavbar({
 
   const [availableBalance, setAvailableBalance] =
     useState(0);
+  const [balanceCurrency, setBalanceCurrency] =
+    useState("EUR");
   const [notifications, setNotifications] =
     useState<Notification[]>([]);
   const [notificationsLoading, setNotificationsLoading] =
@@ -96,6 +98,10 @@ export function DashboardNavbar({
             dashboardResult.data.earnings
               ?.available ?? 0,
           );
+          setBalanceCurrency(
+            dashboardResult.data.profile
+              ?.currency ?? "EUR",
+          );
           setNotifications(
             notificationsResult.data,
           );
@@ -121,6 +127,16 @@ export function DashboardNavbar({
     notifications.filter(
       (item) => !item.read_at,
     ).length;
+
+  const formattedBalance =
+    new Intl.NumberFormat(
+      "en-US",
+      {
+        style: "currency",
+        currency: balanceCurrency,
+        maximumFractionDigits: 0,
+      },
+    ).format(availableBalance / 100);
 
   const handleNotificationClick = async (
     notification: Notification,
@@ -258,8 +274,7 @@ export function DashboardNavbar({
                 strokeWidth={1.8}
               />
               <span>
-                €{" "}
-                {availableBalance.toLocaleString()}
+                {formattedBalance}
               </span>
             </Button>
           </motion.div>
