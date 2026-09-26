@@ -2,6 +2,7 @@ import {
   Bell,
   CheckCheck,
   ChevronDown,
+  Globe2,
   LogOut,
   Settings,
   PanelLeftClose,
