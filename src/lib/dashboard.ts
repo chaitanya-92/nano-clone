@@ -2,8 +2,6 @@ import { request } from "@/dashboard/services/apiClient";
 
 import type { User } from "@/features/authSlice";
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8787";
-
 export interface CreatorProfile {
   user_id: string;
   name: string;

@@ -6,7 +6,6 @@ on:
       - building/auth-onboarding
       - fix/**
       - dashboard-refractor
-      - dashboard-refractor
   pull_request:
     branches:
       - building/auth-onboarding
