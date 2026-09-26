@@ -32,7 +32,10 @@ export async function profileRoutes(
     return getProfile(request, response);
   }
 
-  if (url.pathname === "/api/creator/card/publish" && request.method === "POST") {
+  if (
+    url.pathname === "/api/creator/card/publish" &&
+    request.method === "POST"
+  ) {
     return publishCard(request, response);
   }
 
