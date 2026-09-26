@@ -197,7 +197,11 @@ export async function patchProfile(
       try {
         parsed = new URL(value);
       } catch {
-        return "Enter a valid " + (provider === "linkedin" ? "LinkedIn" : "X") + " profile URL.";
+        return (
+          "Enter a valid " +
+          (provider === "linkedin" ? "LinkedIn" : "X") +
+          " profile URL."
+        );
       }
 
       const hostname = parsed.hostname.toLowerCase().replace(/^www\./, "");
@@ -207,7 +211,11 @@ export async function patchProfile(
         (provider === "linkedin" && hostname !== "linkedin.com") ||
         (provider === "x" && !["x.com", "twitter.com"].includes(hostname))
       ) {
-        return "Enter a valid " + (provider === "linkedin" ? "LinkedIn" : "X") + " profile URL.";
+        return (
+          "Enter a valid " +
+          (provider === "linkedin" ? "LinkedIn" : "X") +
+          " profile URL."
+        );
       }
 
       const pathname = parsed.pathname.replace(/\/$/, "");
