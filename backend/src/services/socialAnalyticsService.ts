@@ -261,8 +261,6 @@ async function syncLinkedIn(userId: string, account: any) {
     : [];
 
   const timestamp = new Date().toISOString();
-  const totalImpressions = rows.reduce((sum, row) => sum + row.impressions, 0);
-  const totalEngagements = rows.reduce((sum, row) => sum + row.engagements, 0);
   const upsert = db.prepare(
     `INSERT INTO analytics_posts
       (id,creator_id,platform,external_id,url,text,published_at,impressions,reach,likes,comments,reposts,engagements,created_at)
@@ -299,6 +297,9 @@ async function syncLinkedIn(userId: string, account: any) {
       };
     }),
   );
+
+  const totalImpressions = rows.reduce((sum, row) => sum + row.impressions, 0);
+  const totalEngagements = rows.reduce((sum, row) => sum + row.engagements, 0);
 
   const write = db.transaction(() => {
     for (const row of rows) {

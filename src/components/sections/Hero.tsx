@@ -6,6 +6,8 @@ import { TwitterIcon } from "@/components/ui/icons/TwitterIcon";
 import { Button } from "@/components/ui/button";
 import { heroSection } from "@/data/data";
 import { useMouseParallax } from "@/hooks/useMouseParallax";
+import { scrollToSection } from "@/lib/landingNavigation";
+import { useNavigate } from "react-router-dom";
 
 import cloudBackground from "@/assets/images/cloud-background.png";
 
@@ -13,9 +15,20 @@ import { TrustedLogos } from "./TrustedLogos";
 
 export function Hero() {
   const { x, y } = useMouseParallax();
+  const navigate = useNavigate();
 
-  const navigate = (href: string) => {
-    window.location.href = href;
+  const handleAction = (href: string) => {
+    if (href === "#launch-campaign") {
+      navigate("/register");
+      return;
+    }
+
+    if (href.startsWith("#")) {
+      scrollToSection(href);
+      return;
+    }
+
+    navigate(href);
   };
 
   return (
@@ -71,7 +84,7 @@ export function Hero() {
         >
           <Button
             size="lg"
-            onClick={() => navigate(heroSection.primaryAction.href)}
+            onClick={() => handleAction(heroSection.primaryAction.href)}
             className="h-14 rounded-2xl bg-black px-7 text-base font-medium text-white shadow-none transition-none hover:bg-black hover:text-white"
           >
             {heroSection.primaryAction.label}
@@ -81,7 +94,7 @@ export function Hero() {
           <Button
             variant="ghost"
             size="lg"
-            onClick={() => navigate(heroSection.secondaryAction.href)}
+            onClick={() => handleAction(heroSection.secondaryAction.href)}
             className="h-14 rounded-2xl px-5 text-base font-medium text-black shadow-none transition-none hover:bg-transparent hover:text-black"
           >
             {heroSection.secondaryAction.label}

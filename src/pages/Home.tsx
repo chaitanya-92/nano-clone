@@ -9,6 +9,7 @@ import { Workflow } from "../components/sections/Workflow";
 import { FeaturedTestimonial } from "@/components/sections/FeaturedTestimonial";
 import { CreatorPosts } from "@/components/sections/CreatorPosts";
 import { FinalCta } from "@/components/sections/FinalCta";
+import { NaanoAssistant } from "@/components/layout/NaanoAssistant";
 
 export default function Home() {
   return (
@@ -26,6 +27,7 @@ export default function Home() {
         <FinalCta />
       </main>
       <Footer />
+      <NaanoAssistant />
     </div>
   );
 }

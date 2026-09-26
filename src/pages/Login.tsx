@@ -10,7 +10,6 @@ import {
 import { AuthShell } from "@/components/auth/AuthShell";
 import { AuthSocialButton } from "@/components/auth/AuthSocialButton";
 import GoogleIcon from "@/components/ui/icons/GoogleIcon";
-import { LinkedinIcon } from "@/components/ui/icons/linkedin-icon";
 import { authContent } from "@/data/data";
 import { signIn } from "@/features/authSlice";
 import { login } from "@/lib/auth";
@@ -75,13 +74,6 @@ export default function Login() {
         <p className="mt-1 text-[16px] text-[#747c8d]">{content.subtitle}</p>
 
         <div className="mt-7 space-y-3">
-          <AuthSocialButton
-            icon={<LinkedinIcon className="h-5 w-5" variant="brand" />}
-            disabled
-          >
-            LinkedIn sign-in coming soon
-          </AuthSocialButton>
-
           <a
             href={`${import.meta.env.VITE_API_URL ?? "http://localhost:8787"}/api/auth/google?flow=login`}
             className="block"

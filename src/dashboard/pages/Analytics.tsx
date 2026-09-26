@@ -1,55 +1,66 @@
 import { Activity, BarChart3, Eye, FileText, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { getAnalytics, type AnalyticsResponse } from "@/lib/dashboard";
 import { useSearchParams } from "react-router-dom";
+import { getAnalytics, type AnalyticsResponse } from "@/lib/dashboard";
+
+type AnalyticsRange = "all" | "30d" | "90d";
+
+const RANGE_OPTIONS: Array<{ value: AnalyticsRange; label: string }> = [
+  { value: "all", label: "All time" },
+  { value: "30d", label: "Last 30 days" },
+  { value: "90d", label: "Last 90 days" },
+];
 
 const metrics = [
-  {
-    key: "posts",
-    label: "Posts",
-    icon: FileText,
-  },
-  {
-    key: "reach",
-    label: "Reach",
-    icon: Eye,
-  },
-  {
-    key: "engagements",
-    label: "Engagements",
-    icon: Activity,
-  },
-  {
-    key: "followers",
-    label: "Followers",
-    icon: Users,
-  },
+  { key: "posts", label: "Posts", icon: FileText },
+  { key: "reach", label: "Reach", icon: Eye },
+  { key: "engagements", label: "Engagements", icon: Activity },
+  { key: "followers", label: "Followers", icon: Users },
 ] as const;
+
+function parseRange(value: string | null): AnalyticsRange {
+  return value === "30d" || value === "90d" ? value : "all";
+}
 
 export default function Analytics() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [range, setRange] = useState<"all" | "30d" | "90d">(
-    searchParams.get("range") === "30d"
-      ? "30d"
-      : searchParams.get("range") === "90d"
-        ? "90d"
-        : "all",
+  const [range, setRange] = useState<AnalyticsRange>(() =>
+    parseRange(searchParams.get("range")),
   );
   const [data, setData] = useState<AnalyticsResponse["data"] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    let cancelled = false;
+
     setLoading(true);
+    setError("");
 
     void getAnalytics(range)
-      .then(({ data: response }) => setData(response))
-      .catch((value) =>
-        setError(
-          value instanceof Error ? value.message : "Unable to load analytics.",
-        ),
-      )
-      .finally(() => setLoading(false));
+      .then(({ data: response }) => {
+        if (!cancelled) {
+          setData(response);
+        }
+      })
+      .catch((value: unknown) => {
+        if (!cancelled) {
+          setError(
+            value instanceof Error
+              ? value.message
+              : "Unable to load analytics.",
+          );
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [range]);
 
   const values = useMemo(
@@ -62,7 +73,7 @@ export default function Analytics() {
     [data],
   );
 
-  const updateRange = (value: "all" | "30d" | "90d") => {
+  const updateRange = (value: AnalyticsRange) => {
     setRange(value);
 
     const next = new URLSearchParams(searchParams);
@@ -89,14 +100,14 @@ export default function Analytics() {
 
         <select
           value={range}
-          onChange={(event) =>
-            updateRange(event.target.value as "all" | "30d" | "90d")
-          }
+          onChange={(event) => updateRange(parseRange(event.target.value))}
           className="h-11 cursor-pointer rounded-xl border border-[#dce3ec] bg-white px-4 text-sm font-medium text-[#59667e] outline-none"
         >
-          <option value="all">All time</option>
-          <option value="30d">Last 30 days</option>
-          <option value="90d">Last 90 days</option>
+          {RANGE_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -132,7 +143,7 @@ export default function Analytics() {
                   </div>
 
                   <p className="mt-5 text-[28px] font-semibold tracking-[-1px] text-[#172033]">
-                    {values[metric.key as keyof typeof values].toLocaleString()}
+                    {values[metric.key].toLocaleString()}
                   </p>
                 </div>
               );
