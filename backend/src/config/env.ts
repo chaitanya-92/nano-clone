@@ -13,7 +13,8 @@ export const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL ?? "";
 export const LINKEDIN_CLIENT_ID = process.env.LINKEDIN_CLIENT_ID ?? "";
 export const LINKEDIN_CLIENT_SECRET = process.env.LINKEDIN_CLIENT_SECRET ?? "";
 export const LINKEDIN_CALLBACK_URL = process.env.LINKEDIN_CALLBACK_URL ?? "";
-export const LINKEDIN_API_VERSION = process.env.LINKEDIN_API_VERSION ?? "202609";
+export const LINKEDIN_API_VERSION =
+  process.env.LINKEDIN_API_VERSION ?? "202609";
 export const X_BEARER_TOKEN = process.env.X_BEARER_TOKEN ?? "";
 export const COOKIE_NAME = "naano_session";
 export const OAUTH_STATE_COOKIE = "naano_oauth_state";

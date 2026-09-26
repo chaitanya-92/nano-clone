@@ -345,7 +345,8 @@ export function migrateDatabase() {
     try {
       db.exec(statement);
     } catch (error: any) {
-      if (!String(error?.message ?? "").includes("duplicate column name")) throw error;
+      if (!String(error?.message ?? "").includes("duplicate column name"))
+        throw error;
     }
   }
 

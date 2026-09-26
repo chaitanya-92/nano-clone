@@ -115,7 +115,8 @@ export function PublicCardActions({
     if (!url) {
       toast.add({
         title: "Publish your card first",
-        description: "Your public card will be available here after publishing.",
+        description:
+          "Your public card will be available here after publishing.",
         type: "info",
         timeout: 2600,
       });
@@ -130,7 +131,11 @@ export function PublicCardActions({
     "h-11 w-full cursor-pointer rounded-xl border-[#dce3ec] bg-white px-3 text-[13px] font-medium text-[#52617b] shadow-[0_1px_2px_rgba(20,30,50,0.02)] hover:bg-[#f7f9fc] hover:text-[#263247]";
 
   return (
-    <div className={compact ? "grid w-full gap-2" : "grid w-full grid-cols-2 gap-2"}>
+    <div
+      className={
+        compact ? "grid w-full gap-2" : "grid w-full grid-cols-2 gap-2"
+      }
+    >
       <Button
         type="button"
         variant="outline"

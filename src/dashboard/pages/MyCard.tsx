@@ -405,7 +405,9 @@ export default function MyCard() {
             }}
             role="button"
             tabIndex={0}
-            aria-label={cardFlipped ? "Show creator card" : "Show creator details"}
+            aria-label={
+              cardFlipped ? "Show creator card" : "Show creator details"
+            }
           >
             <motion.div
               animate={{ rotateY: cardFlipped ? 180 : 0 }}
@@ -436,7 +438,11 @@ export default function MyCard() {
                     aria-label="Change profile photo"
                   >
                     {profile.profile_photo_url ? (
-                      <img src={profile.profile_photo_url} alt="" className="h-full w-full object-cover" />
+                      <img
+                        src={profile.profile_photo_url}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
                     ) : (
                       creatorInitials(profile.name)
                     )}
@@ -445,7 +451,9 @@ export default function MyCard() {
                       <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/95 text-[#263247] shadow-lg">
                         <Upload className="h-4 w-4" />
                       </span>
-                      <span className="text-[10px] font-semibold tracking-wide">Change photo</span>
+                      <span className="text-[10px] font-semibold tracking-wide">
+                        Change photo
+                      </span>
                     </span>
                   </motion.button>
                 </div>
@@ -460,13 +468,18 @@ export default function MyCard() {
                   </p>
 
                   <p className="mx-auto mt-6 max-w-[640px] text-[15px] leading-7 text-[#64728a]">
-                    {profile.bio || profile.headline || "Complete your card profile."}
+                    {profile.bio ||
+                      profile.headline ||
+                      "Complete your card profile."}
                   </p>
 
                   {industries.length > 0 && (
                     <div className="mt-7 flex flex-wrap justify-center gap-2">
                       {industries.map((industry) => (
-                        <span key={industry} className="rounded-full border border-[#dfe5ed] bg-[#fafbfc] px-3 py-1.5 text-xs font-medium text-[#60708a]">
+                        <span
+                          key={industry}
+                          className="rounded-full border border-[#dfe5ed] bg-[#fafbfc] px-3 py-1.5 text-xs font-medium text-[#60708a]"
+                        >
                           {industry}
                         </span>
                       ))}
@@ -475,7 +488,11 @@ export default function MyCard() {
 
                   <div className="mt-8 grid grid-cols-3 border-y border-[#e8ecf2] py-6">
                     <CardMetric label="Followers" value={profile.followers} />
-                    <CardMetric label="Impressions" value={profile.impressions} bordered />
+                    <CardMetric
+                      label="Impressions"
+                      value={profile.impressions}
+                      bordered
+                    />
                     <CardMetric label="Posts" value={profile.post_count} />
                   </div>
 
@@ -514,8 +531,13 @@ export default function MyCard() {
                     ["Posts", profile.post_count],
                     ["Industries", industries.length],
                   ].map(([label, value]) => (
-                    <div key={String(label)} className="rounded-2xl border border-[#e2e8f0] bg-[#fbfcfe] p-5 text-center">
-                      <p className="text-xs font-medium text-[#8794aa]">{label}</p>
+                    <div
+                      key={String(label)}
+                      className="rounded-2xl border border-[#e2e8f0] bg-[#fbfcfe] p-5 text-center"
+                    >
+                      <p className="text-xs font-medium text-[#8794aa]">
+                        {label}
+                      </p>
                       <p className="mt-3 text-2xl font-semibold text-[#172033]">
                         {Number(value) ? Number(value).toLocaleString() : "—"}
                       </p>
@@ -526,7 +548,9 @@ export default function MyCard() {
                 <div className="mt-5 rounded-2xl border border-[#e2e8f0] bg-white p-5">
                   <p className="text-sm font-semibold text-[#27344b]">About</p>
                   <p className="mt-2 text-sm leading-6 text-[#7d899f]">
-                    {profile.bio || profile.headline || "No creator bio available yet."}
+                    {profile.bio ||
+                      profile.headline ||
+                      "No creator bio available yet."}
                   </p>
                 </div>
 
@@ -543,20 +567,20 @@ export default function MyCard() {
 
         <aside className="h-full min-h-[620px] rounded-[24px] border border-[#dfe5ed] bg-white p-6 shadow-[0_4px_16px_rgba(32,52,82,0.035)]">
           <div className="flex h-full flex-col">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#8a96aa]">
-            Public link
-          </p>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#8a96aa]">
+              Public link
+            </p>
 
-          <p className="mt-4 min-h-[72px] break-all rounded-xl border border-[#e4e8ee] bg-[#f8fafc] px-4 py-3.5 text-[13px] leading-5 text-[#52617b]">
-            {publicUrl || "Publish your card to create a public link."}
-          </p>
+            <p className="mt-4 min-h-[72px] break-all rounded-xl border border-[#e4e8ee] bg-[#f8fafc] px-4 py-3.5 text-[13px] leading-5 text-[#52617b]">
+              {publicUrl || "Publish your card to create a public link."}
+            </p>
 
-          <div className="mt-4">
-            <PublicCardActions
-              url={publicUrl}
-              title={(profile.name || "Creator") + " on Naano"}
-            />
-          </div>
+            <div className="mt-4">
+              <PublicCardActions
+                url={publicUrl}
+                title={(profile.name || "Creator") + " on Naano"}
+              />
+            </div>
           </div>
         </aside>
       </section>
