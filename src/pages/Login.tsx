@@ -74,13 +74,6 @@ export default function Login() {
         <p className="mt-1 text-[16px] text-[#747c8d]">{content.subtitle}</p>
 
         <div className="mt-7 space-y-3">
-          <AuthSocialButton
-            icon={<LinkedinIcon className="h-5 w-5" variant="brand" />}
-            disabled
-          >
-            LinkedIn sign-in coming soon
-          </AuthSocialButton>
-
           <a
             href={`${import.meta.env.VITE_API_URL ?? "http://localhost:8787"}/api/auth/google?flow=login`}
             className="block"
