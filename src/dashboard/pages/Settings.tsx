@@ -157,18 +157,12 @@ const tabs: Array<{
 export default function Settings() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const authUser = useAppSelector(
-    (state) => state.auth.user,
-  );
-
   const [tab, setTab] =
     useState<Tab>("profile");
   const [profile, setProfile] =
     useState<CreatorProfile | null>(
       null,
     );
-  const [socialAccounts, setSocialAccounts] =
-    useState<SocialAccount[]>([]);
   const [methods, setMethods] =
     useState<PayoutMethod[]>([]);
 
@@ -251,9 +245,6 @@ export default function Settings() {
             profileResult.data;
 
           setProfile(creator);
-          setSocialAccounts(
-            socialResult.data,
-          );
           setName(
             creator.name ?? "",
           );
@@ -360,9 +351,6 @@ export default function Settings() {
       profileResult.data;
 
     setProfile(creator);
-    setSocialAccounts(
-      socialResult.data,
-    );
     setName(creator.name ?? "");
     setLinkedinUrl(
       creator.linkedin_url ?? "",
