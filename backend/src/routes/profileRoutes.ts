@@ -3,7 +3,10 @@ import {
   getProfile,
   patchProfile,
   getPublicCard,
+  publishCard,
+  unpublishCard,
 } from "../controllers/profileController";
+
 export async function profileRoutes(
   request: IncomingMessage,
   response: ServerResponse,
@@ -13,18 +16,38 @@ export async function profileRoutes(
     (url.pathname === "/api/creator/profile" ||
       url.pathname === "/api/brand/profile") &&
     request.method === "GET"
-  )
+  ) {
     return getProfile(request, response);
+  }
+
   if (
     (url.pathname === "/api/creator/profile" ||
       url.pathname === "/api/brand/profile") &&
     request.method === "PATCH"
-  )
+  ) {
     return patchProfile(request, response);
-  if (url.pathname === "/api/creator/card" && request.method === "GET")
+  }
+
+  if (url.pathname === "/api/creator/card" && request.method === "GET") {
     return getProfile(request, response);
+  }
+
+  if (url.pathname === "/api/creator/card/publish" && request.method === "POST") {
+    return publishCard(request, response);
+  }
+
+  if (
+    url.pathname === "/api/creator/card/publish" &&
+    request.method === "DELETE"
+  ) {
+    return unpublishCard(request, response);
+  }
+
   const card = url.pathname.match(/^\/api\/creator\/card\/([^/]+)$/);
-  if (card && request.method === "GET")
+
+  if (card && request.method === "GET") {
     return getPublicCard(request, response, card[1]);
+  }
+
   return false;
 }
