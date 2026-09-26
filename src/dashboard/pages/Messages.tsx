@@ -10,7 +10,7 @@ import {
   Sparkles,
   Users,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
@@ -83,9 +83,6 @@ function createUserMessage(body: string): ChatMessage {
   };
 }
 
-function formatMetric(value: number) {
-  return value.toLocaleString();
-}
 
 export default function Messages() {
   const [context, setContext] = useState<AssistantContext | null>(null);
@@ -116,28 +113,6 @@ export default function Messages() {
         setLoading(false);
       });
   }, []);
-
-  const snapshot = useMemo(
-    () => [
-      {
-        label: "Followers",
-        value: context?.profile.followers ?? 0,
-      },
-      {
-        label: "Posts",
-        value: context?.profile.posts ?? 0,
-      },
-      {
-        label: "Impressions",
-        value: context?.profile.impressions ?? 0,
-      },
-      {
-        label: "Engagements",
-        value: context?.profile.engagements ?? 0,
-      },
-    ],
-    [context],
-  );
 
   const ask = async (prompt: string) => {
     const value = prompt.trim();
