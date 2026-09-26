@@ -31,7 +31,7 @@ export function DashboardLayout() {
 
   return (
     <div className="dashboard-shell h-screen overflow-hidden bg-[#f6f8fb]">
-      <DashboardSidebar collapsed={collapsed} onToggle={toggleSidebar} />
+      <DashboardSidebar collapsed={collapsed} />
 
       <div
         className={[
@@ -39,7 +39,7 @@ export function DashboardLayout() {
           collapsed ? "lg:ml-[76px]" : "lg:ml-[224px]",
         ].join(" ")}
       >
-        <DashboardNavbar />
+        <DashboardNavbar collapsed={collapsed} onToggleSidebar={toggleSidebar} />
 
         <main className="dashboard-scroll-area h-[calc(100vh-64px)] overflow-y-auto overscroll-contain">
           <div className="px-5 py-6 sm:px-7 sm:py-8 lg:px-9">
