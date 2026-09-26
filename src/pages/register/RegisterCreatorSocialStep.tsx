@@ -1,5 +1,4 @@
 import { CheckCircle2, Globe2, Linkedin } from "lucide-react";
-import { FieldError } from "@/auth/components/FieldError";
 import { Input } from "./RegisterFields";
 import { useRegistrationForm } from "./registerContext";
 import { connectSocial } from "@/lib/onboarding";
@@ -125,6 +124,5 @@ export function RegisterCreatorSocialStep() {
       your account.
     </div>
   </div>
-)}
   );
 }
