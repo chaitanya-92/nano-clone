@@ -75,6 +75,11 @@ export function initializeDatabase() {
       user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       provider TEXT NOT NULL CHECK(provider IN ('linkedin','x')),
       provider_user_id TEXT,
+      access_token TEXT,
+      refresh_token TEXT,
+      token_expires_at INTEGER,
+      last_synced_at TEXT,
+      sync_error TEXT,
       username TEXT,
       profile_url TEXT,
       profile_image_url TEXT,
@@ -319,6 +324,23 @@ export function initializeDatabase() {
 }
 
 export function migrateDatabase() {
+  const migrations = [
+    "ALTER TABLE social_accounts ADD COLUMN provider_user_id TEXT",
+    "ALTER TABLE social_accounts ADD COLUMN access_token TEXT",
+    "ALTER TABLE social_accounts ADD COLUMN refresh_token TEXT",
+    "ALTER TABLE social_accounts ADD COLUMN token_expires_at INTEGER",
+    "ALTER TABLE social_accounts ADD COLUMN last_synced_at TEXT",
+    "ALTER TABLE social_accounts ADD COLUMN sync_error TEXT",
+  ];
+
+  for (const statement of migrations) {
+    try {
+      db.exec(statement);
+    } catch (error: any) {
+      if (!String(error?.message ?? "").includes("duplicate column name")) throw error;
+    }
+  }
+
   try {
     db.exec(
       "ALTER TABLE users ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 0",
