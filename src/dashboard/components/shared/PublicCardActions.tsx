@@ -19,7 +19,15 @@ export function PublicCardActions({
   const [sharing, setSharing] = useState(false);
 
   const handleCopy = async () => {
-    if (!url) return;
+    if (!url) {
+      toast.add({
+        title: "Publish your card first",
+        description: "A public URL is created when your card is published.",
+        type: "info",
+        timeout: 2600,
+      });
+      return;
+    }
 
     const success = await copyText(url);
 
@@ -45,7 +53,17 @@ export function PublicCardActions({
   };
 
   const handleShare = async () => {
-    if (!url || sharing) return;
+    if (sharing) return;
+
+    if (!url) {
+      toast.add({
+        title: "Publish your card first",
+        description: "A public URL is required before you can share your card.",
+        type: "info",
+        timeout: 2600,
+      });
+      return;
+    }
 
     setSharing(true);
 
@@ -93,6 +111,20 @@ export function PublicCardActions({
     }
   };
 
+  const handleOpen = () => {
+    if (!url) {
+      toast.add({
+        title: "Publish your card first",
+        description: "Your public card will be available here after publishing.",
+        type: "info",
+        timeout: 2600,
+      });
+      return;
+    }
+
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
   const size = compact ? "sm" : "default";
   const baseClass =
     "cursor-pointer border-[#dce3ec] bg-white text-[#52617b] hover:bg-[#f7f9fc] hover:text-[#263247]";
@@ -104,7 +136,6 @@ export function PublicCardActions({
         variant="outline"
         size={size}
         onClick={() => void handleCopy()}
-        disabled={!url}
         className={baseClass}
       >
         {copied ? (
@@ -119,7 +150,6 @@ export function PublicCardActions({
         type="button"
         size={size}
         onClick={() => void handleShare()}
-        disabled={!url || sharing}
         className="cursor-pointer bg-[#171d2b] text-white hover:bg-[#111827]"
       >
         <Share2 className="mr-2 h-4 w-4" />
@@ -130,8 +160,7 @@ export function PublicCardActions({
         type="button"
         variant="outline"
         size={size}
-        render={<a href={url || undefined} target="_blank" rel="noreferrer" />}
-        disabled={!url}
+        onClick={handleOpen}
         className={compact ? baseClass : `${baseClass} sm:col-span-2`}
       >
         <ExternalLink className="mr-2 h-4 w-4" />
