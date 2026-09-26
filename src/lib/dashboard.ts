@@ -21,6 +21,18 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   return body;
 }
 
+export interface SocialAccount {
+  id: string;
+  provider: "linkedin" | "x";
+  username: string | null;
+  profile_url: string;
+  profile_image_url: string | null;
+  status: string;
+  verified_at: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface CreatorProfile {
   user_id: string;
   name: string;
@@ -390,4 +402,11 @@ export function connectSocial(
       profileUrl,
     }),
   });
+}
+
+
+export function getSocialAccounts() {
+  return request<{
+    data: SocialAccount[];
+  }>("/api/social-accounts");
 }
