@@ -3,6 +3,13 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { db } from "../db/client";
 import { COOKIE_NAME, IS_PRODUCTION, SESSION_LIFETIME } from "../config/env";
 
+export interface CurrentUser {
+  id: string;
+  email: string;
+  name: string;
+  role: "creator" | "brand";
+}
+
 function parseCookies(request: IncomingMessage) {
   return Object.fromEntries(
     (request.headers.cookie ?? "")
@@ -96,7 +103,7 @@ export function destroySession(
   });
 }
 
-export function getCurrentUser(request: IncomingMessage) {
+export function getCurrentUser(request: IncomingMessage): CurrentUser | null {
   const sessionId = getSessionId(request);
 
   if (!sessionId) {
@@ -117,7 +124,7 @@ export function getCurrentUser(request: IncomingMessage) {
       AND sessions.expires_at > ?
     `,
     )
-    .get(sessionId, Date.now());
+    .get(sessionId, Date.now()) as CurrentUser | undefined;
 
   return user ?? null;
 }
