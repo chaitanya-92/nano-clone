@@ -30,22 +30,6 @@ export function DashboardSidebar({
         collapsed ? "w-[76px]" : "w-[224px]",
       ].join(" ")}
     >
-      <div className="flex h-16 items-center justify-end px-3">
-        <button
-          type="button"
-          onClick={onToggle}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl text-[#69758a] transition hover:bg-[#f5f7fa] hover:text-[#202938]"
-        >
-          {collapsed ? (
-            <PanelLeftOpen className="h-[19px] w-[19px]" strokeWidth={1.8} />
-          ) : (
-            <PanelLeftClose className="h-[19px] w-[19px]" strokeWidth={1.8} />
-          )}
-        </button>
-      </div>
-
       <nav
         aria-label="Dashboard navigation"
         className="flex flex-1 flex-col gap-1.5 px-3 py-2"
