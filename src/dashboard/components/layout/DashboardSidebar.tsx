@@ -18,8 +18,7 @@ export function DashboardSidebar({ collapsed }: { collapsed: boolean }) {
   return (
     <aside
       className={[
-        "fixed inset-y-0 left-0 z-50 hidden bg-white lg:flex lg:flex-col",
-        "border-r border-[#edf0f5] shadow-[4px_0_18px_rgba(24,35,57,0.025)]",
+        "fixed inset-y-0 left-0 z-50 hidden bg-transparent lg:flex lg:flex-col",
         "transition-[width] duration-300 ease-[cubic-bezier(.22,1,.36,1)]",
         collapsed ? "w-[76px]" : "w-[224px]",
       ].join(" ")}
