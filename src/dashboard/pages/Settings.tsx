@@ -26,9 +26,11 @@ import {
   deleteAccount,
   getCreatorProfile,
   getPayoutMethods,
+  getSocialAccounts,
   updateCreatorProfile,
   type CreatorProfile,
   type PayoutMethod,
+  type SocialAccount,
 } from "@/lib/dashboard";
 import { connectSocial } from "@/lib/onboarding";
 import { logout } from "@/lib/auth";
@@ -918,7 +920,7 @@ export default function Settings() {
           }
         }}
       >
-        <DialogContent className="max-w-[520px]">
+        <DialogContent className="!max-w-[520px] border-[#ecd1d1] p-6">
           <DialogHeader>
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#fff0f0] text-[#d23838]">
               <Trash2 className="h-5 w-5" />
