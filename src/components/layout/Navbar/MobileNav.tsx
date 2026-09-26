@@ -10,13 +10,23 @@ import {
 } from "@/components/ui/sheet";
 
 import { Button } from "@/components/ui/button";
+import { useAppSelector } from "@/store/hooks";
+import { scrollToSection } from "@/lib/landingNavigation";
 
 import { navItems, resourceLinks, navigationActions } from "@/data/data";
 
 export function MobileNav() {
   const navigate = (href: string) => {
+    if (href.startsWith("#")) {
+      scrollToSection(href);
+      return;
+    }
+
     window.location.assign(href);
   };
+
+  const { isAuthenticated, isLoading } = useAppSelector((state) => state.auth);
+  const showDashboard = !isLoading && isAuthenticated;
 
   return (
     <div className="lg:hidden">
@@ -110,8 +120,9 @@ export function MobileNav() {
 
             {/* Actions */}
             <div className="mt-8 flex flex-col gap-3">
-              <SheetClose
-                onClick={() => navigate(navigationActions.signIn.href)}
+              {!showDashboard ? (
+                <SheetClose
+                  onClick={() => navigate("/login")}
                 className="
                   inline-flex
                   h-11
@@ -132,11 +143,13 @@ export function MobileNav() {
                   hover:bg-white
                 "
               >
-                {navigationActions.signIn.label}
-              </SheetClose>
+                  {navigationActions.signIn.label}
+                </SheetClose>
+              ) : null}
 
-              <SheetClose
-                onClick={() => navigate(navigationActions.signUp.href)}
+              {!showDashboard ? (
+                <SheetClose
+                  onClick={() => navigate("/register")}
                 className="
                   inline-flex
                   h-11
@@ -155,8 +168,32 @@ export function MobileNav() {
                   hover:bg-black
                 "
               >
-                {navigationActions.signUp.label}
-              </SheetClose>
+                  {navigationActions.signUp.label}
+                </SheetClose>
+              ) : (
+                <SheetClose
+                  onClick={() => navigate("/dashboard")}
+                  className="
+                    inline-flex
+                    h-11
+                    w-full
+                    items-center
+                    justify-center
+                    rounded-full
+                    bg-black
+                    px-5
+                    text-sm
+                    font-medium
+                    text-white
+                    shadow-none
+                    outline-none
+                    transition-none
+                    hover:bg-black
+                  "
+                >
+                  Dashboard
+                </SheetClose>
+              )}
             </div>
           </div>
         </SheetContent>
