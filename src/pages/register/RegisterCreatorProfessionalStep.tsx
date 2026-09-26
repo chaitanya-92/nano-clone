@@ -1,14 +1,12 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { FieldError } from "@/auth/components/FieldError";
-import { TermsReaderDialog } from "@/auth/components/TermsReaderDialog";
 import { countries } from "@/data/creatorOptions";
 import { Input } from "./RegisterFields";
 import { useRegistrationForm } from "./registerContext";
 import type { ProfessionalTerm } from "./registerTypes";
 
 export function RegisterCreatorProfessionalStep() {
-  const { formik, readTerms, setReadTerms, activeTerm, setActiveTerm } =
-    useRegistrationForm();
+  const { formik } = useRegistrationForm();
 
   return (
     <div className="space-y-4">
@@ -155,37 +153,12 @@ export function RegisterCreatorProfessionalStep() {
               onCheckedChange={(checked) =>
                 formik.setFieldValue(term.key, Boolean(checked))
               }
-              disabled={!readTerms[term.key]}
               aria-label={term.label}
               className="mt-0.5"
             />
 
             <div className="min-w-0 flex-1">
               <p className="text-sm font-medium text-[#555e6e]">{term.label}</p>
-
-              <div className="mt-2 flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setActiveTerm({
-                      key: term.key,
-                      label: term.label,
-                      title: term.title,
-                      description: term.description,
-                      sections: term.sections,
-                    })
-                  }
-                  className="cursor-pointer text-xs font-semibold text-[#3f4857] underline underline-offset-2 transition hover:text-[#171d2b]"
-                >
-                  Read more
-                </button>
-
-                {!readTerms[term.key] && (
-                  <span className="text-[11px] text-[#9aa1ad]">
-                    Read to the end to unlock
-                  </span>
-                )}
-              </div>
 
               <FieldError
                 error={formik.errors[term.key]}
@@ -196,25 +169,6 @@ export function RegisterCreatorProfessionalStep() {
         </div>
       ))}
 
-      <TermsReaderDialog
-        open={Boolean(activeTerm)}
-        title={activeTerm?.title ?? ""}
-        description={activeTerm?.description ?? ""}
-        sections={activeTerm?.sections ?? []}
-        onOpenChange={(open) => {
-          if (!open) {
-            setActiveTerm(null);
-          }
-        }}
-        onReadComplete={() => {
-          if (activeTerm) {
-            setReadTerms((terms) => ({
-              ...terms,
-              [activeTerm.key]: true,
-            }));
-          }
-        }}
-      />
     </div>
   );
 }
