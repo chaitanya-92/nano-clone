@@ -4,6 +4,7 @@ import {
   Loader2,
   Pencil,
   Save,
+  Globe,
   Upload,
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -22,6 +23,8 @@ import {
   getCreatorProfile,
   getPublicCardUrl,
   updateCreatorProfile,
+  publishCreatorCard,
+  unpublishCreatorCard,
   type CreatorProfile,
 } from "@/lib/dashboard";
 import { PublicCardActions } from "@/dashboard/components/shared/PublicCardActions";
@@ -203,6 +206,27 @@ export default function MyCard() {
     reader.readAsDataURL(file);
   };
 
+  const togglePublish = async () => {
+    try {
+      const { data } =
+        profile.card_status === "published"
+          ? await unpublishCreatorCard()
+          : await publishCreatorCard();
+      setProfile(data);
+      toast.add({
+        title: data.card_status === "published" ? "Card published" : "Card unpublished",
+        description:
+          data.card_status === "published"
+            ? "Your public card link is now active."
+            : "Your public card is no longer publicly accessible.",
+        type: "success",
+        timeout: 2200,
+      });
+    } catch (value) {
+      setError(value instanceof Error ? value.message : "Unable to update card status.");
+    }
+  };
+
   const save = async () => {
     setSaving(true);
     setError("");
@@ -294,6 +318,15 @@ export default function MyCard() {
           >
             <Pencil className="mr-2 h-4 w-4" />
             Edit
+          </Button>
+
+          <Button
+            type="button"
+            onClick={() => void togglePublish()}
+            className="cursor-pointer bg-[#2864f0] text-white hover:bg-[#2056d4]"
+          >
+            <Globe className="mr-2 h-4 w-4" />
+            {profile.card_status === "published" ? "Unpublish" : "Publish card"}
           </Button>
 
           <a
