@@ -1,14 +1,11 @@
-import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 import { dashboardNavigation } from "@/dashboard/constants/navigation";
 
 export function DashboardSidebar({
   collapsed,
-  onToggle,
 }: {
   collapsed: boolean;
-  onToggle: () => void;
 }) {
   const location = useLocation();
 
@@ -50,19 +47,7 @@ export function DashboardSidebar({
             </span>
           </Link>
 
-          <button
-            type="button"
-            onClick={onToggle}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-[#687166] transition-all duration-200 hover:bg-[#f2f3ee] hover:text-[#20251f]"
-          >
-            {collapsed ? (
-              <PanelLeftOpen className="h-[17px] w-[17px]" strokeWidth={1.8} />
-            ) : (
-              <PanelLeftClose className="h-[17px] w-[17px]" strokeWidth={1.8} />
-            )}
-          </button>
+
         </div>
       </div>
 
