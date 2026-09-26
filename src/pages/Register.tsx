@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { useAppSelector } from "@/store/hooks";
-import { RoleChoice } from "./register/RegisterRoleChoice";
+import { RegisterRoleChoice } from "./register/RegisterRoleChoice";
 import { RegistrationWizard } from "./register/RegistrationWizard";
 
 export default function Register() {
@@ -29,7 +29,7 @@ export default function Register() {
 
   if (!role) {
     return (
-      <RoleChoice
+      <RegisterRoleChoice
         onSelect={(value) => {
           setRole(value);
         }}
