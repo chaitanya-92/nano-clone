@@ -13,6 +13,7 @@ import {
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/toast";
 import {
   Dialog,
   DialogContent,
@@ -325,6 +326,13 @@ export default function Settings() {
       setInitialX(savedX);
       setSaved(true);
 
+      toast.add({
+        title: "Settings saved",
+        description: "Your profile and social links have been updated.",
+        type: "success",
+        timeout: 2400,
+      });
+
       window.setTimeout(() => setSaved(false), 1800);
     } catch (value) {
       setError(
@@ -370,6 +378,13 @@ export default function Settings() {
 
       setMethods((current) => [data, ...current]);
       setMethodLabel("");
+
+      toast.add({
+        title: "Payout method saved",
+        description: "Your payout method has been added.",
+        type: "success",
+        timeout: 2200,
+      });
     } catch (value) {
       setError(
         value instanceof Error ? value.message : "Unable to add payout method.",
@@ -708,9 +723,9 @@ export default function Settings() {
                   type="button"
                   variant="destructive"
                   onClick={() => setShowDelete(true)}
-                  className="mt-5 cursor-pointer"
+                  className="mt-5 cursor-pointer border-[#d23838] bg-[#d23838] text-white shadow-none hover:border-[#b92f2f] hover:bg-[#b92f2f]"
                 >
-                  <Trash2 className="mr-2 h-4 w-4" />
+                  <Trash2 className="mr-2 h-4 w-4 text-white" />
                   Delete my account
                 </Button>
               </div>
@@ -786,7 +801,7 @@ export default function Settings() {
               disabled={
                 deleting || deleteConfirmation.trim().toUpperCase() !== "DELETE"
               }
-              className="cursor-pointer"
+              className="cursor-pointer border-[#d23838] bg-[#d23838] text-white shadow-none hover:border-[#b92f2f] hover:bg-[#b92f2f]"
             >
               {deleting ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
