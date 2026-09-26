@@ -214,7 +214,10 @@ export default function MyCard() {
           : await publishCreatorCard();
       setProfile(data);
       toast.add({
-        title: data.card_status === "published" ? "Card published" : "Card unpublished",
+        title:
+          data.card_status === "published"
+            ? "Card published"
+            : "Card unpublished",
         description:
           data.card_status === "published"
             ? "Your public card link is now active."
@@ -223,7 +226,11 @@ export default function MyCard() {
         timeout: 2200,
       });
     } catch (value) {
-      setError(value instanceof Error ? value.message : "Unable to update card status.");
+      setError(
+        value instanceof Error
+          ? value.message
+          : "Unable to update card status.",
+      );
     }
   };
 
