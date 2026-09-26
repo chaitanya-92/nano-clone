@@ -67,16 +67,25 @@ export function DashboardSidebar() {
 
   const activePath =
     navigation
-      .filter((item) =>
-        location.pathname.startsWith(
+      .filter((item) => {
+        if (
+          item.href === "/dashboard"
+        ) {
+          return (
+            location.pathname ===
+            "/dashboard"
+          );
+        }
+
+        return location.pathname.startsWith(
           item.href,
-        ),
-      )
+        );
+      })
       .sort(
         (first, second) =>
           second.href.length -
           first.href.length,
-      )[0]?.href ?? "/dashboard";
+      )[0]?.href ?? "";
 
   return (
     <aside className="fixed inset-y-0 left-0 z-40 flex w-[232px] flex-col overflow-hidden border-r border-[#e7ebf0] bg-white">
