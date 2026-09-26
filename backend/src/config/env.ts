@@ -2,26 +2,51 @@ import "dotenv/config";
 
 const getEnv = (key: string) => process.env[key]?.trim() || undefined;
 
+const isValidHttpOrigin = (value: string | undefined): value is string => {
+  if (!value) return false;
+
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+};
+
+const normalizeOrigin = (value: string | undefined, fallback: string) =>
+  isValidHttpOrigin(value) ? new URL(value).origin : fallback;
+
 export const PORT = Number(getEnv("PORT") ?? 8787);
 export const NODE_ENV = getEnv("NODE_ENV") ?? "development";
 export const IS_PRODUCTION = NODE_ENV === "production";
 
-export const APP_ORIGIN =
-  getEnv("APP_ORIGIN") ??
-  getEnv("RENDER_EXTERNAL_URL") ??
-  (IS_PRODUCTION
-    ? "https://nano-clone-lo9q.onrender.com"
-    : `http://localhost:${PORT}`);
+const defaultAppOrigin = IS_PRODUCTION
+  ? "https://nano-clone-lo9q.onrender.com"
+  : `http://localhost:${PORT}`;
 
-export const FRONTEND_ORIGIN =
-  getEnv("FRONTEND_ORIGIN") ?? "https://jocular-longma-0f9c9d.netlify.app";
+const defaultFrontendOrigin = "https://jocular-longma-0f9c9d.netlify.app";
+
+export const APP_ORIGIN = normalizeOrigin(
+  getEnv("APP_ORIGIN") ?? getEnv("RENDER_EXTERNAL_URL"),
+  defaultAppOrigin,
+);
+
+export const FRONTEND_ORIGIN = normalizeOrigin(
+  getEnv("FRONTEND_ORIGIN"),
+  defaultFrontendOrigin,
+);
 
 export const DATABASE_PATH = getEnv("DATABASE_PATH") ?? "./data/naano.sqlite";
 
 export const GOOGLE_CLIENT_ID = getEnv("GOOGLE_CLIENT_ID") ?? "";
 export const GOOGLE_CLIENT_SECRET = getEnv("GOOGLE_CLIENT_SECRET") ?? "";
+
+const configuredGoogleCallback = getEnv("GOOGLE_CALLBACK_URL");
 export const GOOGLE_CALLBACK_URL =
-  getEnv("GOOGLE_CALLBACK_URL") ?? `${APP_ORIGIN}/api/auth/google/callback`;
+  configuredGoogleCallback &&
+  isValidHttpOrigin(configuredGoogleCallback.replace(/\/api\/auth\/google\/callback\/?$/, ""))
+    ? configuredGoogleCallback
+    : `${APP_ORIGIN}/api/auth/google/callback`;
 
 export const LINKEDIN_API_VERSION = getEnv("LINKEDIN_API_VERSION") ?? "202609";
 export const X_BEARER_TOKEN = getEnv("X_BEARER_TOKEN") ?? "";
