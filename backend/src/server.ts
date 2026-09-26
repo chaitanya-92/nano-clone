@@ -26,6 +26,7 @@ import { healthRoutes } from "./routes/healthRoutes";
 import { targetRoutes } from "./routes/targetRoutes";
 import { socialRoutes } from "./routes/socialRoutes";
 import { websiteRoutes } from "./routes/websiteRoutes";
+import { assistantRoutes } from "./routes/assistantRoutes";
 
 import { handleError } from "./middleware/errorMiddleware";
 
@@ -140,6 +141,7 @@ const server = createServer(async (request, response) => {
         targetRoutes,
         socialRoutes,
         websiteRoutes,
+        assistantRoutes,
       ];
 
       for (const handler of handlers) {
