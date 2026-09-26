@@ -1,15 +1,6 @@
-import {
-  Activity,
-  BarChart3,
-  Eye,
-  FileText,
-  Users,
-} from "lucide-react";
+import { Activity, BarChart3, Eye, FileText, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import {
-  getAnalytics,
-  type AnalyticsResponse,
-} from "@/lib/dashboard";
+import { getAnalytics, type AnalyticsResponse } from "@/lib/dashboard";
 import { useSearchParams } from "react-router-dom";
 
 const metrics = [
@@ -36,36 +27,26 @@ const metrics = [
 ] as const;
 
 export default function Analytics() {
-  const [searchParams, setSearchParams] =
-    useSearchParams();
-  const [range, setRange] =
-    useState<"all" | "30d" | "90d">(
-      searchParams.get("range") === "30d"
-        ? "30d"
-        : searchParams.get("range") === "90d"
-          ? "90d"
-          : "all",
-    );
-  const [data, setData] =
-    useState<AnalyticsResponse["data"] | null>(
-      null,
-    );
-  const [loading, setLoading] =
-    useState(true);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [range, setRange] = useState<"all" | "30d" | "90d">(
+    searchParams.get("range") === "30d"
+      ? "30d"
+      : searchParams.get("range") === "90d"
+        ? "90d"
+        : "all",
+  );
+  const [data, setData] = useState<AnalyticsResponse["data"] | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     setLoading(true);
 
     void getAnalytics(range)
-      .then(({ data: response }) =>
-        setData(response),
-      )
+      .then(({ data: response }) => setData(response))
       .catch((value) =>
         setError(
-          value instanceof Error
-            ? value.message
-            : "Unable to load analytics.",
+          value instanceof Error ? value.message : "Unable to load analytics.",
         ),
       )
       .finally(() => setLoading(false));
@@ -75,22 +56,16 @@ export default function Analytics() {
     () => ({
       posts: data?.summary.posts ?? 0,
       reach: data?.summary.reach ?? 0,
-      engagements:
-        data?.summary.engagements ?? 0,
-      followers:
-        data?.profile.followers ?? 0,
+      engagements: data?.summary.engagements ?? 0,
+      followers: data?.profile.followers ?? 0,
     }),
     [data],
   );
 
-  const updateRange = (
-    value: "all" | "30d" | "90d",
-  ) => {
+  const updateRange = (value: "all" | "30d" | "90d") => {
     setRange(value);
 
-    const next = new URLSearchParams(
-      searchParams,
-    );
+    const next = new URLSearchParams(searchParams);
     next.set("range", value);
     setSearchParams(next);
   };
@@ -108,30 +83,20 @@ export default function Analytics() {
           </h1>
 
           <p className="mt-1 text-[17px] text-[#74819a]">
-            Live performance from your connected
-            profile data.
+            Live performance from your connected profile data.
           </p>
         </div>
 
         <select
           value={range}
           onChange={(event) =>
-            updateRange(
-              event.target.value as
-                | "all"
-                | "30d"
-                | "90d",
-            )
+            updateRange(event.target.value as "all" | "30d" | "90d")
           }
           className="h-11 cursor-pointer rounded-xl border border-[#dce3ec] bg-white px-4 text-sm font-medium text-[#59667e] outline-none"
         >
           <option value="all">All time</option>
-          <option value="30d">
-            Last 30 days
-          </option>
-          <option value="90d">
-            Last 90 days
-          </option>
+          <option value="30d">Last 30 days</option>
+          <option value="90d">Last 90 days</option>
         </select>
       </div>
 
@@ -167,9 +132,7 @@ export default function Analytics() {
                   </div>
 
                   <p className="mt-5 text-[28px] font-semibold tracking-[-1px] text-[#172033]">
-                    {values[
-                      metric.key as keyof typeof values
-                    ].toLocaleString()}
+                    {values[metric.key as keyof typeof values].toLocaleString()}
                   </p>
                 </div>
               );
@@ -193,38 +156,20 @@ export default function Analytics() {
                   >
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                       <p className="max-w-[700px] text-sm leading-6 text-[#334057]">
-                        {post.text ||
-                          "Published LinkedIn post"}
+                        {post.text || "Published LinkedIn post"}
                       </p>
 
                       <span className="shrink-0 text-[11px] text-[#8d99ac]">
-                        {new Date(
-                          post.published_at,
-                        ).toLocaleDateString()}
+                        {new Date(post.published_at).toLocaleDateString()}
                       </span>
                     </div>
 
                     <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-5">
-                      <Mini
-                        label="Impressions"
-                        value={post.impressions}
-                      />
-                      <Mini
-                        label="Reach"
-                        value={post.reach}
-                      />
-                      <Mini
-                        label="Likes"
-                        value={post.likes}
-                      />
-                      <Mini
-                        label="Comments"
-                        value={post.comments}
-                      />
-                      <Mini
-                        label="Reposts"
-                        value={post.reposts}
-                      />
+                      <Mini label="Impressions" value={post.impressions} />
+                      <Mini label="Reach" value={post.reach} />
+                      <Mini label="Likes" value={post.likes} />
+                      <Mini label="Comments" value={post.comments} />
+                      <Mini label="Reposts" value={post.reposts} />
                     </div>
 
                     {post.url && (
@@ -248,8 +193,7 @@ export default function Analytics() {
                     No post data yet
                   </p>
                   <p className="mt-1 max-w-md text-xs leading-5 text-[#8b97aa]">
-                    Connected public post metrics
-                    will populate this section.
+                    Connected public post metrics will populate this section.
                   </p>
                 </div>
               </div>
@@ -261,13 +205,7 @@ export default function Analytics() {
   );
 }
 
-function Mini({
-  label,
-  value,
-}: {
-  label: string;
-  value: number;
-}) {
+function Mini({ label, value }: { label: string; value: number }) {
   return (
     <div className="rounded-lg bg-[#f7f9fc] px-3 py-2">
       <p className="text-[9px] uppercase tracking-[0.08em] text-[#9aa5b5]">

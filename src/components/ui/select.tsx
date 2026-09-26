@@ -36,10 +36,7 @@ export function SelectValue({
   ...props
 }: ComponentProps<typeof SelectPrimitive.Value>) {
   return (
-    <SelectPrimitive.Value
-      className={cn("truncate", className)}
-      {...props}
-    />
+    <SelectPrimitive.Value className={cn("truncate", className)} {...props} />
   );
 }
 

@@ -101,7 +101,8 @@ export function DashboardNavbar({
 
         setBalance(dashboardResult.data.earnings?.available ?? 0);
         setCurrency(dashboardResult.data.profile?.currency ?? "EUR");
-        const nextProfilePhotoUrl = profileResult.data.profile_photo_url ?? null;
+        const nextProfilePhotoUrl =
+          profileResult.data.profile_photo_url ?? null;
 
         if (nextProfilePhotoUrl) {
           const image = new Image();
