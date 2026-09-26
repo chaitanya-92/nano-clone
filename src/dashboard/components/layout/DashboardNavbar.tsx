@@ -13,7 +13,6 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Logo } from "@/components/layout/Logo";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
