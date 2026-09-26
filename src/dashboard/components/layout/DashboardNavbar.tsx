@@ -2,7 +2,6 @@ import {
   Bell,
   CheckCheck,
   ChevronDown,
-  Globe2,
   LogOut,
   Settings,
   PanelLeftClose,
@@ -197,7 +196,7 @@ export function DashboardNavbar({
             type="button"
             variant="ghost"
             onClick={() => navigate("/dashboard/earnings")}
-            className="h-10 cursor-pointer gap-2 rounded-xl px-2.5 text-[13px] font-medium text-[#55637b] hover:bg-[#f6f8fb] hover:text-[#202938] sm:px-3"
+            className="h-10 cursor-pointer gap-2 rounded-xl border border-[#d9dee7] bg-white px-3 text-[13px] font-medium text-[#44516a] shadow-[0_1px_2px_rgba(20,30,50,0.03)] hover:bg-[#f8fafc] hover:text-[#202938]"
           >
             <WalletCards className="h-[17px] w-[17px]" strokeWidth={1.8} />
             <span className="hidden sm:inline">
@@ -205,28 +204,7 @@ export function DashboardNavbar({
             </span>
           </Button>
 
-          <div className="hidden items-center gap-1 rounded-xl px-1 sm:flex">
-            <Globe2
-              className="h-[17px] w-[17px] text-[#748198]"
-              strokeWidth={1.8}
-            />
 
-            <Button
-              type="button"
-              variant="ghost"
-              className="h-9 cursor-pointer rounded-lg px-2.5 text-xs font-semibold text-[#202938] hover:bg-[#f6f8fb] hover:text-[#202938]"
-            >
-              EN
-            </Button>
-
-            <Button
-              type="button"
-              variant="ghost"
-              className="h-9 cursor-pointer rounded-lg px-2.5 text-xs font-semibold text-[#7a879b] hover:bg-[#f6f8fb] hover:text-[#202938]"
-            >
-              FR
-            </Button>
-          </div>
 
           <DropdownMenu>
             <DropdownMenuTrigger
@@ -236,7 +214,7 @@ export function DashboardNavbar({
                   variant="ghost"
                   size="icon-lg"
                   aria-label="Notifications"
-                  className="relative cursor-pointer rounded-xl text-[#5e6d84] hover:bg-[#f6f8fb] hover:text-[#202938]"
+                  className="relative cursor-pointer rounded-xl border border-[#d9dee7] bg-white text-[#5e6d84] shadow-[0_1px_2px_rgba(20,30,50,0.03)] hover:bg-[#f6f8fb] hover:text-[#202938]"
                 />
               }
             >
