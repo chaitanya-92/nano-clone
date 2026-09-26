@@ -1,5 +1,5 @@
 import { FieldError } from "@/auth/components/FieldError";
-import { countries, industries } from "@/data/creatorOptions";
+import { industries } from "@/data/creatorOptions";
 import { Input } from "./RegisterFields";
 import { useRegistrationForm } from "./registerContext";
 import type { RegistrationValues } from "./registerTypes";
@@ -129,6 +129,5 @@ export function RegisterBrandIcpStep() {
       ))}
     </div>
   </div>
-)}
   );
 }
