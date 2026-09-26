@@ -637,14 +637,14 @@ export default function Register() {
               return false;
             }
             return true;
-          } catch (e) {
-            if (!(e instanceof Yup.ValidationError)) {
+          } catch (error) {
+            if (!(error instanceof Yup.ValidationError)) {
               return false;
             }
 
             const errors: Record<string, string> = {};
 
-            e.inner.forEach((item) => {
+            error.inner.forEach((item: Yup.ValidationError) => {
               if (item.path && !errors[item.path]) {
                 errors[item.path] = item.message;
               }
@@ -699,7 +699,7 @@ export default function Register() {
               await saveBrandOnboarding({
                 ...formik.values,
                 step: step + 1,
-                icps: formik.values.icps.filter((item) => item.title),
+                icps: formik.values.icps.filter((item: ICP) => item.title),
               });
             if (step < steps.length - 1) setStep((value) => value + 1);
             else navigate("/dashboard", { replace: true });
@@ -1236,7 +1236,7 @@ export default function Register() {
                                     "industries",
                                     selected
                                       ? formik.values.industries.filter(
-                                          (item) => item !== industry,
+                                          (item: string) => item !== industry,
                                         )
                                       : formik.values.industries.length < 3
                                         ? [
@@ -1279,7 +1279,7 @@ export default function Register() {
                                     "industries",
                                     selected
                                       ? formik.values.industries.filter(
-                                          (item) => item !== industry,
+                                          (item: string) => item !== industry,
                                         )
                                       : formik.values.industries.length < 3
                                         ? [
@@ -1708,7 +1708,7 @@ export default function Register() {
                                 "industries",
                                 selected
                                   ? formik.values.industries.filter(
-                                      (x) => x !== item,
+                                      (x: string) => x !== item,
                                     )
                                   : formik.values.industries.length < 3
                                     ? [...formik.values.industries, item]
@@ -1732,7 +1732,7 @@ export default function Register() {
                     />
                   </div>
                   <div className="grid gap-4 md:grid-cols-3">
-                    {formik.values.icps.map((item, index) => (
+                    {formik.values.icps.map((item: ICP, index: number) => (
                       <div
                         key={index}
                         className="rounded-2xl border border-[#e3e7ed] p-4"
@@ -1785,8 +1785,8 @@ export default function Register() {
                   </div>
                   <div className="grid gap-3 md:grid-cols-3">
                     {formik.values.icps
-                      .filter((item) => item.title)
-                      .map((item) => (
+                      .filter((item: ICP) => item.title)
+                      .map((item: ICP) => (
                         <div
                           key={item.title}
                           className="rounded-xl border border-[#e4e8ee] p-4"
