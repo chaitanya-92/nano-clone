@@ -298,6 +298,9 @@ async function syncLinkedIn(userId: string, account: any) {
     }),
   );
 
+  const totalImpressions = rows.reduce((sum, row) => sum + row.impressions, 0);
+  const totalEngagements = rows.reduce((sum, row) => sum + row.engagements, 0);
+
   const write = db.transaction(() => {
     for (const row of rows) {
       upsert.run(
