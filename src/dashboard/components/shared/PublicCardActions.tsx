@@ -125,12 +125,12 @@ export function PublicCardActions({
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  const size = compact ? "sm" : "default";
+  const size = compact ? "sm" : "lg";
   const baseClass =
-    "cursor-pointer border-[#dce3ec] bg-white text-[#52617b] hover:bg-[#f7f9fc] hover:text-[#263247]";
+    "h-10 w-full cursor-pointer border-[#dce3ec] bg-white text-[#52617b] hover:bg-[#f7f9fc] hover:text-[#263247]";
 
   return (
-    <div className={compact ? "grid gap-2" : "grid gap-2.5 sm:grid-cols-2"}>
+    <div className={compact ? "grid w-full gap-2" : "grid w-full grid-cols-2 gap-2.5"}>
       <Button
         type="button"
         variant="outline"
@@ -150,7 +150,7 @@ export function PublicCardActions({
         type="button"
         size={size}
         onClick={() => void handleShare()}
-        className="cursor-pointer bg-[#171d2b] text-white hover:bg-[#111827]"
+        className="h-10 w-full cursor-pointer bg-[#171d2b] text-white hover:bg-[#111827]"
       >
         <Share2 className="mr-2 h-4 w-4" />
         {sharing ? "Sharing…" : "Share card"}
@@ -161,7 +161,7 @@ export function PublicCardActions({
         variant="outline"
         size={size}
         onClick={handleOpen}
-        className={compact ? baseClass : `${baseClass} sm:col-span-2`}
+        className={compact ? baseClass : baseClass + " col-span-2"}
       >
         <ExternalLink className="mr-2 h-4 w-4" />
         Open public card
