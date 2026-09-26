@@ -34,10 +34,11 @@ export function DashboardSidebar({ collapsed }: { collapsed: boolean }) {
           >
             <Logo
               compact={collapsed}
+              href="/dashboard"
               className={
                 collapsed
-                  ? "pointer-events-none [&>span:first-child]:scale-[0.82]"
-                  : "pointer-events-none [&>span:first-child]:scale-[0.9] [&>span:last-child]:text-[1.45rem]"
+                  ? "[&>span:first-child]:scale-[0.82]"
+                  : "[&>span:first-child]:scale-[0.9] [&>span:last-child]:text-[1.45rem]"
               }
             />
           </div>
