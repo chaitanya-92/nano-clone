@@ -1,4 +1,4 @@
-const DEFAULT_API_URL = "http://localhost:8787";
+const DEFAULT_API_URL = "https://nano-clone-lo9q.onrender.com";
 const API_URL = (import.meta.env.VITE_API_URL ?? DEFAULT_API_URL).replace(
   /\/$/,
   "",
