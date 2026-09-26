@@ -60,7 +60,13 @@ function formatNotificationTime(value: string) {
   });
 }
 
-export function DashboardNavbar({ collapsed, onToggleSidebar }: { collapsed: boolean; onToggleSidebar: () => void }) {
+export function DashboardNavbar({
+  collapsed,
+  onToggleSidebar,
+}: {
+  collapsed: boolean;
+  onToggleSidebar: () => void;
+}) {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.auth.user);
@@ -181,19 +187,23 @@ export function DashboardNavbar({ collapsed, onToggleSidebar }: { collapsed: boo
             title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             className="h-10 w-10 cursor-pointer rounded-xl text-[#5e6d84] transition-all duration-200 hover:bg-[#f6f8fb] hover:text-[#202938]"
           >
-            {collapsed ? <PanelLeftOpen className="h-[19px] w-[19px]" strokeWidth={1.8} /> : <PanelLeftClose className="h-[19px] w-[19px]" strokeWidth={1.8} />}
+            {collapsed ? (
+              <PanelLeftOpen className="h-[19px] w-[19px]" strokeWidth={1.8} />
+            ) : (
+              <PanelLeftClose className="h-[19px] w-[19px]" strokeWidth={1.8} />
+            )}
           </Button>
 
           <button
-          type="button"
-          onClick={() => navigate("/dashboard")}
-          aria-label="Open Naano dashboard"
-          className="cursor-pointer rounded-xl px-2 py-1 text-left outline-none transition-opacity hover:opacity-75"
-        >
-          <span className="text-[23px] font-bold tracking-[-1.5px] text-[#111318]">
-            naano.
-          </span>
-        </button>
+            type="button"
+            onClick={() => navigate("/dashboard")}
+            aria-label="Open Naano dashboard"
+            className="cursor-pointer rounded-xl px-2 py-1 text-left outline-none transition-opacity hover:opacity-75"
+          >
+            <span className="text-[23px] font-bold tracking-[-1.5px] text-[#111318]">
+              naano.
+            </span>
+          </button>
         </div>
 
         <div className="flex items-center gap-1.5 sm:gap-2.5">
