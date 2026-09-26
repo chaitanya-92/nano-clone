@@ -71,9 +71,11 @@ const server = createServer(async (request, response) => {
   }
 
   try {
-    const requestOrigin =
-      APP_ORIGIN || `http://${request.headers.host ?? `localhost:${PORT}`}`;
-    const url = new URL(request.url ?? "/", requestOrigin);
+    // request.url is a relative path on Node's IncomingMessage.
+    // Use the request host only as the parsing base so a bad APP_ORIGIN
+    // environment variable can never turn a normal API request into a 500.
+    const requestBase = `http://${request.headers.host ?? `localhost:${PORT}`}`;
+    const url = new URL(request.url ?? "/", requestBase);
 
     if (url.pathname.startsWith("/api/")) {
       const handlers = [
