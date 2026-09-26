@@ -26,6 +26,7 @@ import {
 import { logout } from "@/lib/auth";
 import {
   getDashboard,
+  getCreatorProfile,
   getNotifications,
   markAllNotifications,
   markNotification,
@@ -76,6 +77,7 @@ export function DashboardNavbar({
   const [currency, setCurrency] = useState("EUR");
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loadingNotifications, setLoadingNotifications] = useState(true);
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
 
   const initials = useMemo(
     () =>
@@ -93,14 +95,15 @@ export function DashboardNavbar({
   useEffect(() => {
     let cancelled = false;
 
-    void Promise.all([getDashboard(), getNotifications()])
-      .then(([dashboardResult, notificationsResult]) => {
+    void Promise.all([getDashboard(), getNotifications(), getCreatorProfile()])
+      .then(([dashboardResult, notificationsResult, profileResult]) => {
         if (cancelled) {
           return;
         }
 
         setBalance(dashboardResult.data.earnings?.available ?? 0);
         setCurrency(dashboardResult.data.profile?.currency ?? "EUR");
+        setProfilePhotoUrl(profileResult.data.profile_photo_url ?? null);
         setNotifications(notificationsResult.data);
       })
       .catch(() => {
@@ -308,9 +311,17 @@ export function DashboardNavbar({
                 className="flex items-center"
               >
                 <Avatar className="h-10 w-10">
-                  <AvatarFallback className="bg-[#5f6bc6] text-sm font-semibold text-white">
-                    {initials}
-                  </AvatarFallback>
+                  {profilePhotoUrl ? (
+                    <img
+                      src={profilePhotoUrl}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <AvatarFallback className="bg-[#5f6bc6] text-sm font-semibold text-white">
+                      {initials}
+                    </AvatarFallback>
+                  )}
                 </Avatar>
 
                 <ChevronDown
@@ -327,9 +338,17 @@ export function DashboardNavbar({
             >
               <div className="flex items-center gap-3 px-3 py-3">
                 <Avatar className="h-10 w-10">
-                  <AvatarFallback className="bg-[#5f6bc6] text-sm font-semibold text-white">
-                    {initials}
-                  </AvatarFallback>
+                  {profilePhotoUrl ? (
+                    <img
+                      src={profilePhotoUrl}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <AvatarFallback className="bg-[#5f6bc6] text-sm font-semibold text-white">
+                      {initials}
+                    </AvatarFallback>
+                  )}
                 </Avatar>
 
                 <div className="min-w-0">
