@@ -5,6 +5,8 @@ import {
   Globe2,
   LogOut,
   Settings,
+  PanelLeftClose,
+  PanelLeftOpen,
   Sparkles,
   WalletCards,
 } from "lucide-react";
@@ -58,7 +60,7 @@ function formatNotificationTime(value: string) {
   });
 }
 
-export function DashboardNavbar() {
+export function DashboardNavbar({ collapsed, onToggleSidebar }: { collapsed: boolean; onToggleSidebar: () => void }) {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.auth.user);
@@ -169,7 +171,20 @@ export function DashboardNavbar() {
   return (
     <header className="relative z-40 h-16 bg-white">
       <div className="flex h-full items-center justify-between px-4 sm:px-6 lg:px-7">
-        <button
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={onToggleSidebar}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className="h-10 w-10 cursor-pointer rounded-xl text-[#5e6d84] transition-all duration-200 hover:bg-[#f6f8fb] hover:text-[#202938]"
+          >
+            {collapsed ? <PanelLeftOpen className="h-[19px] w-[19px]" strokeWidth={1.8} /> : <PanelLeftClose className="h-[19px] w-[19px]" strokeWidth={1.8} />}
+          </Button>
+
+          <button
           type="button"
           onClick={() => navigate("/dashboard")}
           aria-label="Open Naano dashboard"
@@ -179,6 +194,7 @@ export function DashboardNavbar() {
             naano.
           </span>
         </button>
+        </div>
 
         <div className="flex items-center gap-1.5 sm:gap-2.5">
           <Button
