@@ -104,15 +104,17 @@ export default function MyCard() {
   useEffect(() => {
     let cancelled = false;
 
-    void getCreatorProfile()
-      .then(({ data }) => {
+    const loadProfile = async () => {
+      try {
+        const { data } = await getCreatorProfile();
+
         if (cancelled) {
           return;
         }
 
         let nextProfile = data;
 
-        // Creator cards should open in the published state.
+        // Creator cards should always open in the published state.
         if (data.card_status !== "published") {
           try {
             const published = await publishCreatorCard();
@@ -122,14 +124,17 @@ export default function MyCard() {
           }
         }
 
+        if (cancelled) {
+          return;
+        }
+
         setProfile(nextProfile);
         setDraft({
           headline: nextProfile.headline ?? "",
           category: nextProfile.category ?? "",
           bio: nextProfile.bio ?? "",
         });
-      })
-      .catch((value) => {
+      } catch (value) {
         if (cancelled) {
           return;
         }
@@ -139,7 +144,10 @@ export default function MyCard() {
             ? value.message
             : "Unable to load your creator card.",
         );
-      });
+      }
+    };
+
+    void loadProfile();
 
     return () => {
       cancelled = true;
