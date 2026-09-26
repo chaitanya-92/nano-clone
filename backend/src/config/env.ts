@@ -6,8 +6,7 @@ export const APP_ORIGIN =
   process.env.RENDER_EXTERNAL_URL ??
   `http://localhost:${PORT}`;
 export const FRONTEND_ORIGIN =
-  process.env.FRONTEND_ORIGIN ??
-  "https://jocular-longma-0f9c9d.netlify.app";
+  process.env.FRONTEND_ORIGIN ?? "https://jocular-longma-0f9c9d.netlify.app";
 export const NODE_ENV = process.env.NODE_ENV ?? "development";
 export const IS_PRODUCTION = NODE_ENV === "production";
 export const DATABASE_PATH = process.env.DATABASE_PATH ?? "./data/naano.sqlite";
