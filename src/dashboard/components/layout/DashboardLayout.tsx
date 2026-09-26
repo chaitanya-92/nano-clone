@@ -30,7 +30,7 @@ export function DashboardLayout() {
   };
 
   return (
-    <div className="dashboard-shell h-screen overflow-hidden bg-[#f4f5f0]">
+    <div className="dashboard-shell h-screen overflow-hidden bg-[#f6f8fb]">
       <DashboardSidebar collapsed={collapsed} />
 
       <div
