@@ -143,6 +143,16 @@ export interface EarningsResponse {
   };
 }
 
+export interface Notification {
+  id: string;
+  user_id: string;
+  type: string;
+  title: string;
+  body: string;
+  read_at: string | null;
+  created_at: string;
+}
+
 export interface SocialAccount {
   id: string;
   provider: "linkedin" | "x";
@@ -446,4 +456,33 @@ export function sendAssistantMessage(message: string) {
       message,
     }),
   });
+}
+
+
+export function getNotifications() {
+  return request<{
+    data: Notification[];
+  }>("/api/notifications");
+}
+
+export function markNotification(
+  id: string,
+) {
+  return request<{ ok: true }>(
+    "/api/notifications/" +
+      id +
+      "/read",
+    {
+      method: "PATCH",
+    },
+  );
+}
+
+export function markAllNotifications() {
+  return request<{ ok: true }>(
+    "/api/notifications/read-all",
+    {
+      method: "PATCH",
+    },
+  );
 }
