@@ -59,13 +59,33 @@ export default function PublicCreatorCard() {
     );
   }
 
-  let industries: string[] = [];
+  const industries = (() => {
+    try {
+      const value = JSON.parse(
+        card.industries || "[]",
+      );
 
-  try {
-    industries = JSON.parse(card.industries || "[]");
-  } catch {
-    industries = [];
-  }
+      return Array.isArray(value)
+        ? value.filter(
+            (item): item is string =>
+              typeof item === "string",
+          )
+        : [];
+    } catch {
+      return [];
+    }
+  })();
+
+  const name = card.name || "Creator";
+  const initials =
+    name
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((value) => value[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase() || "N";
 
   return (
     <main className="min-h-screen bg-[#f6f8fc] px-6 py-12">
@@ -123,18 +143,14 @@ export default function PublicCreatorCard() {
                   className="h-full w-full object-cover"
                 />
               ) : (
-                card.name
-                  .split(" ")
-                  .map((value) => value[0])
-                  .slice(0, 2)
-                  .join("")
+                initials
               )}
             </motion.div>
           </div>
 
           <div className="px-8 pb-10 pt-20 text-center">
             <h1 className="text-[32px] font-semibold tracking-[-1.2px] text-[#141a29]">
-              {card.name}
+              {name}
             </h1>
 
             <p className="mt-2 text-[16px] text-[#7b879d]">
@@ -161,21 +177,27 @@ export default function PublicCreatorCard() {
             <div className="mt-10 grid grid-cols-3 border-y border-[#e8ecf2] py-6">
               <div>
                 <p className="text-2xl font-semibold text-[#182239]">
-                  {card.followers.toLocaleString()}
+                  {Number(
+                    card.followers ?? 0,
+                  ).toLocaleString()}
                 </p>
                 <p className="mt-1 text-xs text-[#8794aa]">Followers</p>
               </div>
 
               <div className="border-x border-[#e8ecf2]">
                 <p className="text-2xl font-semibold text-[#182239]">
-                  {card.impressions.toLocaleString()}
+                  {Number(
+                    card.impressions ?? 0,
+                  ).toLocaleString()}
                 </p>
                 <p className="mt-1 text-xs text-[#8794aa]">Impressions</p>
               </div>
 
               <div>
                 <p className="text-2xl font-semibold text-[#182239]">
-                  {card.post_count.toLocaleString()}
+                  {Number(
+                    card.post_count ?? 0,
+                  ).toLocaleString()}
                 </p>
                 <p className="mt-1 text-xs text-[#8794aa]">Posts</p>
               </div>
