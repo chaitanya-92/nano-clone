@@ -3,12 +3,13 @@ import { cn } from "../../lib/utils";
 type LogoProps = {
   compact?: boolean;
   className?: string;
+  href?: string;
 };
 
-export function Logo({ compact = false, className }: LogoProps) {
+export function Logo({ compact = false, className, href = "#top" }: LogoProps) {
   return (
     <a
-      href="#top"
+      href={href}
       aria-label="Naano home"
       className={cn(
         "group inline-flex items-center gap-2.5 font-black tracking-normal text-[hsl(var(--naano-ink))]",
