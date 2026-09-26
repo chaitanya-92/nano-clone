@@ -137,11 +137,11 @@ export default function Collaborations() {
       </div>
 
       {loading ? (
-        <div className="mt-6 flex items-center justify-center rounded-[22px] border border-[#e0e6ee] bg-white py-24">
+        <div className="mt-6 flex items-center justify-center rounded-[30px] border border-[#e0e6ee] bg-white py-24">
           <Loader2 className="h-5 w-5 animate-spin text-[#71809a]" />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="mt-6 rounded-[22px] border border-[#e0e6ee] bg-white px-8 py-20 text-center">
+        <div className="mt-6 rounded-[30px] border border-[#e0e6ee] bg-white px-8 py-20 text-center">
           <h2 className="text-lg font-semibold text-[#27344b]">
             No collaborations here
           </h2>
@@ -155,7 +155,7 @@ export default function Collaborations() {
           {filtered.map((item) => (
             <article
               key={item.id}
-              className="rounded-[20px] border border-[#dfe5ed] bg-white p-5"
+              className="rounded-[26px] border border-[#dfe5ed] bg-white p-5"
             >
               <div className="flex flex-col gap-5 xl:flex-row xl:items-center">
                 <div className="min-w-0 flex-1">
