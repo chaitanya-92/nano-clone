@@ -36,7 +36,7 @@ export function setCookie(
     `${name}=${encodeURIComponent(value)}`,
     "Path=/",
     "HttpOnly",
-    "SameSite=Lax",
+    IS_PRODUCTION ? "SameSite=None" : "SameSite=Lax",
   ];
 
   if (IS_PRODUCTION) {
