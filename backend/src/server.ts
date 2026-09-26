@@ -1,7 +1,3 @@
-import { createReadStream, existsSync } from "node:fs";
-
-import { join, extname, normalize } from "node:path";
-
 import { createServer, type ServerResponse } from "node:http";
 
 import { PORT, APP_ORIGIN, FRONTEND_ORIGIN } from "./config/env";
@@ -30,21 +26,6 @@ import { assistantRoutes } from "./routes/assistantRoutes";
 
 import { handleError } from "./middleware/errorMiddleware";
 
-const distDirectory = join(process.cwd(), "..", "dist");
-
-const mimeTypes: Record<string, string> = {
-  ".css": "text/css",
-  ".js": "text/javascript",
-  ".html": "text/html",
-  ".json": "application/json",
-  ".png": "image/png",
-  ".jpg": "image/jpeg",
-  ".jpeg": "image/jpeg",
-  ".svg": "image/svg+xml",
-  ".mp4": "video/mp4",
-  ".woff2": "font/woff2",
-};
-
 const allowedOrigins = Array.from(
   new Set([
     process.env.FRONTEND_ORIGIN?.trim() || FRONTEND_ORIGIN,
@@ -71,37 +52,11 @@ function setCorsHeaders(response: ServerResponse, origin: string | undefined) {
   response.setHeader("Vary", "Origin");
 }
 
-function serveStatic(response: ServerResponse, url: URL) {
-  const requestedPath = url.pathname === "/" ? "/index.html" : url.pathname;
-
-  const safePath = normalize(requestedPath).replace(/^([.][.][/\\])+/, "");
-
-  const filePath = join(distDirectory, safePath);
-
-  const file =
-    existsSync(filePath) && !filePath.endsWith("/")
-      ? filePath
-      : join(distDirectory, "index.html");
-
-  if (!existsSync(file)) {
-    response.writeHead(503, {
-      "Content-Type": "application/json; charset=utf-8",
-    });
-
-    response.end(
-      JSON.stringify({
-        error: "Application build is missing. Run npm run build.",
-      }),
-    );
-
-    return;
-  }
-
-  response.writeHead(200, {
-    "Content-Type": mimeTypes[extname(file)] ?? "application/octet-stream",
+function serveNotFound(response: ServerResponse) {
+  response.writeHead(404, {
+    "Content-Type": "application/json; charset=utf-8",
   });
-
-  createReadStream(file).pipe(response);
+  response.end(JSON.stringify({ error: "Route not found." }));
 }
 
 const server = createServer(async (request, response) => {
@@ -149,7 +104,7 @@ const server = createServer(async (request, response) => {
       }
     }
 
-    serveStatic(response, url);
+    serveNotFound(response);
   } catch (error) {
     handleError(response, error);
   }
