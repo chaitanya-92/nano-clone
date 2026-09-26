@@ -9,8 +9,10 @@ build/
 .env
 .env.local
 .env.*.local
-data/*.sqlite
-data/*.sqlite-*
+
+# Local SQLite databases and SQLite runtime files
+**/data/*.sqlite
+**/data/*.sqlite-*
 
 # Vite
 .vite/
