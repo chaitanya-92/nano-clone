@@ -527,8 +527,7 @@ export default function Register() {
     certificationAccepted: false,
   });
   const [activeTerm, setActiveTerm] = useState<ProfessionalTerm | null>(null);
-  const [analysis, setAnalysis] =
-    useState<WebsiteAnalysis | null>(null);
+  const [analysis, setAnalysis] = useState<WebsiteAnalysis | null>(null);
   const [emailStatus, setEmailStatus] = useState<
     "idle" | "checking" | "available" | "taken"
   >("idle");
@@ -641,12 +640,8 @@ export default function Register() {
             const errors: Record<string, string> = {};
 
             e.inner.forEach((item) => {
-              if (
-                item.path &&
-                !errors[item.path]
-              ) {
-                errors[item.path] =
-                  item.message;
+              if (item.path && !errors[item.path]) {
+                errors[item.path] = item.message;
               }
             });
 
